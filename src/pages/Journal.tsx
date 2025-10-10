@@ -60,16 +60,33 @@ export default function Journal() {
   }, [form.entryPrice, form.exitPrice, form.leverage, form.position, form.type])
 
   const save = () => {
-    const it = { id: Date.now(), ...form } as JournalEntry
-    const next = [it, ...items]
+    let next: JournalEntry[]
+    if (form.id) {
+      // Edit mode: update existing trade
+      next = items.map(i => i.id === form.id ? { ...i, ...form } as JournalEntry : i)
+    } else {
+      // New trade
+      const it = { id: Date.now(), ...form } as JournalEntry
+      next = [it, ...items]
+    }
     setItems(next)
     saveData({ journal: next })
     setForm({
-      ...form,
+      date: new Date().toISOString().split('T')[0],
+      time: new Date().toLocaleTimeString('en-US', { hour12: false }).slice(0, 5),
       ticker: '',
+      objective: 'Scalping',
+      setup: '',
+      type: 'Spot',
+      position: 'Long',
+      leverage: 1,
       entryPrice: 0,
+      exitDate: new Date().toISOString().split('T')[0],
+      exitTime: new Date().toLocaleTimeString('en-US', { hour12: false }).slice(0, 5),
       exitPrice: 0,
       fee: 0,
+      pnlAmount: 0,
+      pnlPercent: 0,
       chartImg: '',
       pnlImg: '',
       reasonIn: '',
@@ -308,15 +325,15 @@ export default function Journal() {
             Save Trade
           </button>
         </div>
-
-        <div className="lg:col-span-2">
+      </div>
+      <div className="lg:col-span-2">
           <div className="space-y-4">
             {items.map((it) => {
               const isProfit = it.pnlAmount > 0
               return (
                 <div key={it.id} className="bg-white rounded-xl shadow-sm border border-krborder p-4 flex gap-4">
                   {it.chartImg && (
-                    <img src={it.chartImg} className="w-32 h-24 object-cover rounded-md" />
+                    <img src={it.chartImg} className="w-32 h-24 object-cover rounded-md" alt="Chart" />
                   )}
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
@@ -329,13 +346,43 @@ export default function Journal() {
                       </span>
                     </div>
                     <div className="mt-1 text-sm text-gray-600">
-                      {it.objective} • {it.setup} • {it.type} {it.type === 'Futures' ? `${it.leverage}x` : ''} {it.position}
+                      <strong>Objective:</strong> {it.objective} <br />
+                      <strong>Setup:</strong> {it.setup} <br />
+                      <strong>Type:</strong> {it.type} {it.type === 'Futures' ? `${it.leverage}x` : ''} <br />
+                      <strong>Position:</strong> {it.position}
                     </div>
                     <div className="mt-2 text-sm">
-                      Entry: {formatAmount(it.entryPrice)} • Exit: {formatAmount(it.exitPrice)} • Fee: {formatAmount(it.fee || 0)}
+                      <strong>Entry:</strong> {formatAmount(it.entryPrice)} on {it.date} {it.time}<br />
+                      <strong>Exit:</strong> {formatAmount(it.exitPrice)} on {it.exitDate} {it.exitTime}<br />
+                      <strong>Fee:</strong> {formatAmount(it.fee || 0)}
+                    </div>
+                    <div className="mt-2 text-sm">
+                      <strong>Reason for Entry:</strong> {it.reasonIn || 'N/A'}<br />
+                      <strong>Reason for Exit:</strong> {it.reasonOut || 'N/A'}
+                    </div>
+                    <div className="mt-2 flex gap-4">
+                      {it.chartImg && (
+                        <a href={it.chartImg} target="_blank" rel="noopener noreferrer" className="text-sm text-krgold hover:text-kryellow flex items-center gap-1">
+                          <Link size={14} />Chart Image
+                        </a>
+                      )}
+                      {it.pnlImg && (
+                        <a href={it.pnlImg} target="_blank" rel="noopener noreferrer" className="text-sm text-krgold hover:text-kryellow flex items-center gap-1">
+                          <Link size={14} />PnL Image
+                        </a>
+                      )}
                     </div>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex flex-col gap-2 justify-center">
+                    <button
+                      onClick={() => {
+                        setForm({ ...it });
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      className="text-sm px-3 py-1 text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+                    >
+                      Edit
+                    </button>
                     <SendToDiscordButton trade={it} />
                     <button
                       onClick={() => remove(it.id)}
@@ -351,5 +398,5 @@ export default function Journal() {
         </div>
       </div>
     </div>
-  )
+  );
 }
