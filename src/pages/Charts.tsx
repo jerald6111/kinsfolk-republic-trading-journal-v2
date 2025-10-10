@@ -1,7 +1,7 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { loadData, saveData } from '../utils/storage'
 import FileUploader from '../components/FileUploader'
-import { TrendingUp, TrendingDown, Calendar, DollarSign, Percent } from 'lucide-react'
+import { TrendingUp, TrendingDown, Calendar, DollarSign, Percent, Filter, X } from 'lucide-react'
 
 export default function Charts(){
   const data = loadData()
@@ -9,6 +9,9 @@ export default function Charts(){
   const charts = journal.filter((j:any)=> j.chartImg)
   const [items, setItems] = useState(charts)
   const [showUpload, setShowUpload] = useState(false)
+  const [filterTicker, setFilterTicker] = useState('')
+  const [filterStartDate, setFilterStartDate] = useState('')
+  const [filterEndDate, setFilterEndDate] = useState('')
   const [uploadForm, setUploadForm] = useState({
     ticker: '',
     chartImg: '',
@@ -18,6 +21,30 @@ export default function Charts(){
     reasonIn: '',
     reasonOut: ''
   })
+
+  // Get unique tickers from all charts
+  const uniqueTickers = useMemo(() => {
+    const tickers = new Set(charts.map((c: any) => c.ticker).filter(Boolean))
+    return Array.from(tickers).sort()
+  }, [charts])
+
+  // Filter items based on ticker and date range
+  const filteredItems = useMemo(() => {
+    return items.filter((item: any) => {
+      const matchesTicker = !filterTicker || item.ticker === filterTicker
+      const matchesStartDate = !filterStartDate || item.date >= filterStartDate
+      const matchesEndDate = !filterEndDate || item.date <= filterEndDate
+      return matchesTicker && matchesStartDate && matchesEndDate
+    })
+  }, [items, filterTicker, filterStartDate, filterEndDate])
+
+  const clearFilters = () => {
+    setFilterTicker('')
+    setFilterStartDate('')
+    setFilterEndDate('')
+  }
+
+  const hasActiveFilters = filterTicker || filterStartDate || filterEndDate
 
   const updateReason = (id:number, key:'reasonIn'|'reasonOut', val:string)=>{
     const j = journal.map((it:any)=> it.id===id ? { ...it, [key]: val } : it)
@@ -72,6 +99,59 @@ export default function Charts(){
         >
           {showUpload ? 'Cancel' : 'Upload Chart'}
         </button>
+      </div>
+
+      {/* Filters Section */}
+      <div className="bg-krcard backdrop-blur-sm rounded-xl shadow-sm border border-krborder p-4 mb-6">
+        <div className="flex items-center gap-2 mb-3">
+          <Filter size={18} className="text-krgold" />
+          <h2 className="text-lg font-semibold">Filters</h2>
+          {hasActiveFilters && (
+            <button
+              onClick={clearFilters}
+              className="ml-auto text-sm px-3 py-1 text-gray-400 hover:text-krtext border border-krborder rounded-md transition-colors flex items-center gap-1"
+            >
+              <X size={14} />
+              Clear Filters
+            </button>
+          )}
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="space-y-1">
+            <label className="text-sm font-medium text-krtext">Ticker</label>
+            <select
+              value={filterTicker}
+              onChange={e => setFilterTicker(e.target.value)}
+              className="w-full px-3 py-2 border border-krborder rounded-md bg-krblack text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
+            >
+              <option value="">All Tickers</option>
+              {uniqueTickers.map(ticker => (
+                <option key={ticker} value={ticker}>{ticker}</option>
+              ))}
+            </select>
+          </div>
+          <div className="space-y-1">
+            <label className="text-sm font-medium text-krtext">Start Date</label>
+            <input
+              type="date"
+              value={filterStartDate}
+              onChange={e => setFilterStartDate(e.target.value)}
+              className="w-full px-3 py-2 border border-krborder rounded-md bg-krblack text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
+            />
+          </div>
+          <div className="space-y-1">
+            <label className="text-sm font-medium text-krtext">End Date</label>
+            <input
+              type="date"
+              value={filterEndDate}
+              onChange={e => setFilterEndDate(e.target.value)}
+              className="w-full px-3 py-2 border border-krborder rounded-md bg-krblack text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
+            />
+          </div>
+        </div>
+        <div className="mt-3 text-sm text-gray-400">
+          Showing {filteredItems.length} of {items.length} charts
+        </div>
       </div>
 
       {/* Upload Form */}
@@ -154,7 +234,12 @@ export default function Charts(){
 
       {/* Charts Grid */}
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {items.map((it:any)=> {
+        {filteredItems.length === 0 && (
+          <div className="col-span-full text-center text-gray-400 py-12">
+            {hasActiveFilters ? 'No charts match the selected filters.' : 'No charts available. Upload your first chart to get started!'}
+          </div>
+        )}
+        {filteredItems.map((it:any)=> {
           const isProfit = it.exitPrice > it.entryPrice
           const pnlAmount = it.pnlAmount || (it.exitPrice - it.entryPrice)
           const pnlPercent = it.pnlPercent || (((it.exitPrice - it.entryPrice) / it.entryPrice) * 100)

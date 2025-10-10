@@ -104,8 +104,9 @@ export default function Journal() {
     <div className="min-h-screen bg-krblack text-krtext p-6">
       <h1 className="text-2xl font-bold mb-6 text-krtext">Journal</h1>
       
-      {/* Form Section */}
-      <div className="max-w-4xl mx-auto mb-6">
+      {/* Main Grid Layout - Form on Left, Trade History on Right */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        {/* Form Section - Left Side */}
         <div className="bg-krcard backdrop-blur-sm rounded-xl shadow-sm border border-krborder p-6">
           <h2 className="text-xl font-semibold mb-4 text-krtext">{form.id ? 'Edit Trade' : 'Add New Trade'}</h2>
           <div className="space-y-4">
@@ -116,7 +117,7 @@ export default function Journal() {
                 className="w-full px-3 py-2 border border-krborder rounded-md bg-krblack text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
                 value={form.ticker}
                 onChange={e => setForm({...form, ticker: e.target.value.toUpperCase()})}
-                placeholder="1INCH/USDT"
+                placeholder="BTC/USDT"
               />
             </div>
 
@@ -222,8 +223,8 @@ export default function Journal() {
               </div>
             )}
 
-            {/* Entry Price, Exit Date & Time, Chart Image */}
-            <div className="grid grid-cols-3 gap-4">
+            {/* Entry Price and Exit Date & Time */}
+            <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">
                 <label className="block text-sm font-medium text-krtext">Entry Price</label>
                 <input
@@ -241,15 +242,16 @@ export default function Journal() {
                 onDateChange={exitDate => setForm({...form, exitDate})}
                 onTimeChange={exitTime => setForm({...form, exitTime})}
               />
+            </div>
 
-              <div className="space-y-1">
-                <label className="block text-sm font-medium text-krtext">Chart Image</label>
-                <FileUploader
-                  value={form.chartImg || ''}
-                  onChange={chartImg => setForm({...form, chartImg})}
-                  accept="image/*"
-                />
-              </div>
+            {/* Chart Image */}
+            <div className="space-y-1">
+              <label className="block text-sm font-medium text-krtext">Chart Image</label>
+              <FileUploader
+                value={form.chartImg || ''}
+                onChange={chartImg => setForm({...form, chartImg})}
+                accept="image/*"
+              />
             </div>
 
             {/* Exit Price and Fee */}
@@ -316,80 +318,81 @@ export default function Journal() {
             </button>
           </div>
         </div>
-      </div>
-      
-      {/* Saved Trades List */}
-      <div className="bg-krcard backdrop-blur-sm rounded-xl shadow-sm border border-krborder p-6">
-        <h2 className="text-xl font-semibold mb-4 text-krtext">Trade History</h2>
-        <div className="space-y-4">
+
+        {/* Trade History - Right Side */}
+        <div className="bg-krcard backdrop-blur-sm rounded-xl shadow-sm border border-krborder p-6">
+          <h2 className="text-xl font-semibold mb-4 text-krtext">Trade History</h2>
+          <div className="space-y-4 max-h-[calc(100vh-12rem)] overflow-y-auto pr-2">
+            {items.length === 0 && (
+              <div className="text-center text-gray-400 py-12">
+                No trades yet. Add your first trade to get started!
+              </div>
+            )}
             {items.map((it) => {
               const isProfit = it.pnlAmount > 0
               return (
                 <div key={it.id} className="bg-krblack/30 rounded-xl shadow-sm border border-krborder p-4">
-                  <div className="flex flex-col sm:flex-row gap-4">
-                    {it.chartImg && (
-                      <img src={it.chartImg} className="w-full sm:w-32 h-24 object-cover rounded-md flex-shrink-0" alt="Chart" />
-                    )}
+                  {/* Chart Image */}
+                  {it.chartImg && (
+                    <img src={it.chartImg} className="w-full h-32 object-cover rounded-md mb-3" alt="Chart" />
+                  )}
+                  
+                  {/* Trade Header */}
+                  <div className="flex items-start justify-between gap-2 mb-3">
                     <div className="flex-1 min-w-0">
-                      <div className="flex flex-wrap items-center gap-2 mb-2">
-                        <span className="font-bold text-krtext">{it.ticker}</span>
-                        <span className="text-sm text-gray-500">•</span>
-                        <span className="text-sm text-krtext">{it.date} {it.time}</span>
-                        <span className={`text-sm px-2 py-0.5 rounded whitespace-nowrap ${isProfit ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
-                          {isProfit ? <TrendingUp className="inline-block w-4 h-4 mr-1" /> : <TrendingDown className="inline-block w-4 h-4 mr-1" />}
-                          {formatAmount(it.pnlAmount)} ({it.pnlPercent.toFixed(2)}%)
-                        </span>
-                      </div>
-                      <div className="mt-2 text-sm text-gray-400 space-y-1">
-                        <div><strong className="text-krtext">Objective:</strong> {it.objective}</div>
-                        <div><strong className="text-krtext">Setup:</strong> {it.setup}</div>
-                        <div><strong className="text-krtext">Type:</strong> {it.type} {it.type === 'Futures' ? `${it.leverage}x` : ''}</div>
-                        <div><strong className="text-krtext">Position:</strong> {it.position}</div>
-                      </div>
-                      <div className="mt-3 text-sm text-gray-400 space-y-1">
-                        <div><strong className="text-krtext">Entry:</strong> {formatAmount(it.entryPrice)} on {it.date} {it.time}</div>
-                        <div><strong className="text-krtext">Exit:</strong> {formatAmount(it.exitPrice)} on {it.exitDate} {it.exitTime}</div>
-                        <div><strong className="text-krtext">Fee:</strong> {formatAmount(it.fee || 0)}</div>
-                      </div>
-                      <div className="mt-3 text-sm text-gray-400 space-y-1">
-                        <div><strong className="text-krtext">Reason for Entry:</strong> {it.reasonIn || 'N/A'}</div>
-                        <div><strong className="text-krtext">Reason for Exit:</strong> {it.reasonOut || 'N/A'}</div>
-                      </div>
-                      <div className="mt-3 flex flex-wrap gap-3">
-                        {it.chartImg && (
-                          <a href={it.chartImg} target="_blank" rel="noopener noreferrer" className="text-sm text-krgold hover:text-kryellow flex items-center gap-1">
-                            <Link size={14} />Chart Image
-                          </a>
-                        )}
-                        {it.pnlImg && (
-                          <a href={it.pnlImg} target="_blank" rel="noopener noreferrer" className="text-sm text-krgold hover:text-kryellow flex items-center gap-1">
-                            <Link size={14} />PnL Image
-                          </a>
-                        )}
-                      </div>
+                      <div className="font-bold text-lg text-krtext">{it.ticker}</div>
+                      <div className="text-sm text-gray-400">{it.date} {it.time}</div>
                     </div>
-                    <div className="flex sm:flex-col flex-row gap-2 justify-end sm:justify-center flex-shrink-0">
-                      <button
-                        onClick={() => {
-                          setForm({ ...it });
-                          window.scrollTo({ top: 0, behavior: 'smooth' });
-                        }}
-                        className="text-sm px-3 py-1.5 text-blue-400 hover:bg-blue-500/10 border border-blue-500/30 rounded-md transition-colors"
-                      >
-                        Edit
-                      </button>
-                      <SendToDiscordButton trade={it} />
-                      <button
-                        onClick={() => remove(it.id)}
-                        className="text-sm px-3 py-1.5 text-red-400 hover:bg-red-500/10 border border-red-500/30 rounded-md transition-colors"
-                      >
-                        Delete
-                      </button>
+                    <span className={`text-sm px-2 py-1 rounded whitespace-nowrap font-semibold ${isProfit ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
+                      {isProfit ? <TrendingUp className="inline-block w-4 h-4 mr-1" /> : <TrendingDown className="inline-block w-4 h-4 mr-1" />}
+                      {it.pnlPercent.toFixed(2)}%
+                    </span>
+                  </div>
+
+                  {/* Trade Details */}
+                  <div className="text-xs text-gray-400 space-y-1.5 mb-3">
+                    <div className="flex justify-between">
+                      <span><strong className="text-krtext">Type:</strong> {it.type} {it.type === 'Futures' ? `${it.leverage}x` : ''}</span>
+                      <span><strong className="text-krtext">Position:</strong> {it.position}</span>
                     </div>
+                    <div><strong className="text-krtext">Entry:</strong> {formatAmount(it.entryPrice)}</div>
+                    <div><strong className="text-krtext">Exit:</strong> {formatAmount(it.exitPrice)}</div>
+                    <div><strong className="text-krtext">P&L:</strong> {formatAmount(it.pnlAmount)}</div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      onClick={() => {
+                        setForm({ ...it });
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      className="flex-1 min-w-[80px] text-xs px-3 py-1.5 text-blue-400 hover:bg-blue-500/10 border border-blue-500/30 rounded-md transition-colors"
+                    >
+                      Edit
+                    </button>
+                    {it.chartImg && (
+                      <a 
+                        href={it.chartImg} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="flex-1 min-w-[80px] text-center text-xs px-3 py-1.5 text-krgold hover:bg-krgold/10 border border-krgold/30 rounded-md transition-colors"
+                      >
+                        Chart
+                      </a>
+                    )}
+                    <SendToDiscordButton trade={it} />
+                    <button
+                      onClick={() => remove(it.id)}
+                      className="flex-1 min-w-[80px] text-xs px-3 py-1.5 text-red-400 hover:bg-red-500/10 border border-red-500/30 rounded-md transition-colors"
+                    >
+                      Delete
+                    </button>
                   </div>
                 </div>
               )
             })}
+          </div>
         </div>
       </div>
     </div>
