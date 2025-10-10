@@ -101,7 +101,7 @@ export default function Journal() {
   }
 
   return (
-    <div className="min-h-screen bg-krblack text-krtext p-6">
+    <div className="min-h-screen bg-krcard/30 backdrop-blur-sm text-krtext p-6">
       <h1 className="text-2xl font-bold mb-6 text-krtext">Journal</h1>
       
       {/* Main Layout - Form and Trade History side by side on large screens, stacked on smaller */}
@@ -199,18 +199,8 @@ export default function Journal() {
               />
             )}
 
-            {/* Entry Price and Exit Date & Time */}
+            {/* Exit Date & Time and Exit Price */}
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <label className="block text-sm font-medium text-krtext">Entry Price</label>
-                <input
-                  type="number"
-                  className="w-full px-3 py-2 border border-krborder rounded-md bg-krblack text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
-                  value={form.entryPrice || ''}
-                  onChange={e => setForm({...form, entryPrice: Number(e.target.value)})}
-                />
-              </div>
-
               <DateTimePicker
                 label="Exit Date & Time"
                 date={form.exitDate || ''}
@@ -218,10 +208,7 @@ export default function Journal() {
                 onDateChange={exitDate => setForm({...form, exitDate})}
                 onTimeChange={exitTime => setForm({...form, exitTime})}
               />
-            </div>
 
-            {/* Exit Price and Fee */}
-            <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">
                 <label className="block text-sm font-medium text-krtext">Exit Price</label>
                 <input
@@ -229,6 +216,32 @@ export default function Journal() {
                   className="w-full px-3 py-2 border border-krborder rounded-md bg-transparent text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
                   value={form.exitPrice || ''}
                   onChange={e => setForm({...form, exitPrice: Number(e.target.value)})}
+                  placeholder="Exit price"
+                />
+              </div>
+            </div>
+
+            {/* Gain/Loss Amount, Gain/Loss %, and Fee */}
+            <div className="grid grid-cols-3 gap-4">
+              <div className="space-y-1">
+                <label className="block text-sm font-medium text-krtext">Gain/Loss Amount</label>
+                <input
+                  type="number"
+                  className="w-full px-3 py-2 border border-krborder rounded-md bg-transparent text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
+                  value={form.pnlAmount?.toFixed(2) || '0.00'}
+                  readOnly
+                  disabled
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="block text-sm font-medium text-krtext">Gain/Loss %</label>
+                <input
+                  type="text"
+                  className="w-full px-3 py-2 border border-krborder rounded-md bg-transparent text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
+                  value={`${form.pnlPercent?.toFixed(2) || '0.00'}%`}
+                  readOnly
+                  disabled
                 />
               </div>
 
@@ -239,6 +252,7 @@ export default function Journal() {
                   className="w-full px-3 py-2 border border-krborder rounded-md bg-transparent text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
                   value={form.fee || ''}
                   onChange={e => setForm({...form, fee: Number(e.target.value)})}
+                  placeholder="Fee"
                 />
               </div>
             </div>

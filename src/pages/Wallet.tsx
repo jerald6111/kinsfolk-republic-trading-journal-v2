@@ -71,7 +71,7 @@ export default function Wallet() {
   const balance = items.reduce((s, it)=> s + (it.type==='deposit'? Number(it.amount): -Number(it.amount)), 0)
 
   return (
-    <div className="min-h-screen bg-krblack text-krtext p-6">
+    <div className="min-h-screen bg-krcard/30 backdrop-blur-sm text-krtext p-6">
       <h1 className="text-2xl font-bold mb-6 text-krtext">Wallet</h1>
       <div className="grid md:grid-cols-3 gap-6 mb-6">
         {/* Form Section */}

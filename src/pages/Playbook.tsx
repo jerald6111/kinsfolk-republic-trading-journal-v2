@@ -94,7 +94,7 @@ export default function Playbook(){
   }
 
   return (
-    <div className="min-h-screen bg-krblack text-krtext p-6">
+    <div className="min-h-screen bg-krcard/30 backdrop-blur-sm text-krtext p-6">
       <h1 className="text-2xl font-bold mb-6">Playbook</h1>
       
       <div className="grid md:grid-cols-3 gap-6 mb-6">

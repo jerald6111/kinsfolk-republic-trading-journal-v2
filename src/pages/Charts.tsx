@@ -90,7 +90,7 @@ export default function Charts(){
   }
 
   return (
-    <div className="min-h-screen bg-krblack text-krtext p-6">
+    <div className="min-h-screen bg-krcard/30 backdrop-blur-sm text-krtext p-6">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold">Charts</h1>
         <button
