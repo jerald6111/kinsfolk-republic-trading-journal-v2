@@ -2,46 +2,225 @@ import React, { useState } from 'react'
 import FileUploader from '../components/FileUploader'
 import { loadData, saveData } from '../utils/storage'
 import { marked } from 'marked'
+import Modal from '../components/Modal'
+import { Trash2, Edit2, Eye, X } from 'lucide-react'
+
+interface Strategy {
+  id: number
+  title: string
+  desc: string
+  images: string[] // Now supports multiple images
+}
 
 export default function Playbook(){
   const data = loadData()
-  const [items, setItems] = useState(data.playbook || [])
+  const [items, setItems] = useState<Strategy[]>(data.playbook || [])
   const [title, setTitle] = useState('')
   const [desc, setDesc] = useState('')
-  const [img, setImg] = useState('')
+  const [images, setImages] = useState<string[]>(['', '', '', ''])
+  const [editingId, setEditingId] = useState<number | null>(null)
+  const [viewStrategy, setViewStrategy] = useState<Strategy | null>(null)
 
-  const add = ()=>{
-    const it = { id: Date.now(), title, desc, img }
-    const next = [it, ...items]
+  const add = () => {
+    const filteredImages = images.filter(img => img.trim() !== '')
+    
+    if (editingId) {
+      // Update existing strategy
+      const next = items.map(it => 
+        it.id === editingId ? { id: editingId, title, desc, images: filteredImages } : it
+      )
+      setItems(next)
+      saveData({ playbook: next })
+      setEditingId(null)
+    } else {
+      // Add new strategy
+      const it = { id: Date.now(), title, desc, images: filteredImages }
+      const next = [it, ...items]
+      setItems(next)
+      saveData({ playbook: next })
+    }
+    
+    setTitle('')
+    setDesc('')
+    setImages(['', '', '', ''])
+  }
+
+  const editStrategy = (strategy: Strategy) => {
+    setTitle(strategy.title)
+    setDesc(strategy.desc)
+    const imgs = [...strategy.images]
+    while (imgs.length < 4) imgs.push('')
+    setImages(imgs.slice(0, 4))
+    setEditingId(strategy.id)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const deleteStrategy = (id: number) => {
+    if (!confirm('Are you sure you want to delete this strategy?')) return
+    const next = items.filter(it => it.id !== id)
     setItems(next)
     saveData({ playbook: next })
-    setTitle(''); setDesc(''); setImg('')
+  }
+
+  const cancelEdit = () => {
+    setEditingId(null)
+    setTitle('')
+    setDesc('')
+    setImages(['', '', '', ''])
   }
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-4">Playbook</h1>
-      <div className="grid md:grid-cols-3 gap-4 mb-6">
-        <div className="p-4 bg-krgray/10 rounded-xl">
-          <input className="w-full mb-2 p-2 rounded bg-krblack/40" placeholder="Title" value={title} onChange={e=>setTitle(e.target.value)} />
-          <div className="mb-2">
-            <FileUploader value={img} onChange={setImg} accept="image/*" />
+    <div className="min-h-screen bg-krblack text-krtext p-6">
+      <h1 className="text-2xl font-bold mb-6">Playbook</h1>
+      
+      <div className="grid md:grid-cols-3 gap-6 mb-6">
+        {/* Form Section */}
+        <div className="bg-krcard backdrop-blur-sm rounded-xl shadow-sm border border-krborder p-6">
+          <h2 className="text-lg font-semibold mb-4">
+            {editingId ? 'Edit Strategy' : 'Add New Strategy'}
+          </h2>
+          
+          <input 
+            className="w-full mb-3 px-3 py-2 rounded-lg bg-krblack border border-krborder text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold" 
+            placeholder="Strategy Title" 
+            value={title} 
+            onChange={e => setTitle(e.target.value)} 
+          />
+          
+          <div className="mb-3 space-y-2">
+            <label className="text-sm font-medium text-krtext">Strategy Images (up to 4)</label>
+            {[0, 1, 2, 3].map(idx => (
+              <div key={idx}>
+                <FileUploader 
+                  value={images[idx]} 
+                  onChange={val => {
+                    const newImgs = [...images]
+                    newImgs[idx] = val
+                    setImages(newImgs)
+                  }} 
+                  accept="image/*" 
+                />
+              </div>
+            ))}
           </div>
-          <textarea className="w-full mb-2 p-2 rounded bg-krblack/40" placeholder="Description (markdown)" value={desc} onChange={e=>setDesc(e.target.value)} />
-          <button className="px-4 py-2 bg-krgold text-krblack rounded font-bold" onClick={add}>Save Strategy</button>
+          
+          <textarea 
+            className="w-full mb-3 px-3 py-2 rounded-lg bg-krblack border border-krborder text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold min-h-[120px]" 
+            placeholder="Description (markdown supported)" 
+            value={desc} 
+            onChange={e => setDesc(e.target.value)} 
+          />
+          
+          <div className="flex gap-2">
+            <button 
+              className="flex-1 px-4 py-2 bg-krgold hover:bg-kryellow text-krblack rounded-lg font-semibold transition-colors" 
+              onClick={add}
+            >
+              {editingId ? 'Update Strategy' : 'Save Strategy'}
+            </button>
+            {editingId && (
+              <button 
+                className="px-4 py-2 bg-krcard hover:bg-krgray/20 border border-krborder text-krtext rounded-lg transition-colors" 
+                onClick={cancelEdit}
+              >
+                Cancel
+              </button>
+            )}
+          </div>
         </div>
+
+        {/* Strategies Grid */}
         <div className="md:col-span-2">
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
-            {items.map((it:any)=> (
-              <div key={it.id} className="bg-krgray/10 rounded-xl p-3">
-                {it.img && <img src={it.img} alt={it.title} className="w-full h-40 object-cover rounded mb-2" />}
-                <div className="font-bold">{it.title}</div>
-                <div className="text-sm" dangerouslySetInnerHTML={{__html: marked(it.desc||'')}}></div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {items.map((it) => (
+              <div key={it.id} className="bg-krcard backdrop-blur-sm rounded-xl border border-krborder overflow-hidden hover:border-krgold/50 transition-colors group">
+                {/* Image Grid - Show up to 4 images */}
+                {it.images.length > 0 && (
+                  <div className={`grid ${it.images.length === 1 ? 'grid-cols-1' : 'grid-cols-2'} gap-1 bg-krblack/50`}>
+                    {it.images.slice(0, 4).map((img, idx) => (
+                      <img 
+                        key={idx} 
+                        src={img} 
+                        alt={`${it.title} ${idx + 1}`} 
+                        className="w-full h-32 object-cover" 
+                      />
+                    ))}
+                  </div>
+                )}
+                
+                <div className="p-4">
+                  <h3 className="font-bold text-krtext mb-2">{it.title}</h3>
+                  <div 
+                    className="text-sm text-gray-400 line-clamp-3 prose prose-invert max-w-none" 
+                    dangerouslySetInnerHTML={{__html: marked(it.desc || '')}}
+                  ></div>
+                  
+                  <div className="mt-4 flex gap-2">
+                    <button
+                      onClick={() => setViewStrategy(it)}
+                      className="flex-1 px-3 py-1.5 bg-krgold/10 hover:bg-krgold/20 border border-krgold/30 text-krgold rounded-md transition-colors flex items-center justify-center gap-1"
+                      title="View Details"
+                    >
+                      <Eye size={14} />
+                      View
+                    </button>
+                    <button
+                      onClick={() => editStrategy(it)}
+                      className="px-3 py-1.5 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 text-blue-400 rounded-md transition-colors"
+                      title="Edit Strategy"
+                    >
+                      <Edit2 size={14} />
+                    </button>
+                    <button
+                      onClick={() => deleteStrategy(it.id)}
+                      className="px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 rounded-md transition-colors"
+                      title="Delete Strategy"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
         </div>
       </div>
+
+      {/* View Strategy Modal */}
+      {viewStrategy && (
+        <Modal isOpen={true} onClose={() => setViewStrategy(null)} title="">
+          <div className="max-w-3xl mx-auto">
+            <div className="flex items-start justify-between mb-4">
+              <h2 className="text-2xl font-bold text-krtext">{viewStrategy.title}</h2>
+              <button 
+                onClick={() => setViewStrategy(null)}
+                className="text-gray-400 hover:text-krtext"
+              >
+                <X size={24} />
+              </button>
+            </div>
+            
+            {/* Images Grid in Modal */}
+            {viewStrategy.images.length > 0 && (
+              <div className={`grid ${viewStrategy.images.length === 1 ? 'grid-cols-1' : 'grid-cols-2'} gap-2 mb-4`}>
+                {viewStrategy.images.map((img, idx) => (
+                  <img 
+                    key={idx} 
+                    src={img} 
+                    alt={`${viewStrategy.title} ${idx + 1}`} 
+                    className="w-full h-64 object-cover rounded-lg" 
+                  />
+                ))}
+              </div>
+            )}
+            
+            <div 
+              className="prose prose-invert max-w-none text-gray-300" 
+              dangerouslySetInnerHTML={{__html: marked(viewStrategy.desc || '')}}
+            ></div>
+          </div>
+        </Modal>
+      )}
     </div>
   )
 }

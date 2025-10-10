@@ -1,38 +1,90 @@
 import React, { useState } from 'react'
 import { loadData, saveData } from '../utils/storage'
 import { useCurrency } from '../context/CurrencyContext'
+import { Trash2, Edit2 } from 'lucide-react'
+
+interface Transaction {
+  id: number
+  date: string
+  type: 'deposit' | 'withdrawal'
+  amount: number
+  notes: string
+}
 
 export default function Wallet() {
   const data = loadData()
   const { formatAmount } = useCurrency()
-  const [items, setItems] = useState(data.wallet || [])
+  const [items, setItems] = useState<Transaction[]>(data.wallet || [])
   const [form, setForm] = useState({ date: '', type: 'deposit', amount: '', notes: '' })
+  const [editingId, setEditingId] = useState<number | null>(null)
 
   const save = ()=>{
     if (!form.date || !form.amount) {
       alert('Please fill in date and amount');
       return;
     }
-    const it = { id: Date.now(), ...form, amount: Number(form.amount) }
-    const next = [it, ...items]
-    setItems(next)
-    saveData({ wallet: next })
+    
+    if (editingId) {
+      // Update existing transaction
+      const next = items.map(it => 
+        it.id === editingId 
+          ? { id: editingId, date: form.date, type: form.type as 'deposit' | 'withdrawal', amount: Number(form.amount), notes: form.notes }
+          : it
+      )
+      setItems(next)
+      saveData({ wallet: next })
+      setEditingId(null)
+    } else {
+      // Add new transaction
+      const it = { id: Date.now(), date: form.date, type: form.type as 'deposit' | 'withdrawal', amount: Number(form.amount), notes: form.notes }
+      const next = [it, ...items]
+      setItems(next)
+      saveData({ wallet: next })
+    }
+    
     setForm({ date: '', type: 'deposit', amount: '', notes: '' })
   }
 
-  const balance = items.reduce((s:any, it:any)=> s + (it.type==='deposit'? Number(it.amount): -Number(it.amount)), 0)
+  const editTransaction = (transaction: Transaction) => {
+    setForm({
+      date: transaction.date,
+      type: transaction.type,
+      amount: transaction.amount.toString(),
+      notes: transaction.notes
+    })
+    setEditingId(transaction.id)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const deleteTransaction = (id: number) => {
+    if (!confirm('Are you sure you want to delete this transaction?')) return
+    const next = items.filter(it => it.id !== id)
+    setItems(next)
+    saveData({ wallet: next })
+  }
+
+  const cancelEdit = () => {
+    setEditingId(null)
+    setForm({ date: '', type: 'deposit', amount: '', notes: '' })
+  }
+
+  const balance = items.reduce((s, it)=> s + (it.type==='deposit'? Number(it.amount): -Number(it.amount)), 0)
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-4 text-krtext">Wallet</h1>
-      <div className="grid md:grid-cols-3 gap-4 mb-6">
-        <div className="p-6 bg-krcard rounded-xl shadow-sm border border-krborder">
+    <div className="min-h-screen bg-krblack text-krtext p-6">
+      <h1 className="text-2xl font-bold mb-6 text-krtext">Wallet</h1>
+      <div className="grid md:grid-cols-3 gap-6 mb-6">
+        {/* Form Section */}
+        <div className="bg-krcard backdrop-blur-sm rounded-xl shadow-sm border border-krborder p-6">
+          <h2 className="text-lg font-semibold mb-4">
+            {editingId ? 'Edit Transaction' : 'Add Transaction'}
+          </h2>
           <div className="space-y-4">
             <div className="space-y-1">
               <div className="text-sm font-medium text-krtext">Date</div>
               <input 
                 type="date" 
-                className="w-full px-3 py-2 border border-krborder rounded-md bg-krblack text-krtext focus:ring-1 focus:ring-krgold" 
+                className="w-full px-3 py-2 border border-krborder rounded-md bg-krblack text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold" 
                 value={form.date} 
                 onChange={e=>setForm({...form, date: e.target.value})} 
               />
@@ -42,7 +94,7 @@ export default function Wallet() {
               <select 
                 value={form.type} 
                 onChange={e=>setForm({...form, type: e.target.value})} 
-                className="w-full px-3 py-2 border border-krborder rounded-md bg-krblack text-krtext focus:ring-1 focus:ring-krgold"
+                className="w-full px-3 py-2 border border-krborder rounded-md bg-krblack text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
               >
                 <option value="deposit">Deposit</option>
                 <option value="withdrawal">Withdrawal</option>
@@ -52,7 +104,7 @@ export default function Wallet() {
               <div className="text-sm font-medium text-krtext">Amount</div>
               <input 
                 type="number" 
-                className="w-full px-3 py-2 border border-krborder rounded-md bg-krblack text-krtext focus:ring-1 focus:ring-krgold" 
+                className="w-full px-3 py-2 border border-krborder rounded-md bg-krblack text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold" 
                 placeholder="Enter amount" 
                 value={form.amount} 
                 onChange={e=>setForm({...form, amount: e.target.value})} 
@@ -61,44 +113,86 @@ export default function Wallet() {
             <div className="space-y-1">
               <div className="text-sm font-medium text-krtext">Notes</div>
               <textarea 
-                className="w-full px-3 py-2 border border-krborder rounded-md bg-krblack text-krtext focus:ring-1 focus:ring-krgold" 
+                className="w-full px-3 py-2 border border-krborder rounded-md bg-krblack text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold" 
                 placeholder="Add notes" 
                 value={form.notes} 
                 onChange={e=>setForm({...form, notes: e.target.value})} 
                 rows={4}
               />
             </div>
-            <button 
-              onClick={save}
-              className="w-full px-4 py-2 bg-krgold text-white rounded-md font-semibold hover:bg-kryellow transition-colors"
-            >
-              Save Transaction
-            </button>
+            <div className="flex gap-2">
+              <button 
+                onClick={save}
+                className="flex-1 px-4 py-2 bg-krgold hover:bg-kryellow text-krblack rounded-md font-semibold transition-colors"
+              >
+                {editingId ? 'Update Transaction' : 'Save Transaction'}
+              </button>
+              {editingId && (
+                <button 
+                  onClick={cancelEdit}
+                  className="px-4 py-2 bg-krcard hover:bg-krgray/20 border border-krborder text-krtext rounded-md transition-colors"
+                >
+                  Cancel
+                </button>
+              )}
+            </div>
           </div>
         </div>
+
+        {/* Transactions List */}
         <div className="md:col-span-2">
-          <div className="bg-krcard rounded-xl shadow-sm border border-krborder p-4 mb-4">
-            <div className="text-lg text-krtext">Current Balance: <span className="font-bold text-krgold">{formatAmount(balance)}</span></div>
+          <div className="bg-krcard backdrop-blur-sm rounded-xl shadow-sm border border-krborder p-6 mb-6">
+            <div className="text-lg text-krtext">
+              Current Balance: <span className="font-bold text-krgold text-2xl">{formatAmount(balance)}</span>
+            </div>
           </div>
+          
           <div className="space-y-3">
-            {items.map((it:any)=> (
-              <div key={it.id} className="p-4 bg-krcard rounded-xl shadow-sm border border-krborder">
-                <div className="flex justify-between items-start mb-2">
-                  <div>
-                    <div className="font-medium text-krtext">{it.date}</div>
-                    <div className={`text-sm font-medium ${it.type === 'deposit' ? 'text-krsuccess' : 'text-krdanger'}`}>
-                      {it.type === 'deposit' ? 'Deposit' : 'Withdrawal'}
+            {items.length === 0 && (
+              <div className="text-center text-gray-400 py-8">
+                No transactions yet. Add your first transaction to get started!
+              </div>
+            )}
+            {items.map((it)=> (
+              <div key={it.id} className="bg-krcard backdrop-blur-sm rounded-xl shadow-sm border border-krborder p-4 hover:border-krgold/50 transition-colors">
+                <div className="flex justify-between items-start gap-4">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="font-medium text-krtext">{it.date}</div>
+                      <span className={`px-2 py-0.5 rounded text-xs font-medium ${it.type === 'deposit' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
+                        {it.type === 'deposit' ? 'Deposit' : 'Withdrawal'}
+                      </span>
+                    </div>
+                    {it.notes && (
+                      <div className="text-sm text-gray-400">
+                        <strong className="text-krtext">Notes:</strong> {it.notes}
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="flex items-start gap-3">
+                    <div className={`text-xl font-bold ${it.type === 'deposit' ? 'text-green-400' : 'text-red-400'}`}>
+                      {it.type === 'deposit' ? '+' : '-'}{formatAmount(Number(it.amount))}
+                    </div>
+                    
+                    <div className="flex flex-col gap-2">
+                      <button
+                        onClick={() => editTransaction(it)}
+                        className="px-2 py-1.5 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 text-blue-400 rounded-md transition-colors"
+                        title="Edit Transaction"
+                      >
+                        <Edit2 size={14} />
+                      </button>
+                      <button
+                        onClick={() => deleteTransaction(it.id)}
+                        className="px-2 py-1.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 rounded-md transition-colors"
+                        title="Delete Transaction"
+                      >
+                        <Trash2 size={14} />
+                      </button>
                     </div>
                   </div>
-                  <div className={`text-xl font-bold ${it.type === 'deposit' ? 'text-krsuccess' : 'text-krdanger'}`}>
-                    {it.type === 'deposit' ? '+' : '-'}{formatAmount(Number(it.amount))}
-                  </div>
                 </div>
-                {it.notes && (
-                  <div className="mt-2 text-sm text-krmuted">
-                    <strong>Notes:</strong> {it.notes}
-                  </div>
-                )}
               </div>
             ))}
           </div>
