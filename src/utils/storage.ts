@@ -1,5 +1,12 @@
 const KEY = 'kr_trading_journal_v1'
-const WEBHOOK_KEY = 'kr_discord_webhook'
+const WEBHOOK_KEY = 'kr_discord_webhooks'
+const ACTIVE_WEBHOOK_KEY = 'kr_active_webhook'
+
+export type DiscordWebhook = {
+  id: string;
+  name: string;
+  url: string;
+}
 
 export type AppData = {
   vision: any[],
@@ -17,20 +24,70 @@ export function loadData(): AppData {
   }
 }
 
+export function getDiscordWebhooks(): DiscordWebhook[] {
+  const raw = localStorage.getItem(WEBHOOK_KEY)
+  if(!raw) return []
+  try{ return JSON.parse(raw) }catch(e){
+    console.error('Failed to parse webhooks', e)
+    return []
+  }
+}
+
+export function getActiveWebhookId(): string {
+  return localStorage.getItem(ACTIVE_WEBHOOK_KEY) || ''
+}
+
+export function setActiveWebhookId(id: string) {
+  localStorage.setItem(ACTIVE_WEBHOOK_KEY, id)
+}
+
+export function addDiscordWebhook(name: string, url: string): DiscordWebhook {
+  const webhooks = getDiscordWebhooks()
+  const webhook = { id: Date.now().toString(), name, url }
+  webhooks.push(webhook)
+  localStorage.setItem(WEBHOOK_KEY, JSON.stringify(webhooks))
+  if (webhooks.length === 1) {
+    setActiveWebhookId(webhook.id)
+  }
+  return webhook
+}
+
+export function updateDiscordWebhook(id: string, name: string, url: string) {
+  const webhooks = getDiscordWebhooks()
+  const index = webhooks.findIndex(w => w.id === id)
+  if (index !== -1) {
+    webhooks[index] = { ...webhooks[index], name, url }
+    localStorage.setItem(WEBHOOK_KEY, JSON.stringify(webhooks))
+  }
+}
+
+export function deleteDiscordWebhook(id: string) {
+  const webhooks = getDiscordWebhooks()
+  const filtered = webhooks.filter(w => w.id !== id)
+  localStorage.setItem(WEBHOOK_KEY, JSON.stringify(filtered))
+  if (getActiveWebhookId() === id && filtered.length > 0) {
+    setActiveWebhookId(filtered[0].id)
+  }
+}
+
+// For backward compatibility
 export function getDiscordWebhook(): string {
-  return localStorage.getItem(WEBHOOK_KEY) || ''
+  const activeId = getActiveWebhookId()
+  if (!activeId) return ''
+  const webhooks = getDiscordWebhooks()
+  const webhook = webhooks.find(w => w.id === activeId)
+  return webhook?.url || ''
 }
 
-export function setDiscordWebhook(url: string) {
-  localStorage.setItem(WEBHOOK_KEY, url)
-}
+export async function sendToDiscord(data: any, webhookId?: string) {
+  const url = webhookId ? 
+    getDiscordWebhooks().find(w => w.id === webhookId)?.url :
+    getDiscordWebhook()
+    
+  if (!url) return false
 
-export async function sendToDiscord(data: any) {
-  const webhookUrl = getDiscordWebhook()
-  if (!webhookUrl) return false
-  
   try {
-    const response = await fetch(webhookUrl, {
+    const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

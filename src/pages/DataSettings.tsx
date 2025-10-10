@@ -1,5 +1,16 @@
 import React, { useRef, useState, useEffect } from 'react'
-import { exportData, importData, deleteAllData, getDiscordWebhook, setDiscordWebhook } from '../utils/storage'
+import { 
+  exportData, 
+  importData, 
+  deleteAllData, 
+  getDiscordWebhooks, 
+  addDiscordWebhook, 
+  updateDiscordWebhook, 
+  deleteDiscordWebhook,
+  getActiveWebhookId,
+  setActiveWebhookId,
+  type DiscordWebhook 
+} from '../utils/storage'
 import Modal from '../components/Modal'
 import { AlertTriangle, Save, Link2, Trash2 } from 'lucide-react'
 
@@ -9,12 +20,17 @@ export default function DataSettings(){
   const [showImportModal, setShowImportModal] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [deleteConfirm, setDeleteConfirm] = useState('')
-  const [webhookUrl, setWebhookUrl] = useState('')
+  const [webhooks, setWebhooks] = useState<DiscordWebhook[]>([])
+  const [activeWebhookId, setActiveWebhookId] = useState('')
+  const [newWebhookName, setNewWebhookName] = useState('')
+  const [newWebhookUrl, setNewWebhookUrl] = useState('')
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [importMode, setImportMode] = useState<'merge' | 'overwrite'>('merge')
+  const [editingWebhook, setEditingWebhook] = useState<DiscordWebhook | null>(null)
 
   useEffect(() => {
-    setWebhookUrl(getDiscordWebhook())
+    setWebhooks(getDiscordWebhooks())
+    setActiveWebhookId(getActiveWebhookId())
   }, [])
 
   const handleExport = () => {
@@ -38,9 +54,38 @@ export default function DataSettings(){
     }
   }
 
-  const saveWebhook = () => {
-    setDiscordWebhook(webhookUrl)
-    alert('Discord webhook saved!')
+  const addWebhook = () => {
+    if (!newWebhookName || !newWebhookUrl) {
+      alert('Please provide both name and URL')
+      return
+    }
+    const webhook = addDiscordWebhook(newWebhookName, newWebhookUrl)
+    setWebhooks([...webhooks, webhook])
+    setNewWebhookName('')
+    setNewWebhookUrl('')
+  }
+
+  const updateWebhook = () => {
+    if (!editingWebhook || !editingWebhook.name || !editingWebhook.url) {
+      alert('Please provide both name and URL')
+      return
+    }
+    updateDiscordWebhook(editingWebhook.id, editingWebhook.name, editingWebhook.url)
+    setWebhooks(getDiscordWebhooks())
+    setEditingWebhook(null)
+  }
+
+  const removeWebhook = (id: string) => {
+    if (confirm('Are you sure you want to delete this webhook?')) {
+      deleteDiscordWebhook(id)
+      setWebhooks(getDiscordWebhooks())
+      setActiveWebhookId(getActiveWebhookId())
+    }
+  }
+
+  const handleSetActive = (id: string) => {
+    setActiveWebhookId(id)
+    setActiveWebhookId(id)
   }
 
   return (
@@ -76,25 +121,124 @@ export default function DataSettings(){
 
       <div className="bg-white rounded-xl shadow-sm border border-krborder p-6">
         <h2 className="text-lg font-semibold mb-4">Discord Integration</h2>
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Webhook URL
-            </label>
-            <input
-              type="url"
-              className="w-full px-3 py-2 border border-krborder rounded-md focus:ring-1 focus:ring-krgold"
-              placeholder="https://discord.com/api/webhooks/..."
-              value={webhookUrl}
-              onChange={(e) => setWebhookUrl(e.target.value)}
-            />
+        <div className="space-y-6">
+          {/* Add New Webhook */}
+          <div className="space-y-4 p-4 bg-gray-50 rounded-lg">
+            <h3 className="font-medium">Add New Webhook</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Name
+                </label>
+                <input
+                  type="text"
+                  className="w-full px-3 py-2 border border-krborder rounded-md focus:ring-1 focus:ring-krgold"
+                  placeholder="e.g., Main Channel"
+                  value={newWebhookName}
+                  onChange={(e) => setNewWebhookName(e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Webhook URL
+                </label>
+                <input
+                  type="url"
+                  className="w-full px-3 py-2 border border-krborder rounded-md focus:ring-1 focus:ring-krgold"
+                  placeholder="https://discord.com/api/webhooks/..."
+                  value={newWebhookUrl}
+                  onChange={(e) => setNewWebhookUrl(e.target.value)}
+                />
+              </div>
+            </div>
+            <button
+              onClick={addWebhook}
+              className="w-full sm:w-auto px-4 py-2 bg-krgold text-white rounded-md hover:bg-kryellow transition-colors"
+            >
+              Add Webhook
+            </button>
           </div>
-          <button
-            onClick={saveWebhook}
-            className="px-4 py-2 bg-krgold text-white rounded-md hover:bg-kryellow transition-colors"
-          >
-            Save Webhook
-          </button>
+
+          {/* Webhook List */}
+          <div className="space-y-4">
+            <h3 className="font-medium">Manage Webhooks</h3>
+            <div className="space-y-3">
+              {webhooks.map((webhook) => (
+                <div 
+                  key={webhook.id} 
+                  className={`p-4 rounded-lg border ${webhook.id === activeWebhookId ? 'border-krgold bg-krgold/5' : 'border-krborder'}`}
+                >
+                  {editingWebhook?.id === webhook.id ? (
+                    <div className="space-y-3">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <input
+                          type="text"
+                          className="w-full px-3 py-2 border border-krborder rounded-md focus:ring-1 focus:ring-krgold"
+                          value={editingWebhook.name}
+                          onChange={(e) => setEditingWebhook({...editingWebhook, name: e.target.value})}
+                        />
+                        <input
+                          type="url"
+                          className="w-full px-3 py-2 border border-krborder rounded-md focus:ring-1 focus:ring-krgold"
+                          value={editingWebhook.url}
+                          onChange={(e) => setEditingWebhook({...editingWebhook, url: e.target.value})}
+                        />
+                      </div>
+                      <div className="flex gap-2">
+                        <button 
+                          onClick={updateWebhook}
+                          className="px-3 py-1 bg-krgold text-white rounded hover:bg-kryellow transition-colors text-sm"
+                        >
+                          Save
+                        </button>
+                        <button 
+                          onClick={() => setEditingWebhook(null)}
+                          className="px-3 py-1 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors text-sm"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="font-medium">{webhook.name}</div>
+                        <div className="text-sm text-gray-500 truncate">{webhook.url}</div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {webhook.id === activeWebhookId ? (
+                          <span className="px-2 py-1 bg-krgold/10 text-krgold rounded text-sm">Active</span>
+                        ) : (
+                          <button
+                            onClick={() => handleSetActive(webhook.id)}
+                            className="px-3 py-1 border border-krgold text-krgold rounded hover:bg-krgold hover:text-white transition-colors text-sm"
+                          >
+                            Set Active
+                          </button>
+                        )}
+                        <button 
+                          onClick={() => setEditingWebhook(webhook)}
+                          className="p-1.5 text-gray-500 hover:text-gray-700 rounded transition-colors"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                          </svg>
+                        </button>
+                        <button 
+                          onClick={() => removeWebhook(webhook.id)}
+                          className="p-1.5 text-red-500 hover:text-red-700 rounded transition-colors"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 
