@@ -1,6 +1,6 @@
 {
-  "name": "kinsfolk-republic-trading-journal",
-  "version": "0.1.0",
+  "name": "kinsfolk-republic-trading-journal-v2",
+  "version": "0.2.0",
   "private": true,
   "scripts": {
     "dev": "vite",
