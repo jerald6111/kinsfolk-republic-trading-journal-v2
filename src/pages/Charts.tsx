@@ -1,15 +1,19 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import { loadData, saveData } from '../utils/storage'
 import FileUploader from '../components/FileUploader'
+import Modal from '../components/Modal'
 import { TrendingUp, TrendingDown, Calendar, DollarSign, Percent, Filter, X } from 'lucide-react'
+import { useCurrency } from '../context/CurrencyContext'
 
 export default function Charts(){
   const data = loadData()
+  const { formatAmount } = useCurrency()
   const journal = data.journal || []
   const charts = journal.filter((j:any)=> j.chartImg || j.pnlImg)
   const [items, setItems] = useState(charts)
   const [showUpload, setShowUpload] = useState(false)
-  const [imageType, setImageType] = useState<'Chart' | 'PNL'>('Chart')
+  const [activeTab, setActiveTab] = useState<'Chart' | 'PNL'>('Chart')
+  const [viewingTrade, setViewingTrade] = useState<any>(null)
   const [filterTicker, setFilterTicker] = useState('')
   const [filterStartDate, setFilterStartDate] = useState('')
   const [filterEndDate, setFilterEndDate] = useState('')
@@ -36,10 +40,10 @@ export default function Charts(){
       const matchesTicker = !filterTicker || item.ticker === filterTicker
       const matchesStartDate = !filterStartDate || item.date >= filterStartDate
       const matchesEndDate = !filterEndDate || item.date <= filterEndDate
-      const hasCorrectImage = imageType === 'Chart' ? item.chartImg : item.pnlImg
+      const hasCorrectImage = activeTab === 'Chart' ? item.chartImg : item.pnlImg
       return matchesTicker && matchesStartDate && matchesEndDate && hasCorrectImage
     })
-  }, [items, filterTicker, filterStartDate, filterEndDate, imageType])
+  }, [items, filterTicker, filterStartDate, filterEndDate, activeTab])
 
   const clearFilters = () => {
     setFilterTicker('')
@@ -56,9 +60,9 @@ export default function Charts(){
   }
 
   const uploadChart = () => {
-    const imageToCheck = imageType === 'Chart' ? uploadForm.chartImg : uploadForm.pnlImg
+    const imageToCheck = activeTab === 'Chart' ? uploadForm.chartImg : uploadForm.pnlImg
     if (!uploadForm.ticker || !imageToCheck) {
-      alert(`Please provide at least a ticker and ${imageType.toLowerCase()} image`)
+      alert(`Please provide at least a ticker and ${activeTab.toLowerCase()} image`)
       return
     }
     
@@ -85,15 +89,6 @@ export default function Charts(){
     })
   }
 
-  const formatAmount = (val: number) => {
-    return new Intl.NumberFormat('en-US', { 
-      style: 'currency', 
-      currency: 'USD',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    }).format(val)
-  }
-
   return (
     <div className="min-h-screen bg-krcard/30 backdrop-blur-sm text-krtext p-6">
       <div className="flex items-center justify-between mb-6">
@@ -103,6 +98,30 @@ export default function Charts(){
           className="px-4 py-2 bg-krgold hover:bg-kryellow text-krblack rounded-lg font-semibold transition-colors"
         >
           {showUpload ? 'Cancel' : 'Upload Snapshot'}
+        </button>
+      </div>
+
+      {/* Tabs */}
+      <div className="flex gap-2 mb-6">
+        <button
+          onClick={() => setActiveTab('Chart')}
+          className={`px-6 py-2.5 rounded-lg font-semibold transition-colors ${
+            activeTab === 'Chart'
+              ? 'bg-krgold text-krblack'
+              : 'bg-krcard border border-krborder text-krtext hover:border-krgold/50'
+          }`}
+        >
+          Chart
+        </button>
+        <button
+          onClick={() => setActiveTab('PNL')}
+          className={`px-6 py-2.5 rounded-lg font-semibold transition-colors ${
+            activeTab === 'PNL'
+              ? 'bg-krgold text-krblack'
+              : 'bg-krcard border border-krborder text-krtext hover:border-krgold/50'
+          }`}
+        >
+          PNL Overview
         </button>
       </div>
 
@@ -121,18 +140,7 @@ export default function Charts(){
             </button>
           )}
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="space-y-1">
-            <label className="text-sm font-medium text-krtext">Type</label>
-            <select
-              value={imageType}
-              onChange={e => setImageType(e.target.value as 'Chart' | 'PNL')}
-              className="w-full px-3 py-2 border border-krborder rounded-md bg-transparent text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
-            >
-              <option value="Chart">Chart</option>
-              <option value="PNL">PNL</option>
-            </select>
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-1">
             <label className="text-sm font-medium text-krtext">Ticker</label>
             <select
@@ -260,18 +268,22 @@ export default function Charts(){
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredItems.length === 0 && (
           <div className="col-span-full text-center text-gray-400 py-12">
-            {hasActiveFilters ? `No ${imageType.toLowerCase()} snapshots match the selected filters.` : `No ${imageType.toLowerCase()} snapshots available. Upload your first snapshot to get started!`}
+            {hasActiveFilters ? `No ${activeTab.toLowerCase()} snapshots match the selected filters.` : `No ${activeTab.toLowerCase()} snapshots available. Upload your first snapshot to get started!`}
           </div>
         )}
         {filteredItems.map((it:any)=> {
           const isProfit = it.exitPrice > it.entryPrice
           const pnlAmount = it.pnlAmount || (it.exitPrice - it.entryPrice)
           const pnlPercent = it.pnlPercent || (((it.exitPrice - it.entryPrice) / it.entryPrice) * 100)
-          const displayImage = imageType === 'Chart' ? it.chartImg : it.pnlImg
+          const displayImage = activeTab === 'Chart' ? it.chartImg : it.pnlImg
           
           return (
-            <div key={it.id} className="bg-krcard backdrop-blur-sm rounded-xl border border-krborder overflow-hidden hover:border-krgold/50 transition-colors">
-              <img src={displayImage} className="w-full h-56 object-cover" alt={`${it.ticker} ${imageType.toLowerCase()}`} />
+            <div 
+              key={it.id} 
+              onClick={() => setViewingTrade(it)}
+              className="bg-krcard backdrop-blur-sm rounded-xl border border-krborder overflow-hidden hover:border-krgold/50 transition-colors cursor-pointer"
+            >
+              <img src={displayImage} className="w-full h-56 object-cover" alt={`${it.ticker} ${activeTab.toLowerCase()}`} />
               
               <div className="p-4 space-y-3">
                 {/* Header */}
@@ -291,7 +303,7 @@ export default function Charts(){
                   </span>
                 </div>
 
-                {/* Trade Details */}
+                {/* Trade Details Summary */}
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div className="bg-krblack/50 rounded-lg p-2">
                     <div className="text-gray-400 text-xs mb-1">Entry Price</div>
@@ -318,35 +330,112 @@ export default function Charts(){
                     {it.type && <div><strong className="text-krtext">Type:</strong> {it.type} {it.type === 'Futures' && it.leverage ? `${it.leverage}x` : ''}</div>}
                   </div>
                 )}
-
-                {/* Reasons */}
-                <div className="space-y-2">
-                  <div>
-                    <label className="text-xs font-medium text-gray-400 block mb-1">Reason for Entry</label>
-                    <textarea 
-                      className="w-full p-2 text-sm rounded-md bg-transparent border border-krborder text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold resize-none" 
-                      value={it.reasonIn || ''} 
-                      onChange={e=> updateReason(it.id, 'reasonIn', e.target.value)}
-                      rows={2}
-                      placeholder="Why did you enter?"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium text-gray-400 block mb-1">Reason for Exit</label>
-                    <textarea 
-                      className="w-full p-2 text-sm rounded-md bg-transparent border border-krborder text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold resize-none" 
-                      value={it.reasonOut || ''} 
-                      onChange={e=> updateReason(it.id, 'reasonOut', e.target.value)}
-                      rows={2}
-                      placeholder="Why did you exit?"
-                    />
-                  </div>
-                </div>
               </div>
             </div>
           )
         })}
       </div>
+
+      {/* Trade Details Modal */}
+      {viewingTrade && (
+        <Modal isOpen={!!viewingTrade} onClose={() => setViewingTrade(null)} title="Trade Details" maxWidth="max-w-4xl">
+          <div className="max-w-4xl mx-auto">
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <h2 className="text-2xl font-bold text-krtext">{viewingTrade.ticker}</h2>
+                <p className="text-sm text-gray-400">{viewingTrade.date} {viewingTrade.time}</p>
+              </div>
+              <span className={`text-lg px-3 py-1.5 rounded font-semibold ${viewingTrade.pnlAmount > 0 ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
+                {viewingTrade.pnlAmount > 0 ? <TrendingUp className="inline-block w-5 h-5 mr-1" /> : <TrendingDown className="inline-block w-5 h-5 mr-1" />}
+                {(viewingTrade.pnlPercent || (((viewingTrade.exitPrice - viewingTrade.entryPrice) / viewingTrade.entryPrice) * 100)).toFixed(2)}%
+              </span>
+            </div>
+
+            {/* Images */}
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              {viewingTrade.chartImg && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-2">Chart Image</label>
+                  <img src={viewingTrade.chartImg} className="w-full rounded-lg border border-krborder" alt="Chart" />
+                </div>
+              )}
+              {viewingTrade.pnlImg && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-2">PnL Image</label>
+                  <img src={viewingTrade.pnlImg} className="w-full rounded-lg border border-krborder" alt="PnL" />
+                </div>
+              )}
+            </div>
+
+            {/* Trade Details Grid */}
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-1">Type</label>
+                  <div className="text-krtext">{viewingTrade.type} {viewingTrade.type === 'Futures' ? `${viewingTrade.leverage}x` : ''}</div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-1">Position</label>
+                  <div className="text-krtext">{viewingTrade.position}</div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-1">Objective</label>
+                  <div className="text-krtext">{viewingTrade.objective}</div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-1">Setup</label>
+                  <div className="text-krtext">{viewingTrade.setup}</div>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-1">Entry Price</label>
+                  <div className="text-krtext">{formatAmount(viewingTrade.entryPrice)}</div>
+                  <div className="text-xs text-gray-400">{viewingTrade.date} {viewingTrade.time}</div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-1">Exit Price</label>
+                  <div className="text-krtext">{formatAmount(viewingTrade.exitPrice)}</div>
+                  <div className="text-xs text-gray-400">{viewingTrade.exitDate} {viewingTrade.exitTime}</div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-1">P&L</label>
+                  <div className={`font-semibold ${(viewingTrade.pnlAmount || (viewingTrade.exitPrice - viewingTrade.entryPrice)) > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                    {formatAmount(viewingTrade.pnlAmount || (viewingTrade.exitPrice - viewingTrade.entryPrice))} ({(viewingTrade.pnlPercent || (((viewingTrade.exitPrice - viewingTrade.entryPrice) / viewingTrade.entryPrice) * 100)).toFixed(2)}%)
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-1">Fee</label>
+                  <div className="text-krtext">{formatAmount(viewingTrade.fee || 0)}</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Reasons */}
+            {(viewingTrade.reasonIn || viewingTrade.reasonOut) && (
+              <div className="space-y-4">
+                {viewingTrade.reasonIn && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-400 mb-2">Reason for Entry</label>
+                    <div className="p-3 bg-krcard/50 rounded-lg border border-krborder text-krtext">
+                      {viewingTrade.reasonIn}
+                    </div>
+                  </div>
+                )}
+                {viewingTrade.reasonOut && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-400 mb-2">Reason for Exit</label>
+                    <div className="p-3 bg-krcard/50 rounded-lg border border-krborder text-krtext">
+                      {viewingTrade.reasonOut}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </Modal>
+      )}
     </div>
   )
 }
