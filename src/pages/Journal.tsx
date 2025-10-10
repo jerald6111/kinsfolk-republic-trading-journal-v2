@@ -104,9 +104,9 @@ export default function Journal() {
     <div className="min-h-screen bg-krblack text-krtext p-6">
       <h1 className="text-2xl font-bold mb-6 text-krtext">Journal</h1>
       
-      {/* Main Grid Layout - Form on Left, Trade History on Right */}
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-        {/* Form Section - Left Side */}
+      {/* Main Layout - Form and Trade History side by side on large screens, stacked on smaller */}
+      <div className="grid grid-cols-1 2xl:grid-cols-[1fr,400px] gap-6">
+        {/* Form Section */}
         <div className="bg-krcard backdrop-blur-sm rounded-xl shadow-sm border border-krborder p-6">
           <h2 className="text-xl font-semibold mb-4 text-krtext">{form.id ? 'Edit Trade' : 'Add New Trade'}</h2>
           <div className="space-y-4">

@@ -14,7 +14,21 @@ interface Strategy {
 
 export default function Playbook(){
   const data = loadData()
-  const [items, setItems] = useState<Strategy[]>(data.playbook || [])
+  
+  // Migrate old playbook data format (img -> images array)
+  const migratedPlaybook = (data.playbook || []).map((item: any) => {
+    if (item.img && !item.images) {
+      // Old format: convert single img to images array
+      return { ...item, images: [item.img] }
+    }
+    if (!item.images) {
+      // No images at all
+      return { ...item, images: [] }
+    }
+    return item
+  })
+  
+  const [items, setItems] = useState<Strategy[]>(migratedPlaybook)
   const [title, setTitle] = useState('')
   const [desc, setDesc] = useState('')
   const [images, setImages] = useState<string[]>(['', '', '', ''])
@@ -67,6 +81,16 @@ export default function Playbook(){
     setTitle('')
     setDesc('')
     setImages(['', '', '', ''])
+  }
+
+  // Safe markdown rendering
+  const renderMarkdown = (text: string) => {
+    try {
+      return marked(text || '')
+    } catch (error) {
+      console.error('Markdown rendering error:', error)
+      return text || ''
+    }
   }
 
   return (
@@ -132,6 +156,11 @@ export default function Playbook(){
         {/* Strategies Grid */}
         <div className="md:col-span-2">
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {items.length === 0 && (
+              <div className="col-span-full text-center text-gray-400 py-12">
+                No strategies yet. Add your first strategy to get started!
+              </div>
+            )}
             {items.map((it) => (
               <div key={it.id} className="bg-krcard backdrop-blur-sm rounded-xl border border-krborder overflow-hidden hover:border-krgold/50 transition-colors group">
                 {/* Image Grid - Show up to 4 images */}
@@ -152,7 +181,7 @@ export default function Playbook(){
                   <h3 className="font-bold text-krtext mb-2">{it.title}</h3>
                   <div 
                     className="text-sm text-gray-400 line-clamp-3 prose prose-invert max-w-none" 
-                    dangerouslySetInnerHTML={{__html: marked(it.desc || '')}}
+                    dangerouslySetInnerHTML={{__html: renderMarkdown(it.desc || '')}}
                   ></div>
                   
                   <div className="mt-4 flex gap-2">
@@ -216,7 +245,7 @@ export default function Playbook(){
             
             <div 
               className="prose prose-invert max-w-none text-gray-300" 
-              dangerouslySetInnerHTML={{__html: marked(viewStrategy.desc || '')}}
+              dangerouslySetInnerHTML={{__html: renderMarkdown(viewStrategy.desc || '')}}
             ></div>
           </div>
         </Modal>
