@@ -329,11 +329,6 @@ export default function Journal() {
                   onClick={() => setViewingTrade(it)}
                   className="bg-krblack/30 rounded-xl shadow-sm border border-krborder p-4 cursor-pointer hover:border-krgold/50 transition-colors"
                 >
-                  {/* Chart Image */}
-                  {it.chartImg && (
-                    <img src={it.chartImg} className="w-full h-32 object-cover rounded-md mb-3" alt="Chart" />
-                  )}
-                  
                   {/* Trade Header */}
                   <div className="flex items-start justify-between gap-2 mb-3">
                     <div className="flex-1 min-w-0">

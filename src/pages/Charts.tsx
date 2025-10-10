@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { loadData, saveData } from '../utils/storage'
 import FileUploader from '../components/FileUploader'
 import Modal from '../components/Modal'
@@ -8,6 +9,7 @@ import { useCurrency } from '../context/CurrencyContext'
 export default function Charts(){
   const data = loadData()
   const { formatAmount } = useCurrency()
+  const [searchParams] = useSearchParams()
   const journal = data.journal || []
   const charts = journal.filter((j:any)=> j.chartImg || j.pnlImg)
   const [items, setItems] = useState(charts)
@@ -28,11 +30,21 @@ export default function Charts(){
     reasonOut: ''
   })
 
-  // Get unique tickers from all charts
+  // Set active tab based on URL parameter
+  useEffect(() => {
+    const tab = searchParams.get('tab')
+    if (tab === 'pnl') {
+      setActiveTab('PNL')
+    } else {
+      setActiveTab('Chart')
+    }
+  }, [searchParams])
+
+  // Get unique tickers from all journal entries
   const uniqueTickers = useMemo(() => {
-    const tickers = new Set(charts.map((c: any) => c.ticker).filter(Boolean))
+    const tickers = new Set(journal.map((j: any) => j.ticker).filter(Boolean))
     return Array.from(tickers).sort()
-  }, [charts])
+  }, [journal])
 
   // Filter items based on ticker and date range
   const filteredItems = useMemo(() => {
