@@ -104,37 +104,15 @@ export default function Charts(){
   return (
     <div className="min-h-screen bg-krcard/30 backdrop-blur-sm text-krtext p-6">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">Snapshots</h1>
-        <button
-          onClick={() => setShowUpload(!showUpload)}
-          className="px-4 py-2 bg-krgold hover:bg-kryellow text-krblack rounded-lg font-semibold transition-colors"
-        >
-          {showUpload ? 'Cancel' : 'Upload Snapshot'}
-        </button>
-      </div>
-
-      {/* Tabs */}
-      <div className="flex gap-2 mb-6">
-        <button
-          onClick={() => setActiveTab('Chart')}
-          className={`px-6 py-2.5 rounded-lg font-semibold transition-colors ${
-            activeTab === 'Chart'
-              ? 'bg-krgold text-krblack'
-              : 'bg-krcard border border-krborder text-krtext hover:border-krgold/50'
-          }`}
-        >
-          Chart
-        </button>
-        <button
-          onClick={() => setActiveTab('PNL')}
-          className={`px-6 py-2.5 rounded-lg font-semibold transition-colors ${
-            activeTab === 'PNL'
-              ? 'bg-krgold text-krblack'
-              : 'bg-krcard border border-krborder text-krtext hover:border-krgold/50'
-          }`}
-        >
-          PNL Overview
-        </button>
+        <h1 className="text-2xl font-bold">Snapshots - {activeTab === 'Chart' ? 'Chart' : 'PNL Overview'}</h1>
+        {activeTab === 'Chart' && (
+          <button
+            onClick={() => setShowUpload(!showUpload)}
+            className="px-4 py-2 bg-krgold hover:bg-kryellow text-krblack rounded-lg font-semibold transition-colors"
+          >
+            {showUpload ? 'Cancel' : 'Upload Snapshot'}
+          </button>
+        )}
       </div>
 
       {/* Filters Section */}
