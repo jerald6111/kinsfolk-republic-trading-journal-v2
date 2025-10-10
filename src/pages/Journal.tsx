@@ -6,7 +6,7 @@ import SendToDiscordButton from '../components/SendToDiscordButton'
 import { loadData, saveData } from '../utils/storage'
 import { useCurrency } from '../context/CurrencyContext'
 import { JournalEntry, TradeObjective, TradeType, TradePosition } from '../types'
-import { TrendingUp, TrendingDown } from 'lucide-react'
+import { TrendingUp, TrendingDown, Link } from 'lucide-react'
 
 const OBJECTIVES: TradeObjective[] = ['Scalping', 'Day Trade', 'Swing Trade', 'Position']
 const TYPES: TradeType[] = ['Spot', 'Futures']
@@ -28,8 +28,8 @@ export default function Journal() {
     position: 'Long',
     leverage: 1,
     entryPrice: 0,
-    exitDate: '',
-    exitTime: '',
+    exitDate: new Date().toISOString().split('T')[0],
+    exitTime: new Date().toLocaleTimeString('en-US', { hour12: false }).slice(0, 5),
     exitPrice: 0,
     fee: 0,
     pnlAmount: 0,
@@ -87,20 +87,74 @@ export default function Journal() {
     <div>
       <h1 className="text-2xl font-bold mb-4">Journal</h1>
       <div className="grid lg:grid-cols-3 gap-6 mb-6">
-        <div className="bg-white rounded-xl shadow-sm border border-krborder p-6 space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <DateTimePicker
-              label="Entry Date & Time"
-              date={form.date || ''}
-              time={form.time || ''}
-              onDateChange={date => setForm({...form, date})}
-              onTimeChange={time => setForm({...form, time})}
-            />
-            <input
-              className="w-full px-3 py-2 border border-krborder rounded-md bg-white focus:border-krgold focus:ring-1 focus:ring-krgold"
-              placeholder="Ticker"
-              value={form.ticker || ''}
-              onChange={e => setForm({...form, ticker: e.target.value})}
+        <div className="lg:col-span-2 bg-krblack/5 dark:bg-white/5 backdrop-blur-sm rounded-xl shadow-sm border border-krborder p-6">
+          <div className="space-y-6">
+            {/* Trade Info */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="sm:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Ticker
+                </label>
+                <input
+                  className="w-full px-3 py-2 border border-krborder rounded-md bg-white/50 dark:bg-krblack/50 focus:border-krgold focus:ring-1 focus:ring-krgold"
+                  value={form.ticker}
+                  onChange={e => setForm({...form, ticker: e.target.value.toUpperCase()})}
+                  placeholder="e.g., BTCUSDT"
+                />
+              </div>
+              
+              {/* Trade Type and Position */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Type
+                </label>
+                <select
+                  value={form.type}
+                  onChange={e => setForm({...form, type: e.target.value as TradeType})}
+                  className="w-full px-3 py-2 border border-krborder rounded-md bg-white/50 dark:bg-krblack/50 focus:border-krgold focus:ring-1 focus:ring-krgold"
+                >
+                  {TYPES.map(type => (
+                    <option key={type} value={type}>{type}</option>
+                  ))}
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Position
+                </label>
+                <select
+                  value={form.position}
+                  onChange={e => setForm({...form, position: e.target.value as TradePosition})}
+                  className="w-full px-3 py-2 border border-krborder rounded-md bg-white/50 dark:bg-krblack/50 focus:border-krgold focus:ring-1 focus:ring-krgold"
+                >
+                  {POSITIONS.map(pos => (
+                    <option key={pos} value={pos}>{pos}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Entry Details */}
+              <div>
+                <DateTimePicker
+                  label="Entry Date"
+                  date={form.date || ''}
+                  time={form.time || ''}
+                  onDateChange={date => setForm({...form, date})}
+                  onTimeChange={time => setForm({...form, time})}
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Entry Price
+                </label>
+                <input
+                  type="number"
+                  className="w-full px-3 py-2 border border-krborder rounded-md bg-white/50 dark:bg-krblack/50 focus:border-krgold focus:ring-1 focus:ring-krgold"
+              value={form.entryPrice || ''}
+              onChange={e => setForm({...form, entryPrice: Number(e.target.value)})}
+              placeholder="Enter price"
             />
           </div>
 
@@ -183,13 +237,48 @@ export default function Journal() {
           </div>
 
           <div className="space-y-2">
-            <div className="text-sm font-medium text-gray-700">Chart Image</div>
-            <FileUploader onFile={f => setForm({...form, chartImg: f})} />
+            <div className="text-sm font-medium text-gray-700 dark:text-gray-300">Chart Image</div>
+            <div className="relative">
+              <FileUploader
+                value={form.chartImg || ''}
+                onChange={chartImg => setForm({...form, chartImg})}
+                accept="image/*"
+              />
+              {form.chartImg && (
+                <a 
+                  href={form.chartImg} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="mt-2 text-sm text-krgold hover:text-kryellow inline-flex items-center gap-1"
+                >
+                  <Link size={14} />
+                  View Full Image
+                </a>
+              )}
+            </div>
           </div>
 
           <div className="space-y-2">
-            <div className="text-sm font-medium text-gray-700">PnL Image</div>
-            <FileUploader onFile={f => setForm({...form, pnlImg: f})} />
+            <div className="text-sm font-medium text-gray-700 dark:text-gray-300">PnL Image</div>
+            <div className="relative">
+              <FileUploader
+                value={form.pnlImg || ''}
+                onChange={pnlImg => setForm({...form, pnlImg})}
+                accept="image/*"
+              />
+              {form.pnlImg && (
+                <a 
+                  href={form.pnlImg} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="mt-2 text-sm text-krgold hover:text-kryellow inline-flex items-center gap-1"
+                >
+                  <Link size={14} />
+                  View Full Image
+                </a>
+              )}
+            </div>
+          </div>
           </div>
 
           <div className="space-y-1">

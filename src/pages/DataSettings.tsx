@@ -85,7 +85,6 @@ export default function DataSettings(){
 
   const handleSetActive = (id: string) => {
     setActiveWebhookId(id)
-    setActiveWebhookId(id)
   }
 
   return (
@@ -123,28 +122,28 @@ export default function DataSettings(){
         <h2 className="text-lg font-semibold mb-4">Discord Integration</h2>
         <div className="space-y-6">
           {/* Add New Webhook */}
-          <div className="space-y-4 p-4 bg-gray-50 rounded-lg">
-            <h3 className="font-medium">Add New Webhook</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="space-y-4 p-4 bg-krblack/5 dark:bg-white/5 rounded-lg">
+            <h3 className="font-medium text-gray-700 dark:text-gray-300">Add New Webhook</h3>
+            <div className="grid grid-cols-1 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Name
                 </label>
                 <input
                   type="text"
-                  className="w-full px-3 py-2 border border-krborder rounded-md focus:ring-1 focus:ring-krgold"
+                  className="w-full px-3 py-2 border border-krborder rounded-md bg-white/50 dark:bg-krblack/50 focus:ring-1 focus:ring-krgold"
                   placeholder="e.g., Main Channel"
                   value={newWebhookName}
                   onChange={(e) => setNewWebhookName(e.target.value)}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Webhook URL
                 </label>
                 <input
                   type="url"
-                  className="w-full px-3 py-2 border border-krborder rounded-md focus:ring-1 focus:ring-krgold"
+                  className="w-full px-3 py-2 border border-krborder rounded-md bg-white/50 dark:bg-krblack/50 focus:ring-1 focus:ring-krgold"
                   placeholder="https://discord.com/api/webhooks/..."
                   value={newWebhookUrl}
                   onChange={(e) => setNewWebhookUrl(e.target.value)}
@@ -153,7 +152,7 @@ export default function DataSettings(){
             </div>
             <button
               onClick={addWebhook}
-              className="w-full sm:w-auto px-4 py-2 bg-krgold text-white rounded-md hover:bg-kryellow transition-colors"
+              className="w-full px-4 py-2 bg-krgold text-white rounded-md hover:bg-kryellow transition-colors"
             >
               Add Webhook
             </button>
@@ -161,7 +160,7 @@ export default function DataSettings(){
 
           {/* Webhook List */}
           <div className="space-y-4">
-            <h3 className="font-medium">Manage Webhooks</h3>
+            <h3 className="font-medium text-gray-700 dark:text-gray-300">Manage Webhooks</h3>
             <div className="space-y-3">
               {webhooks.map((webhook) => (
                 <div 

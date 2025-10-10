@@ -5,12 +5,16 @@ module.exports = {
       colors: {
         krblack: '#1E2026',
         krgold: '#F0B90B',
-        kryellow: '#F8D33A',
-        krgray: '#2B3139',
+        kryellow: '#FCD535',
+        krgray: '#474D57',
         krwhite: '#EAECEF',
-        krbg: '#F5F5F5',
+        krbg: '#FAFAFA',
         krcard: '#FFFFFF',
-        krborder: '#E6E8EA'
+        krborder: '#E6E8EA',
+        krsuccess: '#03A66D',
+        krdanger: '#CF304A',
+        krmuted: '#707A8A',
+        krtext: '#1E2329'
       }
     }
   },
