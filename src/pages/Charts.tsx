@@ -122,7 +122,7 @@ export default function Charts(){
             <select
               value={filterTicker}
               onChange={e => setFilterTicker(e.target.value)}
-              className="w-full px-3 py-2 border border-krborder rounded-md bg-krblack text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
+              className="w-full px-3 py-2 border border-krborder rounded-md bg-transparent text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
             >
               <option value="">All Tickers</option>
               {uniqueTickers.map(ticker => (
@@ -136,7 +136,7 @@ export default function Charts(){
               type="date"
               value={filterStartDate}
               onChange={e => setFilterStartDate(e.target.value)}
-              className="w-full px-3 py-2 border border-krborder rounded-md bg-krblack text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
+              className="w-full px-3 py-2 border border-krborder rounded-md bg-transparent text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
             />
           </div>
           <div className="space-y-1">
@@ -145,7 +145,7 @@ export default function Charts(){
               type="date"
               value={filterEndDate}
               onChange={e => setFilterEndDate(e.target.value)}
-              className="w-full px-3 py-2 border border-krborder rounded-md bg-krblack text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
+              className="w-full px-3 py-2 border border-krborder rounded-md bg-transparent text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
             />
           </div>
         </div>
@@ -163,7 +163,7 @@ export default function Charts(){
               <label className="text-sm font-medium text-krtext">Ticker</label>
               <input
                 type="text"
-                className="w-full px-3 py-2 border border-krborder rounded-md bg-krblack text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
+                className="w-full px-3 py-2 border border-krborder rounded-md bg-transparent text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
                 value={uploadForm.ticker}
                 onChange={e => setUploadForm({...uploadForm, ticker: e.target.value})}
                 placeholder="BTC/USDT"
@@ -173,7 +173,7 @@ export default function Charts(){
               <label className="text-sm font-medium text-krtext">Date</label>
               <input
                 type="date"
-                className="w-full px-3 py-2 border border-krborder rounded-md bg-krblack text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
+                className="w-full px-3 py-2 border border-krborder rounded-md bg-transparent text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
                 value={uploadForm.date}
                 onChange={e => setUploadForm({...uploadForm, date: e.target.value})}
               />
@@ -182,7 +182,7 @@ export default function Charts(){
               <label className="text-sm font-medium text-krtext">Entry Price</label>
               <input
                 type="number"
-                className="w-full px-3 py-2 border border-krborder rounded-md bg-krblack text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
+                className="w-full px-3 py-2 border border-krborder rounded-md bg-transparent text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
                 value={uploadForm.entryPrice || ''}
                 onChange={e => setUploadForm({...uploadForm, entryPrice: Number(e.target.value)})}
               />
@@ -191,7 +191,7 @@ export default function Charts(){
               <label className="text-sm font-medium text-krtext">Exit Price</label>
               <input
                 type="number"
-                className="w-full px-3 py-2 border border-krborder rounded-md bg-krblack text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
+                className="w-full px-3 py-2 border border-krborder rounded-md bg-transparent text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
                 value={uploadForm.exitPrice || ''}
                 onChange={e => setUploadForm({...uploadForm, exitPrice: Number(e.target.value)})}
               />
@@ -207,7 +207,7 @@ export default function Charts(){
             <div className="md:col-span-2 space-y-1">
               <label className="text-sm font-medium text-krtext">Reason for Entry</label>
               <textarea
-                className="w-full px-3 py-2 border border-krborder rounded-md bg-krblack text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold min-h-[80px]"
+                className="w-full px-3 py-2 border border-krborder rounded-md bg-transparent text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold min-h-[80px]"
                 value={uploadForm.reasonIn}
                 onChange={e => setUploadForm({...uploadForm, reasonIn: e.target.value})}
                 placeholder="Why did you enter this trade?"
@@ -216,7 +216,7 @@ export default function Charts(){
             <div className="md:col-span-2 space-y-1">
               <label className="text-sm font-medium text-krtext">Reason for Exit</label>
               <textarea
-                className="w-full px-3 py-2 border border-krborder rounded-md bg-krblack text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold min-h-[80px]"
+                className="w-full px-3 py-2 border border-krborder rounded-md bg-transparent text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold min-h-[80px]"
                 value={uploadForm.reasonOut}
                 onChange={e => setUploadForm({...uploadForm, reasonOut: e.target.value})}
                 placeholder="Why did you exit this trade?"
@@ -299,7 +299,7 @@ export default function Charts(){
                   <div>
                     <label className="text-xs font-medium text-gray-400 block mb-1">Reason for Entry</label>
                     <textarea 
-                      className="w-full p-2 text-sm rounded-md bg-krblack/50 border border-krborder text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold resize-none" 
+                      className="w-full p-2 text-sm rounded-md bg-transparent border border-krborder text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold resize-none" 
                       value={it.reasonIn || ''} 
                       onChange={e=> updateReason(it.id, 'reasonIn', e.target.value)}
                       rows={2}
@@ -309,7 +309,7 @@ export default function Charts(){
                   <div>
                     <label className="text-xs font-medium text-gray-400 block mb-1">Reason for Exit</label>
                     <textarea 
-                      className="w-full p-2 text-sm rounded-md bg-krblack/50 border border-krborder text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold resize-none" 
+                      className="w-full p-2 text-sm rounded-md bg-transparent border border-krborder text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold resize-none" 
                       value={it.reasonOut || ''} 
                       onChange={e=> updateReason(it.id, 'reasonOut', e.target.value)}
                       rows={2}

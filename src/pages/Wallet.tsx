@@ -84,7 +84,7 @@ export default function Wallet() {
               <div className="text-sm font-medium text-krtext">Date</div>
               <input 
                 type="date" 
-                className="w-full px-3 py-2 border border-krborder rounded-md bg-krblack text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold" 
+                className="w-full px-3 py-2 border border-krborder rounded-md bg-transparent text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold" 
                 value={form.date} 
                 onChange={e=>setForm({...form, date: e.target.value})} 
               />
@@ -94,7 +94,7 @@ export default function Wallet() {
               <select 
                 value={form.type} 
                 onChange={e=>setForm({...form, type: e.target.value})} 
-                className="w-full px-3 py-2 border border-krborder rounded-md bg-krblack text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
+                className="w-full px-3 py-2 border border-krborder rounded-md bg-transparent text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
               >
                 <option value="deposit">Deposit</option>
                 <option value="withdrawal">Withdrawal</option>
@@ -104,7 +104,7 @@ export default function Wallet() {
               <div className="text-sm font-medium text-krtext">Amount</div>
               <input 
                 type="number" 
-                className="w-full px-3 py-2 border border-krborder rounded-md bg-krblack text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold" 
+                className="w-full px-3 py-2 border border-krborder rounded-md bg-transparent text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold" 
                 placeholder="Enter amount" 
                 value={form.amount} 
                 onChange={e=>setForm({...form, amount: e.target.value})} 
@@ -113,7 +113,7 @@ export default function Wallet() {
             <div className="space-y-1">
               <div className="text-sm font-medium text-krtext">Notes</div>
               <textarea 
-                className="w-full px-3 py-2 border border-krborder rounded-md bg-krblack text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold" 
+                className="w-full px-3 py-2 border border-krborder rounded-md bg-transparent text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold" 
                 placeholder="Add notes" 
                 value={form.notes} 
                 onChange={e=>setForm({...form, notes: e.target.value})} 

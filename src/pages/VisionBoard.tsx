@@ -71,15 +71,15 @@ export default function VisionBoard(){
   return (
     <div>
       <h1 className="text-2xl font-bold mb-4 text-krtext">Vision Board</h1>
-      <div className="grid md:grid-cols-3 gap-4 mb-6">
-        <div className="p-4 bg-krcard rounded-xl border border-krborder">
+      <div className="grid md:grid-cols-[350px,1fr] gap-4 mb-6">
+        <div className="p-4 bg-krcard rounded-xl border border-krborder self-start">
           <h2 className="text-lg font-semibold mb-3 text-krtext">{editingGoal ? 'Edit Goal' : 'Add New Goal'}</h2>
-          <input className="w-full mb-2 p-2 rounded bg-krblack text-krtext border border-krborder" placeholder="Goal title" value={title} onChange={e=>setTitle(e.target.value)} />
-          <textarea className="w-full mb-2 p-2 rounded bg-krblack text-krtext border border-krborder" placeholder="Description" value={desc} onChange={e=>setDesc(e.target.value)} rows={3} />
-          <input className="w-full mb-2 p-2 rounded bg-krblack text-krtext border border-krborder" placeholder="Target amount" value={target} onChange={e=>setTarget(e.target.value)} />
+          <input className="w-full mb-2 p-2 rounded bg-transparent text-krtext border border-krborder focus:border-krgold focus:ring-1 focus:ring-krgold" placeholder="Goal title" value={title} onChange={e=>setTitle(e.target.value)} />
+          <textarea className="w-full mb-2 p-2 rounded bg-transparent text-krtext border border-krborder focus:border-krgold focus:ring-1 focus:ring-krgold" placeholder="Description" value={desc} onChange={e=>setDesc(e.target.value)} rows={3} />
+          <input className="w-full mb-2 p-2 rounded bg-transparent text-krtext border border-krborder focus:border-krgold focus:ring-1 focus:ring-krgold" placeholder="Target amount" value={target} onChange={e=>setTarget(e.target.value)} />
           
           <select 
-            className="w-full mb-2 p-2 rounded bg-krblack text-krtext border border-krborder" 
+            className="w-full mb-2 p-2 rounded bg-transparent text-krtext border border-krborder focus:border-krgold focus:ring-1 focus:ring-krgold" 
             value={timeline} 
             onChange={e=>setTimeline(e.target.value as GoalTimeline)}
           >
@@ -104,7 +104,7 @@ export default function VisionBoard(){
           )}
         </div>
 
-        <div className="md:col-span-2 space-y-6">
+        <div className="space-y-6">
           {/* Active Goals */}
           <div>
             <h2 className="text-xl font-semibold mb-4 text-krtext">Active Goals</h2>

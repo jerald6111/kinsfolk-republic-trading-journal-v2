@@ -114,7 +114,7 @@ export default function Journal() {
             <div className="space-y-1">
               <label className="block text-sm font-medium text-krtext">Ticker</label>
               <input
-                className="w-full px-3 py-2 border border-krborder rounded-md bg-krblack text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
+                className="w-full px-3 py-2 border border-krborder rounded-md bg-transparent text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
                 value={form.ticker}
                 onChange={e => setForm({...form, ticker: e.target.value.toUpperCase()})}
                 placeholder="BTC/USDT"
@@ -128,7 +128,7 @@ export default function Journal() {
                 <select
                   value={form.type}
                   onChange={e => setForm({...form, type: e.target.value as TradeType})}
-                  className="w-full px-3 py-2 border border-krborder rounded-md bg-krblack text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
+                  className="w-full px-3 py-2 border border-krborder rounded-md bg-transparent text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
                 >
                   {TYPES.map(type => (
                     <option key={type} value={type}>{type}</option>
@@ -141,7 +141,7 @@ export default function Journal() {
                 <select
                   value={form.position}
                   onChange={e => setForm({...form, position: e.target.value as TradePosition})}
-                  className="w-full px-3 py-2 border border-krborder rounded-md bg-krblack text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
+                  className="w-full px-3 py-2 border border-krborder rounded-md bg-transparent text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
                 >
                   {POSITIONS.map(pos => (
                     <option key={pos} value={pos}>{pos}</option>
@@ -164,7 +164,7 @@ export default function Journal() {
                 <label className="block text-sm font-medium text-krtext">Entry Price</label>
                 <input
                   type="number"
-                  className="w-full px-3 py-2 border border-krborder rounded-md bg-krblack text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
+                  className="w-full px-3 py-2 border border-krborder rounded-md bg-transparent text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
                   value={form.entryPrice || ''}
                   onChange={e => setForm({...form, entryPrice: Number(e.target.value)})}
                   placeholder="Enter price"
@@ -189,38 +189,14 @@ export default function Journal() {
               />
             </div>
 
-            {/* Conditional Futures Fields */}
+            {/* Leverage (only show for Futures) */}
             {form.type === 'Futures' && (
-              <div className="grid grid-cols-3 gap-4">
-                <div className="space-y-1">
-                  <label className="block text-sm font-medium text-krtext">Type</label>
-                  <select
-                    value={form.type}
-                    className="w-full px-3 py-2 border border-krborder rounded-md bg-krblack text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
-                    disabled
-                  >
-                    <option value="Futures">Futures</option>
-                  </select>
-                </div>
-                
-                <div className="space-y-1">
-                  <label className="block text-sm font-medium text-krtext">Position</label>
-                  <select
-                    value={form.position}
-                    className="w-full px-3 py-2 border border-krborder rounded-md bg-krblack text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
-                    disabled
-                  >
-                    <option value={form.position}>{form.position}</option>
-                  </select>
-                </div>
-
-                <Select
-                  label="Leverage"
-                  value={form.leverage || 1}
-                  onChange={lev => setForm({...form, leverage: Number(lev)})}
-                  options={LEVERAGE_OPTIONS.map(l => ({ value: l, label: `${l}x` }))}
-                />
-              </div>
+              <Select
+                label="Leverage"
+                value={form.leverage || 1}
+                onChange={lev => setForm({...form, leverage: Number(lev)})}
+                options={LEVERAGE_OPTIONS.map(l => ({ value: l, label: `${l}x` }))}
+              />
             )}
 
             {/* Entry Price and Exit Date & Time */}
@@ -244,23 +220,13 @@ export default function Journal() {
               />
             </div>
 
-            {/* Chart Image */}
-            <div className="space-y-1">
-              <label className="block text-sm font-medium text-krtext">Chart Image</label>
-              <FileUploader
-                value={form.chartImg || ''}
-                onChange={chartImg => setForm({...form, chartImg})}
-                accept="image/*"
-              />
-            </div>
-
             {/* Exit Price and Fee */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">
                 <label className="block text-sm font-medium text-krtext">Exit Price</label>
                 <input
                   type="number"
-                  className="w-full px-3 py-2 border border-krborder rounded-md bg-krblack text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
+                  className="w-full px-3 py-2 border border-krborder rounded-md bg-transparent text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
                   value={form.exitPrice || ''}
                   onChange={e => setForm({...form, exitPrice: Number(e.target.value)})}
                 />
@@ -270,28 +236,39 @@ export default function Journal() {
                 <label className="block text-sm font-medium text-krtext">Fee</label>
                 <input
                   type="number"
-                  className="w-full px-3 py-2 border border-krborder rounded-md bg-krblack text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
+                  className="w-full px-3 py-2 border border-krborder rounded-md bg-transparent text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
                   value={form.fee || ''}
                   onChange={e => setForm({...form, fee: Number(e.target.value)})}
                 />
               </div>
             </div>
 
-            {/* PnL Image */}
-            <div className="space-y-1">
-              <label className="block text-sm font-medium text-krtext">PnL Image</label>
-              <FileUploader
-                value={form.pnlImg || ''}
-                onChange={pnlImg => setForm({...form, pnlImg})}
-                accept="image/*"
-              />
+            {/* Chart Image and PnL Image - Side by Side */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <label className="block text-sm font-medium text-krtext">Chart Image</label>
+                <FileUploader
+                  value={form.chartImg || ''}
+                  onChange={chartImg => setForm({...form, chartImg})}
+                  accept="image/*"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="block text-sm font-medium text-krtext">PnL Image</label>
+                <FileUploader
+                  value={form.pnlImg || ''}
+                  onChange={pnlImg => setForm({...form, pnlImg})}
+                  accept="image/*"
+                />
+              </div>
             </div>
 
             {/* Reason for Entry */}
             <div className="space-y-1">
               <label className="block text-sm font-medium text-krtext">Reason for Entry</label>
               <textarea
-                className="w-full px-3 py-2 border border-krborder rounded-md bg-krblack text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
+                className="w-full px-3 py-2 border border-krborder rounded-md bg-transparent text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
                 rows={3}
                 value={form.reasonIn || ''}
                 onChange={e => setForm({...form, reasonIn: e.target.value})}
@@ -302,7 +279,7 @@ export default function Journal() {
             <div className="space-y-1">
               <label className="block text-sm font-medium text-krtext">Reason for Exit</label>
               <textarea
-                className="w-full px-3 py-2 border border-krborder rounded-md bg-krblack text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
+                className="w-full px-3 py-2 border border-krborder rounded-md bg-transparent text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
                 rows={3}
                 value={form.reasonOut || ''}
                 onChange={e => setForm({...form, reasonOut: e.target.value})}
@@ -350,14 +327,25 @@ export default function Journal() {
                   </div>
 
                   {/* Trade Details */}
-                  <div className="text-xs text-gray-400 space-y-1.5 mb-3">
-                    <div className="flex justify-between">
-                      <span><strong className="text-krtext">Type:</strong> {it.type} {it.type === 'Futures' ? `${it.leverage}x` : ''}</span>
-                      <span><strong className="text-krtext">Position:</strong> {it.position}</span>
+                  <div className="text-xs text-gray-400 space-y-1 mb-3">
+                    <div className="grid grid-cols-2 gap-x-2">
+                      <div><strong className="text-krtext">Type:</strong> {it.type} {it.type === 'Futures' ? `${it.leverage}x` : ''}</div>
+                      <div><strong className="text-krtext">Position:</strong> {it.position}</div>
+                      <div><strong className="text-krtext">Objective:</strong> {it.objective}</div>
+                      <div><strong className="text-krtext">Setup:</strong> {it.setup}</div>
                     </div>
-                    <div><strong className="text-krtext">Entry:</strong> {formatAmount(it.entryPrice)}</div>
-                    <div><strong className="text-krtext">Exit:</strong> {formatAmount(it.exitPrice)}</div>
-                    <div><strong className="text-krtext">P&L:</strong> {formatAmount(it.pnlAmount)}</div>
+                    <div className="border-t border-krborder pt-1 mt-2">
+                      <div><strong className="text-krtext">Entry:</strong> {formatAmount(it.entryPrice)} on {it.date} {it.time}</div>
+                      <div><strong className="text-krtext">Exit:</strong> {formatAmount(it.exitPrice)} on {it.exitDate} {it.exitTime}</div>
+                      <div><strong className="text-krtext">P&L:</strong> {formatAmount(it.pnlAmount)} ({it.pnlPercent.toFixed(2)}%)</div>
+                      <div><strong className="text-krtext">Fee:</strong> {formatAmount(it.fee || 0)}</div>
+                    </div>
+                    {(it.reasonIn || it.reasonOut) && (
+                      <div className="border-t border-krborder pt-1 mt-2">
+                        {it.reasonIn && <div><strong className="text-krtext">Entry Reason:</strong> {it.reasonIn}</div>}
+                        {it.reasonOut && <div><strong className="text-krtext">Exit Reason:</strong> {it.reasonOut}</div>}
+                      </div>
+                    )}
                   </div>
 
                   {/* Action Buttons */}

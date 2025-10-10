@@ -105,7 +105,7 @@ export default function Playbook(){
           </h2>
           
           <input 
-            className="w-full mb-3 px-3 py-2 rounded-lg bg-krblack border border-krborder text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold" 
+            className="w-full mb-3 px-3 py-2 rounded-lg bg-transparent border border-krborder text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold" 
             placeholder="Strategy Title" 
             value={title} 
             onChange={e => setTitle(e.target.value)} 
@@ -129,7 +129,7 @@ export default function Playbook(){
           </div>
           
           <textarea 
-            className="w-full mb-3 px-3 py-2 rounded-lg bg-krblack border border-krborder text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold min-h-[120px]" 
+            className="w-full mb-3 px-3 py-2 rounded-lg bg-transparent border border-krborder text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold min-h-[120px]" 
             placeholder="Description (markdown supported)" 
             value={desc} 
             onChange={e => setDesc(e.target.value)} 
