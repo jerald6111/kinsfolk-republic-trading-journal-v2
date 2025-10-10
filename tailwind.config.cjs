@@ -3,11 +3,14 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        krblack: '#0B0E11',
+        krblack: '#1E2026',
         krgold: '#F0B90B',
         kryellow: '#F8D33A',
-        krgray: '#1E2329',
-        krwhite: '#EAECEF'
+        krgray: '#2B3139',
+        krwhite: '#EAECEF',
+        krbg: '#F5F5F5',
+        krcard: '#FFFFFF',
+        krborder: '#E6E8EA'
       }
     }
   },

@@ -4,11 +4,12 @@
 @tailwind utilities;
 
 :root {
-  --bg: #0B0E11;
-  --card: #0f1417;
+  --bg: #F5F5F5;
+  --card: #FFFFFF;
   --accent: #F0B90B;
   --accent-2: #F8D33A;
-  --muted: #EAECEF;
+  --text: #1E2026;
+  --muted: #707A8A;
 }
 
 html, body, #root {
@@ -17,8 +18,8 @@ html, body, #root {
 
 body {
   font-family: 'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
-  background: linear-gradient(180deg, var(--bg), #050607);
-  color: var(--muted);
+  background: var(--bg);
+  color: var(--text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
