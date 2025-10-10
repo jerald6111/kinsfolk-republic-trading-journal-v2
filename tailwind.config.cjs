@@ -3,18 +3,18 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        krblack: '#1E2026',
+        krblack: '#0B0E11',
         krgold: '#F0B90B',
         kryellow: '#FCD535',
-        krgray: '#474D57',
+        krgray: '#2B3139',
         krwhite: '#EAECEF',
-        krbg: '#FAFAFA',
-        krcard: '#FFFFFF',
-        krborder: '#E6E8EA',
-        krsuccess: '#03A66D',
-        krdanger: '#CF304A',
-        krmuted: '#707A8A',
-        krtext: '#1E2329'
+        krbg: '#181A20',
+        krcard: '#1E2329',
+        krborder: '#2B3139',
+        krsuccess: '#0ECB81',
+        krdanger: '#F6465D',
+        krmuted: '#848E9C',
+        krtext: '#EAECEF'
       }
     }
   },

@@ -9,13 +9,14 @@ export default function VisionBoard(){
   const [desc, setDesc] = useState('')
   const [target, setTarget] = useState('')
   const [date, setDate] = useState('')
+  const [img, setImg] = useState('')
 
-  const add = (img?:string) => {
+  const add = () => {
     const it = { id: Date.now(), title, desc, target, date, img }
     const next = [it, ...items]
     setItems(next)
     saveData({ vision: next })
-    setTitle(''); setDesc(''); setTarget(''); setDate('')
+    setTitle(''); setDesc(''); setTarget(''); setDate(''); setImg('')
   }
 
   return (
@@ -27,8 +28,10 @@ export default function VisionBoard(){
           <textarea className="w-full mb-2 p-2 rounded bg-krblack/40" placeholder="Description" value={desc} onChange={e=>setDesc(e.target.value)} />
           <input className="w-full mb-2 p-2 rounded bg-krblack/40" placeholder="Target amount" value={target} onChange={e=>setTarget(e.target.value)} />
           <input type="date" className="w-full mb-2 p-2 rounded bg-krblack/40" value={date} onChange={e=>setDate(e.target.value)} />
-          <div className="mb-2"><FileUploader onFile={(f)=> add(f)} /></div>
-          <button className="px-4 py-2 bg-krgold text-krblack rounded font-bold" onClick={()=>add()}>Add Goal</button>
+          <div className="mb-2">
+            <FileUploader value={img} onChange={setImg} accept="image/*" />
+          </div>
+          <button className="px-4 py-2 bg-krgold text-krblack rounded font-bold" onClick={add}>Add Goal</button>
         </div>
 
         <div className="md:col-span-2">

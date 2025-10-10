@@ -24,7 +24,9 @@ export default function Playbook(){
       <div className="grid md:grid-cols-3 gap-4 mb-6">
         <div className="p-4 bg-krgray/10 rounded-xl">
           <input className="w-full mb-2 p-2 rounded bg-krblack/40" placeholder="Title" value={title} onChange={e=>setTitle(e.target.value)} />
-          <div className="mb-2"><FileUploader onFile={(f)=> setImg(f)} /></div>
+          <div className="mb-2">
+            <FileUploader value={img} onChange={setImg} accept="image/*" />
+          </div>
           <textarea className="w-full mb-2 p-2 rounded bg-krblack/40" placeholder="Description (markdown)" value={desc} onChange={e=>setDesc(e.target.value)} />
           <button className="px-4 py-2 bg-krgold text-krblack rounded font-bold" onClick={add}>Save Strategy</button>
         </div>

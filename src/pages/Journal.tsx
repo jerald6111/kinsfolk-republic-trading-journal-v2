@@ -102,18 +102,19 @@ export default function Journal() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-4">Journal</h1>
+      <h1 className="text-2xl font-bold mb-4 text-krtext">Journal</h1>
       <div className="grid lg:grid-cols-3 gap-6 mb-6">
-        <div className="lg:col-span-2 bg-krblack/5 dark:bg-white/5 backdrop-blur-sm rounded-xl shadow-sm border border-krborder p-6">
+        <div className="lg:col-span-2 bg-krcard backdrop-blur-sm rounded-xl shadow-sm border border-krborder p-6">
+          <h2 className="text-xl font-semibold mb-4 text-krtext">{form.id ? 'Edit Trade' : 'Add New Trade'}</h2>
           <div className="space-y-6">
             {/* Trade Info */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="sm:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-krtext mb-1">
                   Ticker
                 </label>
                 <input
-                  className="w-full px-3 py-2 border border-krborder rounded-md bg-white/50 dark:bg-krblack/50 focus:border-krgold focus:ring-1 focus:ring-krgold"
+                  className="w-full px-3 py-2 border border-krborder rounded-md bg-krblack text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
                   value={form.ticker}
                   onChange={e => setForm({...form, ticker: e.target.value.toUpperCase()})}
                   placeholder="e.g., BTCUSDT"
@@ -122,13 +123,13 @@ export default function Journal() {
               
               {/* Trade Type and Position */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-krtext mb-1">
                   Type
                 </label>
                 <select
                   value={form.type}
                   onChange={e => setForm({...form, type: e.target.value as TradeType})}
-                  className="w-full px-3 py-2 border border-krborder rounded-md bg-white/50 dark:bg-krblack/50 focus:border-krgold focus:ring-1 focus:ring-krgold"
+                  className="w-full px-3 py-2 border border-krborder rounded-md bg-krblack text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
                 >
                   {TYPES.map(type => (
                     <option key={type} value={type}>{type}</option>
@@ -137,13 +138,13 @@ export default function Journal() {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-krtext mb-1">
                   Position
                 </label>
                 <select
                   value={form.position}
                   onChange={e => setForm({...form, position: e.target.value as TradePosition})}
-                  className="w-full px-3 py-2 border border-krborder rounded-md bg-white/50 dark:bg-krblack/50 focus:border-krgold focus:ring-1 focus:ring-krgold"
+                  className="w-full px-3 py-2 border border-krborder rounded-md bg-krblack text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
                 >
                   {POSITIONS.map(pos => (
                     <option key={pos} value={pos}>{pos}</option>
@@ -163,12 +164,12 @@ export default function Journal() {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-krtext mb-1">
                   Entry Price
                 </label>
                 <input
                   type="number"
-                  className="w-full px-3 py-2 border border-krborder rounded-md bg-white/50 dark:bg-krblack/50 focus:border-krgold focus:ring-1 focus:ring-krgold"
+                  className="w-full px-3 py-2 border border-krborder rounded-md bg-krblack text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
               value={form.entryPrice || ''}
               onChange={e => setForm({...form, entryPrice: Number(e.target.value)})}
               placeholder="Enter price"
@@ -215,10 +216,10 @@ export default function Journal() {
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1">
-              <div className="text-sm font-medium text-gray-700">Entry Price</div>
+              <div className="text-sm font-medium text-krtext">Entry Price</div>
               <input
                 type="number"
-                className="w-full px-3 py-2 border border-krborder rounded-md bg-white focus:border-krgold focus:ring-1 focus:ring-krgold"
+                className="w-full px-3 py-2 border border-krborder rounded-md bg-krblack text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
                 value={form.entryPrice || ''}
                 onChange={e => setForm({...form, entryPrice: Number(e.target.value)})}
               />
@@ -233,20 +234,20 @@ export default function Journal() {
             />
 
             <div className="space-y-1">
-              <div className="text-sm font-medium text-gray-700">Exit Price</div>
+              <div className="text-sm font-medium text-krtext">Exit Price</div>
               <input
                 type="number"
-                className="w-full px-3 py-2 border border-krborder rounded-md bg-white focus:border-krgold focus:ring-1 focus:ring-krgold"
+                className="w-full px-3 py-2 border border-krborder rounded-md bg-krblack text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
                 value={form.exitPrice || ''}
                 onChange={e => setForm({...form, exitPrice: Number(e.target.value)})}
               />
             </div>
 
             <div className="space-y-1">
-              <div className="text-sm font-medium text-gray-700">Fee</div>
+              <div className="text-sm font-medium text-krtext">Fee</div>
               <input
                 type="number"
-                className="w-full px-3 py-2 border border-krborder rounded-md bg-white focus:border-krgold focus:ring-1 focus:ring-krgold"
+                className="w-full px-3 py-2 border border-krborder rounded-md bg-krblack text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
                 value={form.fee || ''}
                 onChange={e => setForm({...form, fee: Number(e.target.value)})}
               />
@@ -254,7 +255,7 @@ export default function Journal() {
           </div>
 
           <div className="space-y-2">
-            <div className="text-sm font-medium text-gray-700 dark:text-gray-300">Chart Image</div>
+            <div className="text-sm font-medium text-krtext">Chart Image</div>
             <div className="relative">
               <FileUploader
                 value={form.chartImg || ''}
@@ -276,7 +277,7 @@ export default function Journal() {
           </div>
 
           <div className="space-y-2">
-            <div className="text-sm font-medium text-gray-700 dark:text-gray-300">PnL Image</div>
+            <div className="text-sm font-medium text-krtext">PnL Image</div>
             <div className="relative">
               <FileUploader
                 value={form.pnlImg || ''}
@@ -299,9 +300,9 @@ export default function Journal() {
           </div>
 
           <div className="space-y-1">
-            <div className="text-sm font-medium text-gray-700">Reason for Entry</div>
+            <div className="text-sm font-medium text-krtext">Reason for Entry</div>
             <textarea
-              className="w-full px-3 py-2 border border-krborder rounded-md bg-white focus:border-krgold focus:ring-1 focus:ring-krgold"
+              className="w-full px-3 py-2 border border-krborder rounded-md bg-krblack text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
               rows={3}
               value={form.reasonIn || ''}
               onChange={e => setForm({...form, reasonIn: e.target.value})}
@@ -309,9 +310,9 @@ export default function Journal() {
           </div>
 
           <div className="space-y-1">
-            <div className="text-sm font-medium text-gray-700">Reason for Exit</div>
+            <div className="text-sm font-medium text-krtext">Reason for Exit</div>
             <textarea
-              className="w-full px-3 py-2 border border-krborder rounded-md bg-white focus:border-krgold focus:ring-1 focus:ring-krgold"
+              className="w-full px-3 py-2 border border-krborder rounded-md bg-krblack text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
               rows={3}
               value={form.reasonOut || ''}
               onChange={e => setForm({...form, reasonOut: e.target.value})}
@@ -322,16 +323,19 @@ export default function Journal() {
             className="w-full px-4 py-2 bg-krgold text-white rounded-md font-semibold hover:bg-kryellow transition-colors"
             onClick={save}
           >
-            Save Trade
+            {form.id ? 'Update Trade' : 'Save Trade'}
           </button>
         </div>
       </div>
-      <div className="lg:col-span-2">
-          <div className="space-y-4">
+      
+      {/* Saved Trades List */}
+      <div className="bg-krcard backdrop-blur-sm rounded-xl shadow-sm border border-krborder p-6">
+        <h2 className="text-xl font-semibold mb-4 text-krtext">Trade History</h2>
+        <div className="space-y-4">
             {items.map((it) => {
               const isProfit = it.pnlAmount > 0
               return (
-                <div key={it.id} className="bg-white rounded-xl shadow-sm border border-krborder p-4 flex gap-4">
+                <div key={it.id} className="bg-krblack/30 rounded-xl shadow-sm border border-krborder p-4 flex gap-4">
                   {it.chartImg && (
                     <img src={it.chartImg} className="w-32 h-24 object-cover rounded-md" alt="Chart" />
                   )}
@@ -394,8 +398,8 @@ export default function Journal() {
                 </div>
               )
             })}
-          </div>
         </div>
+      </div>
       </div>
     </div>
   );

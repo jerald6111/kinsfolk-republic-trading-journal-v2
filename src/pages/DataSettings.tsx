@@ -11,11 +11,13 @@ import {
   setActiveWebhookId,
   type DiscordWebhook 
 } from '../utils/storage'
+import { useCurrency } from '../context/CurrencyContext'
 import Modal from '../components/Modal'
 import { AlertTriangle, Save, Link2, Trash2 } from 'lucide-react'
 
 export default function DataSettings(){
   const fileRef = useRef<HTMLInputElement|null>(null)
+  const { currency, currencies, setCurrency } = useCurrency()
   const [showExportModal, setShowExportModal] = useState(false)
   const [showImportModal, setShowImportModal] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
@@ -91,8 +93,37 @@ export default function DataSettings(){
     <div className="max-w-4xl mx-auto">
       <h1 className="text-2xl font-bold mb-6">Data Settings</h1>
       
-      <div className="bg-white rounded-xl shadow-sm border border-krborder p-6 mb-6">
-        <h2 className="text-lg font-semibold mb-4">Data Management</h2>
+      {/* Currency Settings */}
+      <div className="bg-krcard rounded-xl shadow-sm border border-krborder p-6 mb-6">
+        <h2 className="text-lg font-semibold mb-4 text-krtext">Currency Settings</h2>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-krtext mb-2">
+              Select Currency (used throughout the application)
+            </label>
+            <select
+              value={currency.code}
+              onChange={(e) => {
+                const selected = currencies.find(c => c.code === e.target.value)
+                if (selected) setCurrency(selected)
+              }}
+              className="w-full px-3 py-2 border border-krborder rounded-md bg-krblack text-krtext focus:ring-1 focus:ring-krgold"
+            >
+              {currencies.map(c => (
+                <option key={c.code} value={c.code}>
+                  {c.symbol} - {c.name} ({c.code})
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="text-sm text-krmuted">
+            Current: <strong className="text-krtext">{currency.symbol} {currency.name}</strong> (Rate: {currency.rate} to USD)
+          </div>
+        </div>
+      </div>
+      
+      <div className="bg-krcard rounded-xl shadow-sm border border-krborder p-6 mb-6">
+        <h2 className="text-lg font-semibold mb-4 text-krtext">Data Management</h2>
         <div className="grid sm:grid-cols-3 gap-4">
           <button 
             onClick={() => setShowExportModal(true)}
@@ -118,32 +149,32 @@ export default function DataSettings(){
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-krborder p-6">
-        <h2 className="text-lg font-semibold mb-4">Discord Integration</h2>
+      <div className="bg-krcard rounded-xl shadow-sm border border-krborder p-6">
+        <h2 className="text-lg font-semibold mb-4 text-krtext">Discord Integration</h2>
         <div className="space-y-6">
           {/* Add New Webhook */}
-          <div className="space-y-4 p-4 bg-krblack/5 dark:bg-white/5 rounded-lg">
-            <h3 className="font-medium text-gray-700 dark:text-gray-300">Add New Webhook</h3>
+          <div className="space-y-4 p-4 bg-krblack/50 rounded-lg">
+            <h3 className="font-medium text-krtext">Add New Webhook</h3>
             <div className="grid grid-cols-1 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-krtext mb-1">
                   Name
                 </label>
                 <input
                   type="text"
-                  className="w-full px-3 py-2 border border-krborder rounded-md bg-white/50 dark:bg-krblack/50 focus:ring-1 focus:ring-krgold"
+                  className="w-full px-3 py-2 border border-krborder rounded-md bg-krblack text-krtext focus:ring-1 focus:ring-krgold"
                   placeholder="e.g., Main Channel"
                   value={newWebhookName}
                   onChange={(e) => setNewWebhookName(e.target.value)}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-krtext mb-1">
                   Webhook URL
                 </label>
                 <input
                   type="url"
-                  className="w-full px-3 py-2 border border-krborder rounded-md bg-white/50 dark:bg-krblack/50 focus:ring-1 focus:ring-krgold"
+                  className="w-full px-3 py-2 border border-krborder rounded-md bg-krblack text-krtext focus:ring-1 focus:ring-krgold"
                   placeholder="https://discord.com/api/webhooks/..."
                   value={newWebhookUrl}
                   onChange={(e) => setNewWebhookUrl(e.target.value)}
@@ -160,7 +191,7 @@ export default function DataSettings(){
 
           {/* Webhook List */}
           <div className="space-y-4">
-            <h3 className="font-medium text-gray-700 dark:text-gray-300">Manage Webhooks</h3>
+            <h3 className="font-medium text-krtext">Manage Webhooks</h3>
             <div className="space-y-3">
               {webhooks.map((webhook) => (
                 <div 
@@ -199,18 +230,18 @@ export default function DataSettings(){
                       </div>
                     </div>
                   ) : (
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="font-medium">{webhook.name}</div>
-                        <div className="text-sm text-gray-500 truncate">{webhook.url}</div>
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-krtext">{webhook.name}</div>
+                        <div className="text-sm text-krmuted break-all">{webhook.url}</div>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-shrink-0">
                         {webhook.id === activeWebhookId ? (
-                          <span className="px-2 py-1 bg-krgold/10 text-krgold rounded text-sm">Active</span>
+                          <span className="px-2 py-1 bg-krgold/10 text-krgold rounded text-sm whitespace-nowrap">Active</span>
                         ) : (
                           <button
                             onClick={() => handleSetActive(webhook.id)}
-                            className="px-3 py-1 border border-krgold text-krgold rounded hover:bg-krgold hover:text-white transition-colors text-sm"
+                            className="px-3 py-1 border border-krgold text-krgold rounded hover:bg-krgold hover:text-white transition-colors text-sm whitespace-nowrap"
                           >
                             Set Active
                           </button>

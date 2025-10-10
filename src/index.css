@@ -4,12 +4,12 @@
 @tailwind utilities;
 
 :root {
-  --bg: #F5F5F5;
-  --card: #FFFFFF;
+  --bg: #181A20;
+  --card: #1E2329;
   --accent: #F0B90B;
-  --accent-2: #F8D33A;
-  --text: #1E2026;
-  --muted: #707A8A;
+  --accent-2: #FCD535;
+  --text: #EAECEF;
+  --muted: #848E9C;
 }
 
 html, body, #root {

@@ -11,11 +11,11 @@ type Props = {
 export default function Select({ value, onChange, options, label, className = '' }: Props) {
   return (
     <div className="space-y-1">
-      {label && <div className="text-sm font-medium text-gray-700">{label}</div>}
+      {label && <div className="text-sm font-medium text-krtext">{label}</div>}
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className={`w-full px-3 py-2 border border-krborder rounded-md bg-white focus:border-krgold focus:ring-1 focus:ring-krgold ${className}`}
+        className={`w-full px-3 py-2 border border-krborder rounded-md bg-krblack text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold ${className}`}
       >
         {options.map((opt) => (
           <option key={opt.value} value={opt.value}>
