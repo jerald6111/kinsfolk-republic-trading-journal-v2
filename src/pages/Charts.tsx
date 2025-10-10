@@ -6,15 +6,17 @@ import { TrendingUp, TrendingDown, Calendar, DollarSign, Percent, Filter, X } fr
 export default function Charts(){
   const data = loadData()
   const journal = data.journal || []
-  const charts = journal.filter((j:any)=> j.chartImg)
+  const charts = journal.filter((j:any)=> j.chartImg || j.pnlImg)
   const [items, setItems] = useState(charts)
   const [showUpload, setShowUpload] = useState(false)
+  const [imageType, setImageType] = useState<'Chart' | 'PNL'>('Chart')
   const [filterTicker, setFilterTicker] = useState('')
   const [filterStartDate, setFilterStartDate] = useState('')
   const [filterEndDate, setFilterEndDate] = useState('')
   const [uploadForm, setUploadForm] = useState({
     ticker: '',
     chartImg: '',
+    pnlImg: '',
     date: '',
     entryPrice: 0,
     exitPrice: 0,
@@ -34,9 +36,10 @@ export default function Charts(){
       const matchesTicker = !filterTicker || item.ticker === filterTicker
       const matchesStartDate = !filterStartDate || item.date >= filterStartDate
       const matchesEndDate = !filterEndDate || item.date <= filterEndDate
-      return matchesTicker && matchesStartDate && matchesEndDate
+      const hasCorrectImage = imageType === 'Chart' ? item.chartImg : item.pnlImg
+      return matchesTicker && matchesStartDate && matchesEndDate && hasCorrectImage
     })
-  }, [items, filterTicker, filterStartDate, filterEndDate])
+  }, [items, filterTicker, filterStartDate, filterEndDate, imageType])
 
   const clearFilters = () => {
     setFilterTicker('')
@@ -49,12 +52,13 @@ export default function Charts(){
   const updateReason = (id:number, key:'reasonIn'|'reasonOut', val:string)=>{
     const j = journal.map((it:any)=> it.id===id ? { ...it, [key]: val } : it)
     saveData({ journal: j })
-    setItems(j.filter((it:any)=> it.chartImg))
+    setItems(j.filter((it:any)=> it.chartImg || it.pnlImg))
   }
 
   const uploadChart = () => {
-    if (!uploadForm.ticker || !uploadForm.chartImg) {
-      alert('Please provide at least a ticker and chart image')
+    const imageToCheck = imageType === 'Chart' ? uploadForm.chartImg : uploadForm.pnlImg
+    if (!uploadForm.ticker || !imageToCheck) {
+      alert(`Please provide at least a ticker and ${imageType.toLowerCase()} image`)
       return
     }
     
@@ -72,6 +76,7 @@ export default function Charts(){
     setUploadForm({
       ticker: '',
       chartImg: '',
+      pnlImg: '',
       date: '',
       entryPrice: 0,
       exitPrice: 0,
@@ -92,12 +97,12 @@ export default function Charts(){
   return (
     <div className="min-h-screen bg-krcard/30 backdrop-blur-sm text-krtext p-6">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">Charts</h1>
+        <h1 className="text-2xl font-bold">Snapshots</h1>
         <button
           onClick={() => setShowUpload(!showUpload)}
           className="px-4 py-2 bg-krgold hover:bg-kryellow text-krblack rounded-lg font-semibold transition-colors"
         >
-          {showUpload ? 'Cancel' : 'Upload Chart'}
+          {showUpload ? 'Cancel' : 'Upload Snapshot'}
         </button>
       </div>
 
@@ -116,7 +121,18 @@ export default function Charts(){
             </button>
           )}
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="space-y-1">
+            <label className="text-sm font-medium text-krtext">Type</label>
+            <select
+              value={imageType}
+              onChange={e => setImageType(e.target.value as 'Chart' | 'PNL')}
+              className="w-full px-3 py-2 border border-krborder rounded-md bg-transparent text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
+            >
+              <option value="Chart">Chart</option>
+              <option value="PNL">PNL</option>
+            </select>
+          </div>
           <div className="space-y-1">
             <label className="text-sm font-medium text-krtext">Ticker</label>
             <select
@@ -157,7 +173,7 @@ export default function Charts(){
       {/* Upload Form */}
       {showUpload && (
         <div className="bg-krcard backdrop-blur-sm rounded-xl shadow-sm border border-krborder p-6 mb-6">
-          <h2 className="text-lg font-semibold mb-4">Upload New Chart</h2>
+          <h2 className="text-lg font-semibold mb-4">Upload New Snapshot</h2>
           <div className="grid md:grid-cols-2 gap-4">
             <div className="space-y-1">
               <label className="text-sm font-medium text-krtext">Ticker</label>
@@ -205,6 +221,14 @@ export default function Charts(){
               />
             </div>
             <div className="md:col-span-2 space-y-1">
+              <label className="text-sm font-medium text-krtext">PNL Image</label>
+              <FileUploader
+                value={uploadForm.pnlImg}
+                onChange={val => setUploadForm({...uploadForm, pnlImg: val})}
+                accept="image/*"
+              />
+            </div>
+            <div className="md:col-span-2 space-y-1">
               <label className="text-sm font-medium text-krtext">Reason for Entry</label>
               <textarea
                 className="w-full px-3 py-2 border border-krborder rounded-md bg-transparent text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold min-h-[80px]"
@@ -227,26 +251,27 @@ export default function Charts(){
             onClick={uploadChart}
             className="mt-4 px-6 py-2 bg-krgold hover:bg-kryellow text-krblack rounded-lg font-semibold transition-colors"
           >
-            Upload Chart
+            Upload Snapshot
           </button>
         </div>
       )}
 
-      {/* Charts Grid */}
+      {/* Snapshots Grid */}
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredItems.length === 0 && (
           <div className="col-span-full text-center text-gray-400 py-12">
-            {hasActiveFilters ? 'No charts match the selected filters.' : 'No charts available. Upload your first chart to get started!'}
+            {hasActiveFilters ? `No ${imageType.toLowerCase()} snapshots match the selected filters.` : `No ${imageType.toLowerCase()} snapshots available. Upload your first snapshot to get started!`}
           </div>
         )}
         {filteredItems.map((it:any)=> {
           const isProfit = it.exitPrice > it.entryPrice
           const pnlAmount = it.pnlAmount || (it.exitPrice - it.entryPrice)
           const pnlPercent = it.pnlPercent || (((it.exitPrice - it.entryPrice) / it.entryPrice) * 100)
+          const displayImage = imageType === 'Chart' ? it.chartImg : it.pnlImg
           
           return (
             <div key={it.id} className="bg-krcard backdrop-blur-sm rounded-xl border border-krborder overflow-hidden hover:border-krgold/50 transition-colors">
-              <img src={it.chartImg} className="w-full h-56 object-cover" alt={`${it.ticker} chart`} />
+              <img src={displayImage} className="w-full h-56 object-cover" alt={`${it.ticker} ${imageType.toLowerCase()}`} />
               
               <div className="p-4 space-y-3">
                 {/* Header */}

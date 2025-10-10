@@ -69,7 +69,7 @@ export default function VisionBoard(){
   const completedGoals = items.filter((it: any) => it.status === 'completed')
 
   return (
-    <div>
+    <div className="min-h-screen bg-krcard/30 backdrop-blur-sm text-krtext p-6">
       <h1 className="text-2xl font-bold mb-4 text-krtext">Vision Board</h1>
       <div className="grid md:grid-cols-[350px,1fr] gap-4 mb-6">
         <div className="p-4 bg-krcard rounded-xl border border-krborder self-start">

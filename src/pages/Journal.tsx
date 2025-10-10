@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react'
 import FileUploader from '../components/FileUploader'
 import DateTimePicker from '../components/DateTimePicker'
 import Select from '../components/Select'
+import Modal from '../components/Modal'
 import SendToDiscordButton from '../components/SendToDiscordButton'
 import { loadData, saveData } from '../utils/storage'
 import { useCurrency } from '../context/CurrencyContext'
 import { JournalEntry, TradeObjective, TradeType, TradePosition } from '../types'
-import { TrendingUp, TrendingDown, Link } from 'lucide-react'
+import { TrendingUp, TrendingDown, Link, X } from 'lucide-react'
 
 const OBJECTIVES: TradeObjective[] = ['Scalping', 'Day Trade', 'Swing Trade', 'Position']
 const TYPES: TradeType[] = ['Spot', 'Futures']
@@ -18,6 +19,7 @@ export default function Journal() {
   const { formatAmount } = useCurrency()
   const [items, setItems] = useState<JournalEntry[]>(data.journal || [])
   const [strategies, setStrategies] = useState<string[]>([])
+  const [viewingTrade, setViewingTrade] = useState<JournalEntry | null>(null)
   const [form, setForm] = useState<Partial<JournalEntry>>({
     date: new Date().toISOString().split('T')[0],
     time: new Date().toLocaleTimeString('en-US', { hour12: false }).slice(0, 5),
@@ -322,7 +324,11 @@ export default function Journal() {
             {items.map((it) => {
               const isProfit = it.pnlAmount > 0
               return (
-                <div key={it.id} className="bg-krblack/30 rounded-xl shadow-sm border border-krborder p-4">
+                <div 
+                  key={it.id} 
+                  onClick={() => setViewingTrade(it)}
+                  className="bg-krblack/30 rounded-xl shadow-sm border border-krborder p-4 cursor-pointer hover:border-krgold/50 transition-colors"
+                >
                   {/* Chart Image */}
                   {it.chartImg && (
                     <img src={it.chartImg} className="w-full h-32 object-cover rounded-md mb-3" alt="Chart" />
@@ -340,56 +346,16 @@ export default function Journal() {
                     </span>
                   </div>
 
-                  {/* Trade Details */}
-                  <div className="text-xs text-gray-400 space-y-1 mb-3">
+                  {/* Trade Details - Summary Only */}
+                  <div className="text-xs text-gray-400 space-y-1">
                     <div className="grid grid-cols-2 gap-x-2">
                       <div><strong className="text-krtext">Type:</strong> {it.type} {it.type === 'Futures' ? `${it.leverage}x` : ''}</div>
                       <div><strong className="text-krtext">Position:</strong> {it.position}</div>
-                      <div><strong className="text-krtext">Objective:</strong> {it.objective}</div>
-                      <div><strong className="text-krtext">Setup:</strong> {it.setup}</div>
                     </div>
-                    <div className="border-t border-krborder pt-1 mt-2">
-                      <div><strong className="text-krtext">Entry:</strong> {formatAmount(it.entryPrice)} on {it.date} {it.time}</div>
-                      <div><strong className="text-krtext">Exit:</strong> {formatAmount(it.exitPrice)} on {it.exitDate} {it.exitTime}</div>
-                      <div><strong className="text-krtext">P&L:</strong> {formatAmount(it.pnlAmount)} ({it.pnlPercent.toFixed(2)}%)</div>
-                      <div><strong className="text-krtext">Fee:</strong> {formatAmount(it.fee || 0)}</div>
+                    <div>
+                      <strong className="text-krtext">Entry:</strong> {formatAmount(it.entryPrice)} → <strong className="text-krtext">Exit:</strong> {formatAmount(it.exitPrice)}
                     </div>
-                    {(it.reasonIn || it.reasonOut) && (
-                      <div className="border-t border-krborder pt-1 mt-2">
-                        {it.reasonIn && <div><strong className="text-krtext">Entry Reason:</strong> {it.reasonIn}</div>}
-                        {it.reasonOut && <div><strong className="text-krtext">Exit Reason:</strong> {it.reasonOut}</div>}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="flex flex-wrap gap-2">
-                    <button
-                      onClick={() => {
-                        setForm({ ...it });
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                      }}
-                      className="flex-1 min-w-[80px] text-xs px-3 py-1.5 text-blue-400 hover:bg-blue-500/10 border border-blue-500/30 rounded-md transition-colors"
-                    >
-                      Edit
-                    </button>
-                    {it.chartImg && (
-                      <a 
-                        href={it.chartImg} 
-                        target="_blank" 
-                        rel="noopener noreferrer" 
-                        className="flex-1 min-w-[80px] text-center text-xs px-3 py-1.5 text-krgold hover:bg-krgold/10 border border-krgold/30 rounded-md transition-colors"
-                      >
-                        Chart
-                      </a>
-                    )}
-                    <SendToDiscordButton trade={it} />
-                    <button
-                      onClick={() => remove(it.id)}
-                      className="flex-1 min-w-[80px] text-xs px-3 py-1.5 text-red-400 hover:bg-red-500/10 border border-red-500/30 rounded-md transition-colors"
-                    >
-                      Delete
-                    </button>
+                    <div><strong className="text-krtext">P&L:</strong> {formatAmount(it.pnlAmount)} ({it.pnlPercent.toFixed(2)}%)</div>
                   </div>
                 </div>
               )
@@ -397,6 +363,135 @@ export default function Journal() {
           </div>
         </div>
       </div>
+
+      {/* Trade Details Modal */}
+      {viewingTrade && (
+        <Modal isOpen={!!viewingTrade} onClose={() => setViewingTrade(null)} title="Trade Details" maxWidth="max-w-4xl">
+          <div className="max-w-4xl mx-auto">
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <h2 className="text-2xl font-bold text-krtext">{viewingTrade.ticker}</h2>
+                <p className="text-sm text-gray-400">{viewingTrade.date} {viewingTrade.time}</p>
+              </div>
+              <span className={`text-lg px-3 py-1.5 rounded font-semibold ${viewingTrade.pnlAmount > 0 ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
+                {viewingTrade.pnlAmount > 0 ? <TrendingUp className="inline-block w-5 h-5 mr-1" /> : <TrendingDown className="inline-block w-5 h-5 mr-1" />}
+                {viewingTrade.pnlPercent.toFixed(2)}%
+              </span>
+            </div>
+
+            {/* Images */}
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              {viewingTrade.chartImg && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-2">Chart Image</label>
+                  <img src={viewingTrade.chartImg} className="w-full rounded-lg border border-krborder" alt="Chart" />
+                </div>
+              )}
+              {viewingTrade.pnlImg && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-2">PnL Image</label>
+                  <img src={viewingTrade.pnlImg} className="w-full rounded-lg border border-krborder" alt="PnL" />
+                </div>
+              )}
+            </div>
+
+            {/* Trade Details Grid */}
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-1">Type</label>
+                  <div className="text-krtext">{viewingTrade.type} {viewingTrade.type === 'Futures' ? `${viewingTrade.leverage}x` : ''}</div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-1">Position</label>
+                  <div className="text-krtext">{viewingTrade.position}</div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-1">Objective</label>
+                  <div className="text-krtext">{viewingTrade.objective}</div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-1">Setup</label>
+                  <div className="text-krtext">{viewingTrade.setup}</div>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-1">Entry Price</label>
+                  <div className="text-krtext">{formatAmount(viewingTrade.entryPrice)}</div>
+                  <div className="text-xs text-gray-400">{viewingTrade.date} {viewingTrade.time}</div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-1">Exit Price</label>
+                  <div className="text-krtext">{formatAmount(viewingTrade.exitPrice)}</div>
+                  <div className="text-xs text-gray-400">{viewingTrade.exitDate} {viewingTrade.exitTime}</div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-1">P&L</label>
+                  <div className={`font-semibold ${viewingTrade.pnlAmount > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                    {formatAmount(viewingTrade.pnlAmount)} ({viewingTrade.pnlPercent.toFixed(2)}%)
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-1">Fee</label>
+                  <div className="text-krtext">{formatAmount(viewingTrade.fee || 0)}</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Reasons */}
+            {(viewingTrade.reasonIn || viewingTrade.reasonOut) && (
+              <div className="space-y-4 mb-6">
+                {viewingTrade.reasonIn && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-400 mb-2">Reason for Entry</label>
+                    <div className="p-3 bg-krcard/50 rounded-lg border border-krborder text-krtext">
+                      {viewingTrade.reasonIn}
+                    </div>
+                  </div>
+                )}
+                {viewingTrade.reasonOut && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-400 mb-2">Reason for Exit</label>
+                    <div className="p-3 bg-krcard/50 rounded-lg border border-krborder text-krtext">
+                      {viewingTrade.reasonOut}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Action Buttons */}
+            <div className="flex gap-3">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setForm({ ...viewingTrade });
+                  setViewingTrade(null);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className="flex-1 px-4 py-2 text-blue-400 hover:bg-blue-500/10 border border-blue-500/30 rounded-md transition-colors"
+              >
+                Edit Trade
+              </button>
+              <SendToDiscordButton trade={viewingTrade} />
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (confirm('Are you sure you want to delete this trade?')) {
+                    remove(viewingTrade.id);
+                    setViewingTrade(null);
+                  }
+                }}
+                className="px-4 py-2 text-red-400 hover:bg-red-500/10 border border-red-500/30 rounded-md transition-colors"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 }

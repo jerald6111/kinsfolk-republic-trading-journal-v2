@@ -7,7 +7,7 @@ const nav = [
   { to: '/vision', label: 'Vision' },
   { to: '/journal', label: 'Journal' },
   { to: '/playbook', label: 'Playbook' },
-  { to: '/charts', label: 'Charts' },
+  { to: '/charts', label: 'Snapshots' },
   { to: '/wallet', label: 'Wallet' },
 ]
 
