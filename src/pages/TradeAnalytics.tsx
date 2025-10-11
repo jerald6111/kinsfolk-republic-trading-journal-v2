@@ -603,51 +603,6 @@ export default function TradeAnalytics() {
         </div>
       )}
 
-      {/* Leverage Usage Heatmap */}
-      {Object.keys(leverageData).length > 0 && (
-        <div className="bg-krcard backdrop-blur-sm rounded-xl border border-krborder p-6 mb-8">
-          <h2 className="text-xl font-semibold mb-4">Leverage Usage & PnL Correlation</h2>
-          <div className="mb-4 text-sm text-gray-400">
-            Average Leverage: <span className="text-krtext font-semibold">{avgLeverage.toFixed(1)}x</span>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
-            {Object.entries(leverageData)
-              .sort(([a], [b]) => Number(a) - Number(b))
-              .map(([leverage, stats]: any) => {
-                const winRate = stats.count > 0 ? (stats.wins / stats.count) * 100 : 0
-                const avgPnl = stats.count > 0 ? stats.totalPnl / stats.count : 0
-                const intensity = Math.min(stats.count / 5, 1) // Max out at 5 trades for color intensity
-                
-                return (
-                  <div
-                    key={leverage}
-                    className="bg-krblack/30 rounded-lg p-3 border-2"
-                    style={{
-                      borderColor: avgPnl >= 0
-                        ? `rgba(34, 197, 94, ${0.2 + intensity * 0.6})`
-                        : `rgba(239, 68, 68, ${0.2 + intensity * 0.6})`,
-                      backgroundColor: avgPnl >= 0
-                        ? `rgba(34, 197, 94, ${0.05 + intensity * 0.15})`
-                        : `rgba(239, 68, 68, ${0.05 + intensity * 0.15})`
-                    }}
-                  >
-                    <div className="text-lg font-bold text-krtext mb-1">{leverage}x</div>
-                    <div className="text-xs space-y-1">
-                      <div className="text-gray-400">{stats.count} trades</div>
-                      <div className={winRate >= 50 ? 'text-green-400' : 'text-red-400'}>
-                        {winRate.toFixed(0)}% WR
-                      </div>
-                      <div className={avgPnl >= 0 ? 'text-green-400' : 'text-red-400'}>
-                        {formatAmount(avgPnl)} avg
-                      </div>
-                    </div>
-                  </div>
-                )
-              })}
-          </div>
-        </div>
-      )}
-
       {/* Risk Management Metrics */}
       <div className="bg-krcard backdrop-blur-sm rounded-xl border border-krborder p-6 mb-8">
         <div className="flex items-center gap-3 mb-4">
@@ -881,8 +836,8 @@ export default function TradeAnalytics() {
       </div>
 
       {/* Visualization Charts */}
-      <div className="grid md:grid-cols-2 gap-6 mb-8">
-        {/* PnL Over Time - Equity Curve */}
+      <div className="mb-8">
+        {/* PnL Over Time - Equity Curve - Full Width */}
         <div className="bg-krcard backdrop-blur-sm rounded-xl border border-krborder p-6">
           <h2 className="text-lg font-semibold mb-4">PnL Over Time (Equity Curve)</h2>
           {journal.length === 0 ? (
@@ -916,7 +871,7 @@ export default function TradeAnalytics() {
                     <div className="text-sm text-gray-400 mb-2">
                       Starting Balance: {formatAmount(walletBalance)} → Current: {formatAmount(currentBalance)}
                     </div>
-                    <div className="relative h-64 bg-krblack/30 rounded-lg p-4">
+                    <div className="relative h-80 bg-krblack/30 rounded-lg p-4">
                       {/* Y-axis labels */}
                       <div className="absolute left-0 top-0 bottom-0 w-16 flex flex-col justify-between text-xs text-gray-500">
                         <div>{formatAmount(maxPnl)}</div>
