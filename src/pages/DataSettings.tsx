@@ -134,9 +134,9 @@ export default function DataSettings(){
       // Export data
       const dataStr = JSON.stringify(localStorage, null, 2)
       
-      // Call serverless function (works on Netlify/Vercel deployment)
-      const functionUrl = '/.netlify/functions/send-email' // Netlify
-      // For local development or if not deployed, use fallback
+      // Call serverless function (works on Vercel/Netlify deployment)
+      // Try Vercel first, then Netlify
+      const functionUrl = '/api/send-email' // Vercel format
       
       const response = await fetch(functionUrl, {
         method: 'POST',
@@ -156,7 +156,8 @@ export default function DataSettings(){
         setSendingEmail(false)
         alert(`✅ Email sent successfully to ${email}!\n\n🛡️ Anti-Phishing Code: ${antiPhishingCode}\n\nYour backup has been sent. Please check your inbox (and spam folder if needed).\n\nEmail ID: ${result.id}`)
       } else {
-        throw new Error('Failed to send email via serverless function')
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to send email')
       }
       
     } catch (error) {
@@ -175,7 +176,7 @@ export default function DataSettings(){
       document.body.removeChild(link)
       URL.revokeObjectURL(url)
       
-      alert(`⚠️ Email sending failed (not deployed yet or network error)\n\nYour backup has been downloaded instead. You can manually send it to ${email}\n\n💡 To enable email sending:\n1. Deploy this app to Netlify or Vercel\n2. The serverless function will handle emails automatically\n\nError: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      alert(`⚠️ Email sending failed\n\nYour backup has been downloaded instead. You can manually send it to ${email}\n\n💡 Make sure you've deployed to Vercel and the API function is working.\n\nError: ${error instanceof Error ? error.message : 'Unknown error'}`)
     }
   }
 
