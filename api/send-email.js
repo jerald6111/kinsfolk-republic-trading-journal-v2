@@ -81,12 +81,20 @@ module.exports = async (req, res) => {
               <li>Choose "Merge" to combine with existing data, or "Overwrite" to replace all data</li>
             </ol>
             
-            <p><strong>💾 Your Data:</strong><br>
-            The backup is included below in JSON format. You can copy it and save it as a .json file.</p>
+            <h3>📎 Attached File:</h3>
+            <p><strong>trading-journal-backup-${new Date().toISOString().split('T')[0]}.json</strong></p>
+            <p>Your complete trading journal backup is attached to this email. You can:</p>
+            <ul>
+              <li>📥 Download the attachment directly from this email</li>
+              <li>📋 Or copy the JSON data below and create your own backup file for extra security</li>
+            </ul>
             
-            <div style="background: #1E2329; color: #D4AF37; padding: 15px; border-radius: 8px; overflow-x: auto; max-height: 300px; overflow-y: auto;">
-              <pre style="margin: 0; white-space: pre-wrap; word-wrap: break-word; font-size: 11px;">${dataStr}</pre>
-            </div>
+            <details style="margin-top: 20px;">
+              <summary style="cursor: pointer; font-weight: bold; color: #D4AF37;">📄 View JSON Data (Click to expand)</summary>
+              <div style="background: #1E2329; color: #D4AF37; padding: 15px; border-radius: 8px; overflow-x: auto; max-height: 300px; overflow-y: auto; margin-top: 10px;">
+                <pre style="margin: 0; white-space: pre-wrap; word-wrap: break-word; font-size: 11px;">${dataStr}</pre>
+              </div>
+            </details>
           </div>
           
           <div class="footer">
@@ -98,12 +106,22 @@ module.exports = async (req, res) => {
       </html>
     `;
 
-    // Send email
+    // Prepare attachment
+    const filename = `trading-journal-backup-${new Date().toISOString().split('T')[0]}.json`;
+    const attachmentContent = Buffer.from(dataStr).toString('base64');
+
+    // Send email with attachment
     const { data, error } = await resend.emails.send({
-      from: 'onboarding@resend.dev',
+      from: 'Kinsfolk Republic <kinsfolk.republic@resend.dev>',
       to: email,
       subject: `🔒 Trading Journal Backup - ${new Date().toLocaleDateString()} - Code: ${antiPhishingCode}`,
-      html: emailHTML
+      html: emailHTML,
+      attachments: [
+        {
+          filename: filename,
+          content: attachmentContent
+        }
+      ]
     });
 
     if (error) {

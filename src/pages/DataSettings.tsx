@@ -189,6 +189,8 @@ export default function DataSettings(){
     setAntiPhishingCode(code)
   }
 
+  const [showHowToUse, setShowHowToUse] = useState(false)
+
   return (
     <div className="max-w-4xl mx-auto">
       <h1 className="text-2xl font-bold mb-6">Data Settings</h1>
@@ -338,30 +340,39 @@ export default function DataSettings(){
             </button>
           </div>
 
-          {/* Info Note */}
-          <div className="p-4 bg-green-500/10 border border-green-500/30 rounded-xl">
-            <h3 className="text-sm font-semibold text-green-400 mb-2">✅ Resend Email Service Active</h3>
-            <div className="text-xs text-green-300 space-y-2 leading-relaxed">
-              <p><strong>Status:</strong> Email sending is fully configured and ready to use!</p>
-              <p><strong>Service:</strong> Resend (3,000 free emails/month)</p>
-              <p><strong>Features:</strong></p>
-              <ul className="list-disc list-inside ml-2 space-y-1">
-                <li>Professional HTML emails with your anti-phishing code</li>
-                <li>Automatic backup delivery to your inbox</li>
-                <li>Beautiful formatted emails with instructions</li>
-                <li>Inline JSON data for easy restoration</li>
-                <li>Secure and reliable delivery</li>
-              </ul>
-              <p className="mt-2"><strong>💡 How to use:</strong></p>
-              <ol className="list-decimal list-inside ml-2 space-y-1">
-                <li>Enter your email address above</li>
-                <li>Set your anti-phishing code</li>
-                <li>Choose auto-send frequency (or keep as manual)</li>
-                <li>Click "Save Email Settings"</li>
-                <li>Click "Send Now" to test!</li>
-              </ol>
-              <p className="mt-3 text-yellow-300"><strong>📧 Note:</strong> Emails will be sent when app is deployed to Netlify/Vercel. Until then, backups download as files.</p>
-            </div>
+          {/* How to Use Button */}
+          <div className="mt-4">
+            <button
+              onClick={() => setShowHowToUse(!showHowToUse)}
+              className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-krcard border border-krborder text-krtext rounded-xl hover:bg-krborder transition-colors"
+            >
+              <span className="text-lg">ℹ️</span>
+              <span className="text-lg">💡</span>
+              <span className="font-medium">How to use</span>
+            </button>
+            
+            {showHowToUse && (
+              <div className="mt-3 p-4 bg-blue-500/10 border border-blue-500/30 rounded-xl">
+                <h3 className="text-sm font-semibold text-blue-400 mb-3">💡 How to use Email Backup:</h3>
+                <ol className="text-xs text-blue-300 space-y-2 list-decimal list-inside">
+                  <li>Enter your email address above</li>
+                  <li>Set your anti-phishing code (for security verification)</li>
+                  <li>Choose auto-send frequency (or keep as manual)</li>
+                  <li>Click "Save Email Settings"</li>
+                  <li>Click "Send Now" - you'll receive an email with:
+                    <ul className="ml-6 mt-1 space-y-1 list-disc">
+                      <li>Your anti-phishing code (verify it matches!)</li>
+                      <li>📎 <strong>Attached JSON backup file</strong> (ready to download)</li>
+                      <li>Optional: Copy JSON data from email for extra security</li>
+                    </ul>
+                  </li>
+                </ol>
+                <p className="mt-3 text-xs text-yellow-300">
+                  <strong>💾 Note:</strong> The backup file is attached to the email, so you can download it directly. 
+                  The "Export Data" button below lets you save a backup locally without sending an email.
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>
