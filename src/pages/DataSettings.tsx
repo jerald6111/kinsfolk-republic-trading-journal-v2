@@ -13,7 +13,7 @@ import {
 } from '../utils/storage'
 import { useCurrency } from '../context/CurrencyContext'
 import Modal from '../components/Modal'
-import { AlertTriangle, Save, Link2, Trash2, Mail, Shield, Download, Send, CheckCircle2, Info } from 'lucide-react'
+import { AlertTriangle, Save, Link2, Trash2, Mail, Shield, Download, Send, CheckCircle2, Info, Eye, EyeOff } from 'lucide-react'
 
 type EmailFrequency = 'disabled' | 'on-add' | 'on-delete' | 'on-change' | 'daily' | 'weekly'
 
@@ -39,6 +39,8 @@ export default function DataSettings(){
   const [showEmailSettings, setShowEmailSettings] = useState(false)
   const [emailSaved, setEmailSaved] = useState(false)
   const [sendingEmail, setSendingEmail] = useState(false)
+  const [showEmail, setShowEmail] = useState(false)
+  const [showPhishingCode, setShowPhishingCode] = useState(false)
 
   useEffect(() => {
     setWebhooks(getDiscordWebhooks())
@@ -118,8 +120,31 @@ export default function DataSettings(){
     localStorage.setItem('email_frequency', emailFrequency)
     localStorage.setItem('anti_phishing_code', antiPhishingCode)
     
+    // Hide email and phishing code after saving
+    setShowEmail(false)
+    setShowPhishingCode(false)
+    
     setEmailSaved(true)
     setTimeout(() => setEmailSaved(false), 3000)
+  }
+  
+  // Helper function to mask email (show last 3 chars before @)
+  const getMaskedEmail = () => {
+    if (!email || showEmail) return email
+    const atIndex = email.indexOf('@')
+    if (atIndex <= 3) return email // Email too short to mask
+    const beforeAt = email.substring(0, atIndex)
+    const afterAt = email.substring(atIndex)
+    const lastThree = beforeAt.slice(-3)
+    const masked = '•'.repeat(beforeAt.length - 3) + lastThree + afterAt
+    return masked
+  }
+  
+  // Helper function to mask phishing code (show last 2 chars)
+  const getMaskedPhishingCode = () => {
+    if (!antiPhishingCode || showPhishingCode) return antiPhishingCode
+    if (antiPhishingCode.length <= 2) return antiPhishingCode
+    return '•'.repeat(antiPhishingCode.length - 2) + antiPhishingCode.slice(-2)
   }
 
   const handleSendEmail = async () => {
@@ -280,13 +305,30 @@ export default function DataSettings(){
             <label className="block text-sm font-medium text-krtext mb-2">
               Email Address
             </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 border border-krborder rounded-xl bg-krblack text-krtext focus:ring-1 focus:ring-krgold"
-              placeholder="your.email@example.com"
-            />
+            <div className="relative">
+              <input
+                type="email"
+                value={getMaskedEmail()}
+                onChange={(e) => {
+                  // Only update if showing (not masked)
+                  if (showEmail) {
+                    setEmail(e.target.value)
+                  }
+                }}
+                onFocus={() => setShowEmail(true)}
+                className="w-full px-3 py-2 pr-12 border border-krborder rounded-xl bg-krblack text-krtext focus:ring-1 focus:ring-krgold"
+                placeholder="your.email@example.com"
+                readOnly={!showEmail}
+              />
+              <button
+                type="button"
+                onClick={() => setShowEmail(!showEmail)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-krmuted hover:text-krtext transition-colors"
+                title={showEmail ? "Hide email" : "Show email"}
+              >
+                {showEmail ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
             <p className="text-xs text-krmuted mt-1">
               Your data will be sent to this email address automatically based on the frequency you choose
             </p>
@@ -326,26 +368,31 @@ export default function DataSettings(){
               Anti-Phishing Code
             </label>
             <div className="flex gap-2">
-              <input
-                type="text"
-                value={emailSaved && antiPhishingCode.length >= 2 
-                  ? '•'.repeat(antiPhishingCode.length - 2) + antiPhishingCode.slice(-2)
-                  : antiPhishingCode
-                }
-                onChange={(e) => {
-                  // Only allow changes if not saved/masked
-                  if (!emailSaved) {
-                    setAntiPhishingCode(e.target.value.toUpperCase())
-                  }
-                }}
-                onFocus={() => {
-                  // Show full code on focus
-                  setEmailSaved(false)
-                }}
-                className="flex-1 px-3 py-2 border border-krborder rounded-xl bg-krblack text-krtext font-mono text-lg tracking-wider focus:ring-1 focus:ring-krgold"
-                placeholder="XXXXXXXX"
-                maxLength={8}
-              />
+              <div className="relative flex-1">
+                <input
+                  type="text"
+                  value={getMaskedPhishingCode()}
+                  onChange={(e) => {
+                    // Only update if showing (not masked)
+                    if (showPhishingCode) {
+                      setAntiPhishingCode(e.target.value.toUpperCase())
+                    }
+                  }}
+                  onFocus={() => setShowPhishingCode(true)}
+                  className="w-full px-3 py-2 pr-12 border border-krborder rounded-xl bg-krblack text-krtext font-mono text-lg tracking-wider focus:ring-1 focus:ring-krgold"
+                  placeholder="XXXXXXXX"
+                  maxLength={8}
+                  readOnly={!showPhishingCode}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPhishingCode(!showPhishingCode)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-krmuted hover:text-krtext transition-colors"
+                  title={showPhishingCode ? "Hide code" : "Show code"}
+                >
+                  {showPhishingCode ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
               <button
                 onClick={generateRandomPhishingCode}
                 className="px-4 py-2 bg-krgold/20 text-krgold rounded-xl hover:bg-krgold/30 transition-colors whitespace-nowrap"
