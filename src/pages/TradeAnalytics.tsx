@@ -378,126 +378,120 @@ export default function TradeAnalytics() {
   }
 
   return (
-    <div className="min-h-screen bg-krcard/30 backdrop-blur-sm text-krtext p-6">
-      {/* Header */}
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-2">
-          <BarChart3 className="text-krgold" size={32} />
-          <h1 className="text-3xl font-bold">Trade Analytics</h1>
+    <div className="min-h-screen bg-gradient-to-br from-krblack via-krblack to-krcard/20 text-krtext p-4 md:p-6">
+      {/* Header with Gradient */}
+      <div className="mb-6">
+        <div className="flex items-center gap-3 mb-4">
+          <span className="text-4xl">📊</span>
+          <div>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-krgold to-kryellow bg-clip-text text-transparent">Trade Analytics</h1>
+            <p className="text-krmuted text-sm mt-1">Comprehensive analysis of your trading performance</p>
+          </div>
         </div>
-        <p className="text-gray-400">Comprehensive analysis of your trading performance</p>
-      </div>
 
-      {/* ========== SECTION 1: KEY PERFORMANCE METRICS ========== */}
-      <div className="mb-8">
-        <h2 className="text-xl font-semibold mb-4 text-krtext flex items-center gap-2">
-          <Activity size={24} className="text-krgold" />
-          Key Performance Metrics
-        </h2>
-        
-        {/* Primary Stats - 5 columns */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
-          <div className="bg-krcard backdrop-blur-sm rounded-xl border border-krborder p-6">
-            <div className="flex items-center gap-3 mb-2">
-              <Activity className="text-gray-400" size={20} />
-              <div className="text-gray-400 text-sm">Total Trades</div>
+        {/* Key Performance Metrics - 5 columns */}
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4">
+          <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4 hover:border-krgold/50 transition-all">
+            <div className="flex items-center gap-2 mb-2">
+              <Activity className="text-blue-400" size={16} />
+              <p className="text-xs text-krmuted">Total Trades</p>
             </div>
-            <div className="text-3xl font-bold text-krtext">{totalTrades}</div>
-            <div className="text-xs text-gray-500 mt-1">{wins}W / {losses}L</div>
+            <p className="text-2xl font-bold text-krtext">{totalTrades}</p>
+            <p className="text-xs text-krmuted mt-1">{wins}W / {losses}L</p>
           </div>
 
-          <div className="bg-krcard backdrop-blur-sm rounded-xl border border-krborder p-6">
-            <div className="flex items-center gap-3 mb-2">
-              <Percent className="text-gray-400" size={20} />
-              <div className="text-gray-400 text-sm">Win Rate</div>
+          <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4 hover:border-krgold/50 transition-all">
+            <div className="flex items-center gap-2 mb-2">
+              <Percent className="text-purple-400" size={16} />
+              <p className="text-xs text-krmuted">Win Rate</p>
             </div>
-            <div className={`text-3xl font-bold ${winRate >= 50 ? 'text-green-500' : 'text-red-500'}`}>
+            <p className={`text-2xl font-bold ${winRate >= 50 ? 'text-green-400' : 'text-red-400'}`}>
               {winRate}%
-            </div>
-            <div className="text-xs text-gray-500 mt-1">
-              {winRate >= 50 ? 'Above average' : 'Needs improvement'}
-            </div>
+            </p>
+            <p className="text-xs text-krmuted mt-1">
+              {winRate >= 50 ? '✓ Above avg' : '⚠ Improve'}
+            </p>
           </div>
 
-          <div className="bg-krcard backdrop-blur-sm rounded-xl border border-krborder p-6">
-            <div className="flex items-center gap-3 mb-2">
-              <DollarSign className="text-gray-400" size={20} />
-              <div className="text-gray-400 text-sm">Total PnL</div>
+          <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4 hover:border-krgold/50 transition-all">
+            <div className="flex items-center gap-2 mb-2">
+              <DollarSign className="text-krgold" size={16} />
+              <p className="text-xs text-krmuted">Total PnL</p>
             </div>
-            <div className={`text-3xl font-bold ${totalPnl >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+            <p className={`text-2xl font-bold ${totalPnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
               {formatAmount(totalPnl)}
-            </div>
-            <div className="text-xs text-gray-500 mt-1">
-              {totalPnl >= 0 ? '+' : ''}{totalTrades > 0 ? (totalPnl / totalTrades).toFixed(2) : '0.00'} avg per trade
-            </div>
+            </p>
+            <p className="text-xs text-krmuted mt-1">
+              {totalTrades > 0 ? formatAmount(totalPnl / totalTrades) : formatAmount(0)} avg
+            </p>
           </div>
 
-          <div className="bg-krcard backdrop-blur-sm rounded-xl border border-krborder p-6">
-            <div className="flex items-center gap-3 mb-2">
-              <Percent className="text-gray-400" size={20} />
-              <div className="text-gray-400 text-sm">ROI</div>
+          <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4 hover:border-krgold/50 transition-all">
+            <div className="flex items-center gap-2 mb-2">
+              <TrendingUp className="text-green-400" size={16} />
+              <p className="text-xs text-krmuted">ROI</p>
             </div>
-            <div className={`text-3xl font-bold ${roi >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-              {roi >= 0 ? '+' : ''}{roi.toFixed(2)}%
-            </div>
-            <div className="text-xs text-gray-500 mt-1">
-              Return on {formatAmount(totalDeposits)} invested
-            </div>
+            <p className={`text-2xl font-bold ${roi >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+              {roi >= 0 ? '+' : ''}{roi.toFixed(1)}%
+            </p>
+            <p className="text-xs text-krmuted mt-1">
+              on {formatAmount(totalDeposits)}
+            </p>
           </div>
 
-          <div className="bg-krcard backdrop-blur-sm rounded-xl border border-krborder p-6">
-            <div className="flex items-center gap-3 mb-2">
-              <Target className="text-gray-400" size={20} />
-              <div className="text-gray-400 text-sm">Profit Factor</div>
+          <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4 hover:border-krgold/50 transition-all">
+            <div className="flex items-center gap-2 mb-2">
+              <Target className="text-orange-400" size={16} />
+              <p className="text-xs text-krmuted">Profit Factor</p>
             </div>
-            <div className={`text-3xl font-bold ${profitFactor >= 1.5 ? 'text-green-500' : profitFactor >= 1 ? 'text-krgold' : 'text-red-500'}`}>
+            <p className={`text-2xl font-bold ${profitFactor >= 1.5 ? 'text-green-400' : profitFactor >= 1 ? 'text-yellow-400' : 'text-red-400'}`}>
               {profitFactor === Infinity ? '∞' : profitFactor.toFixed(2)}
-            </div>
-            <div className="text-xs text-gray-500 mt-1">
-              {profitFactor >= 1.5 ? 'Excellent' : profitFactor >= 1 ? 'Good' : 'Poor'}
-            </div>
+            </p>
+            <p className="text-xs text-krmuted mt-1">
+              {profitFactor >= 1.5 ? '✓ Excellent' : profitFactor >= 1 ? '~ Good' : '⚠ Poor'}
+            </p>
           </div>
         </div>
 
         {/* Secondary Metrics - 3 columns */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-krcard backdrop-blur-sm rounded-xl border border-krborder p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <TrendingUp className="text-green-500" size={20} />
-              <h2 className="text-lg font-semibold">Average Win</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3">
+          <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <TrendingUp className="text-green-400" size={18} />
+              <h3 className="text-sm font-semibold text-krtext">Average Win</h3>
             </div>
-            <div className="text-2xl font-bold text-green-500 mb-2">
+            <p className="text-xl font-bold text-green-400 mb-1">
               {formatAmount(avgWin)}
-            </div>
-            <div className="text-sm text-gray-400">
+            </p>
+            <p className="text-xs text-krmuted">
               Across {wins} winning trades
-            </div>
+            </p>
           </div>
 
-          <div className="bg-krcard backdrop-blur-sm rounded-xl border border-krborder p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <TrendingDown className="text-red-500" size={20} />
-              <h2 className="text-lg font-semibold">Average Loss</h2>
+          <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <TrendingDown className="text-red-400" size={18} />
+              <h3 className="text-sm font-semibold text-krtext">Average Loss</h3>
             </div>
-            <div className="text-2xl font-bold text-red-500 mb-2">
+            <p className="text-xl font-bold text-red-400 mb-1">
               {formatAmount(avgLoss)}
-            </div>
-            <div className="text-sm text-gray-400">
+            </p>
+            <p className="text-xs text-krmuted">
               Across {losses} losing trades
-            </div>
+            </p>
           </div>
 
-          <div className="bg-krcard backdrop-blur-sm rounded-xl border border-krborder p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <BarChart3 className="text-krgold" size={20} />
-              <h2 className="text-lg font-semibold">Risk/Reward Ratio</h2>
+          <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <BarChart3 className="text-krgold" size={18} />
+              <h3 className="text-sm font-semibold text-krtext">Risk/Reward</h3>
             </div>
-            <div className="text-2xl font-bold text-krgold mb-2">
+            <p className="text-xl font-bold text-krgold mb-1">
               1:{riskReward.toFixed(2)}
-            </div>
-            <div className="text-sm text-gray-400">
-              {riskReward >= 2 ? 'Excellent risk management' : riskReward >= 1 ? 'Good risk management' : 'Improve risk management'}
-            </div>
+            </p>
+            <p className="text-xs text-krmuted">
+              {riskReward >= 2 ? '✓ Excellent' : riskReward >= 1 ? '~ Good' : '⚠ Improve'}
+            </p>
           </div>
         </div>
       </div>
