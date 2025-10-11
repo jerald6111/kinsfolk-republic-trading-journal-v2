@@ -287,24 +287,12 @@ export default function SnapshotsOverview() {
             )}
 
             {/* Reasons */}
-            {(viewingTrade.reasonIn || viewingTrade.reasonOut) && (
-              <div className="space-y-3">
-                {viewingTrade.reasonIn && (
-                  <div>
-                    <label className="block text-sm font-medium text-krmuted mb-2">Reason for Entry</label>
-                    <div className="p-3 bg-krcard/50 rounded-lg border border-krborder text-krtext">
-                      {viewingTrade.reasonIn}
-                    </div>
-                  </div>
-                )}
-                {viewingTrade.reasonOut && (
-                  <div>
-                    <label className="block text-sm font-medium text-krmuted mb-2">Reason for Exit</label>
-                    <div className="p-3 bg-krcard/50 rounded-lg border border-krborder text-krtext">
-                      {viewingTrade.reasonOut}
-                    </div>
-                  </div>
-                )}
+            {viewingTrade.reasonIn && (
+              <div>
+                <label className="block text-sm font-medium text-krmuted mb-2">Reason for Entry & Exit</label>
+                <div className="p-3 bg-krcard/50 rounded-lg border border-krborder text-krtext whitespace-pre-wrap">
+                  {viewingTrade.reasonIn}
+                </div>
               </div>
             )}
           </div>
