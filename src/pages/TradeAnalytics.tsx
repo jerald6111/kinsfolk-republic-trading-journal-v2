@@ -7,6 +7,7 @@ export default function TradeAnalytics() {
   const data = loadData()
   const { formatAmount } = useCurrency()
   const journal = data.journal || []
+  const wallet = data.wallet || []
   
   const [calendarView, setCalendarView] = useState<'monthly' | 'weekly'>('monthly')
   const [currentDate, setCurrentDate] = useState(new Date())
@@ -27,6 +28,14 @@ export default function TradeAnalytics() {
   const profitFactor = losses > 0 && avgLoss !== 0
     ? (wins * avgWin) / (losses * Math.abs(avgLoss))
     : wins > 0 ? Infinity : 0
+
+  // Calculate ROI based on wallet deposits/withdrawals
+  const totalDeposits = wallet.filter((w: any) => w.type === 'deposit').reduce((s: number, w: any) => s + Number(w.amount), 0)
+  const totalWithdrawals = wallet.filter((w: any) => w.type === 'withdrawal').reduce((s: number, w: any) => s + Number(w.amount), 0)
+  const walletBalance = totalDeposits - totalWithdrawals
+  const currentBalance = walletBalance + totalPnl
+  // ROI = ((Current Balance - Total Deposits + Total Withdrawals) / Total Deposits) × 100
+  const roi = totalDeposits > 0 ? ((currentBalance - totalDeposits + totalWithdrawals) / totalDeposits) * 100 : 0
 
   // Group trades by ticker
   const tickerPerformance = journal.reduce((acc: any, trade) => {
@@ -266,7 +275,7 @@ export default function TradeAnalytics() {
       </div>
 
       {/* Primary Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
         <div className="bg-krcard backdrop-blur-sm rounded-xl border border-krborder p-6">
           <div className="flex items-center gap-3 mb-2">
             <Activity className="text-gray-400" size={20} />
@@ -299,6 +308,19 @@ export default function TradeAnalytics() {
           </div>
           <div className="text-xs text-gray-500 mt-1">
             {totalPnl >= 0 ? '+' : ''}{totalTrades > 0 ? (totalPnl / totalTrades).toFixed(2) : '0.00'} avg per trade
+          </div>
+        </div>
+
+        <div className="bg-krcard backdrop-blur-sm rounded-xl border border-krborder p-6">
+          <div className="flex items-center gap-3 mb-2">
+            <Percent className="text-gray-400" size={20} />
+            <div className="text-gray-400 text-sm">ROI</div>
+          </div>
+          <div className={`text-3xl font-bold ${roi >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+            {roi >= 0 ? '+' : ''}{roi.toFixed(2)}%
+          </div>
+          <div className="text-xs text-gray-500 mt-1">
+            Return on {formatAmount(totalDeposits)} invested
           </div>
         </div>
 
