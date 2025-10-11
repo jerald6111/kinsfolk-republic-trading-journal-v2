@@ -26,40 +26,23 @@ function TradingViewWidget({ type, title, icon }: { type: 'gainers' | 'losers' |
         importanceFilter: '0,1' // Medium to High importance
       })
     } else {
-      script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-hotlists.js'
+      script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-screener.js'
       const typeMap = {
-        gainers: 'gainers',
-        losers: 'losers',
-        active: 'active'
+        gainers: { label: 'Top Gainers', field: 'change', order: 'desc' },
+        losers: { label: 'Top Losers', field: 'change', order: 'asc' },
+        active: { label: 'Most Traded', field: 'volume', order: 'desc' }
       }
+      const config = typeMap[type]
       script.innerHTML = JSON.stringify({
-        colorTheme: 'dark',
-        dateRange: '1D',
-        exchange: 'US',
-        showChart: true,
-        locale: 'en',
-        largeChartUrl: '',
-        isTransparent: true,
-        showSymbolLogo: false,
-        showFloatingTooltip: false,
         width: '100%',
         height: '600',
-        plotLineColorGrowing: 'rgba(251, 191, 36, 1)',
-        plotLineColorFalling: 'rgba(251, 191, 36, 1)',
-        gridLineColor: 'rgba(42, 46, 57, 0)',
-        scaleFontColor: 'rgba(209, 212, 220, 1)',
-        belowLineFillColorGrowing: 'rgba(251, 191, 36, 0.12)',
-        belowLineFillColorFalling: 'rgba(251, 191, 36, 0.12)',
-        belowLineFillColorGrowingBottom: 'rgba(251, 191, 36, 0)',
-        belowLineFillColorFallingBottom: 'rgba(251, 191, 36, 0)',
-        symbolActiveColor: 'rgba(251, 191, 36, 0.12)',
-        tabs: [
-          {
-            title: typeMap[type],
-            sortField: type === 'active' ? 'volume' : 'change',
-            sortOrder: type === 'losers' ? 'asc' : 'desc'
-          }
-        ]
+        defaultColumn: config.field,
+        defaultScreen: 'general',
+        market: 'crypto',
+        showToolbar: false,
+        colorTheme: 'dark',
+        locale: 'en',
+        isTransparent: true
       })
     }
 
@@ -127,17 +110,17 @@ export default function News() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         <TradingViewWidget 
           type="gainers" 
-          title="Top Gainers" 
+          title="Top Crypto Gainers" 
           icon={<TrendingUp className="text-green-500" size={24} />} 
         />
         <TradingViewWidget 
           type="losers" 
-          title="Top Losers" 
+          title="Top Crypto Losers" 
           icon={<TrendingDown className="text-red-500" size={24} />} 
         />
         <TradingViewWidget 
           type="active" 
-          title="Most Traded" 
+          title="Most Traded Coins" 
           icon={<Activity className="text-krgold" size={24} />} 
         />
       </div>

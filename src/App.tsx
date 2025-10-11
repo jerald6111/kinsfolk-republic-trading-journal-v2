@@ -7,6 +7,7 @@ import Playbook from './pages/Playbook'
 import Charts from './pages/Charts'
 import Wallet from './pages/Wallet'
 import News from './pages/News'
+import DataMarket from './pages/DataMarket'
 import DataSettings from './pages/DataSettings'
 import Navbar from './components/Navbar'
 import { CurrencyProvider } from './context/CurrencyContext'
@@ -21,6 +22,7 @@ export default function App() {
             <Route path="/" element={<Dashboard />} />
             <Route path="/vision" element={<VisionBoard />} />
             <Route path="/news" element={<News />} />
+            <Route path="/data-market" element={<DataMarket />} />
             <Route path="/journal" element={<Journal />} />
             <Route path="/playbook" element={<Playbook />} />
             <Route path="/charts" element={<Charts />} />
