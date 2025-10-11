@@ -85,7 +85,10 @@ export default function DataSettings(){
     
     setIsImporting(true)
     try {
+      console.log('Starting import for file:', selectedFile.name, 'Size:', selectedFile.size, 'bytes')
+      
       await importData(selectedFile, { overwrite: importMode === 'overwrite' })
+      
       // Small delay to show completion
       await new Promise(resolve => setTimeout(resolve, 500))
       alert(`✅ Data imported successfully! Mode: ${importMode === 'overwrite' ? 'Overwrite' : 'Merge'}\n\n🔄 Refreshing page to load new data...`)
@@ -94,7 +97,8 @@ export default function DataSettings(){
       window.location.reload()
     } catch (error) {
       console.error('Import error:', error)
-      alert('❌ Failed to import data. Please check the file format and try again.')
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+      alert(`❌ Failed to import data.\n\nError: ${errorMessage}\n\nPlease check:\n1. File is a valid JSON file\n2. File was exported from this app\n3. File is not corrupted\n\nCheck browser console (F12) for more details.`)
       setIsImporting(false)
     } finally {
       setShowImportModal(false)

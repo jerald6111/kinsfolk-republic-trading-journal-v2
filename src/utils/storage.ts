@@ -183,15 +183,49 @@ export function exportData(){
 }
 
 export async function importData(file: File, { overwrite = false } = {}){
-  const txt = await file.text()
-  const data = JSON.parse(txt)
-  if(overwrite) {
-    localStorage.setItem(KEY, JSON.stringify(data))
-    return
+  try {
+    const txt = await file.text()
+    
+    // Log for debugging
+    console.log('File content length:', txt.length)
+    console.log('First 100 chars:', txt.substring(0, 100))
+    
+    // Try to parse JSON
+    const data = JSON.parse(txt)
+    
+    // Validate data structure
+    if (!data || typeof data !== 'object') {
+      throw new Error('Invalid data format: Expected an object')
+    }
+    
+    // Check if it has the expected structure (vision, journal, playbook, wallet)
+    const hasValidStructure = (
+      data.hasOwnProperty('vision') ||
+      data.hasOwnProperty('journal') ||
+      data.hasOwnProperty('playbook') ||
+      data.hasOwnProperty('wallet')
+    )
+    
+    if (!hasValidStructure) {
+      console.error('Invalid structure. Data keys:', Object.keys(data))
+      throw new Error('Invalid data format: Missing expected properties (vision, journal, playbook, wallet)')
+    }
+    
+    console.log('Data validated successfully:', Object.keys(data))
+    
+    if(overwrite) {
+      localStorage.setItem(KEY, JSON.stringify(data))
+      console.log('Data overwritten successfully')
+      return
+    }
+    const cur = loadData()
+    const merged = { ...cur, ...data }
+    localStorage.setItem(KEY, JSON.stringify(merged))
+    console.log('Data merged successfully')
+  } catch (error) {
+    console.error('Import error details:', error)
+    throw error // Re-throw to be caught by the calling function
   }
-  const cur = loadData()
-  const merged = { ...cur, ...data }
-  localStorage.setItem(KEY, JSON.stringify(merged))
 }
 
 export function deleteAllData(){

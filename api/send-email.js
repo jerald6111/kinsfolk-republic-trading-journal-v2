@@ -29,6 +29,10 @@ module.exports = async (req, res) => {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
+    // Log data format for debugging
+    console.log('Email send request - Data length:', dataStr.length);
+    console.log('First 200 chars:', dataStr.substring(0, 200));
+
     // Initialize Resend
     const resend = new Resend('re_D145aHmt_8nxXgKGfrUwfUeyP34SrujjN');
 
