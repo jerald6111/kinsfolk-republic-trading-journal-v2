@@ -218,36 +218,68 @@ export default function VisionBoard(){
       </div>
 
       <div className="grid md:grid-cols-[350px,1fr] gap-4 mb-6">
-        <div className="p-4 bg-krcard rounded-xl border border-krborder self-start">
-          <h2 className="text-lg font-semibold mb-3 text-krtext">{editingGoal ? 'Edit Goal' : 'Add New Goal'}</h2>
-          <input className="w-full mb-2 p-2 rounded bg-transparent text-krtext border border-krborder focus:border-krgold focus:ring-1 focus:ring-krgold" placeholder="Goal title" value={title} onChange={e=>setTitle(e.target.value)} />
-          <textarea className="w-full mb-2 p-2 rounded bg-transparent text-krtext border border-krborder focus:border-krgold focus:ring-1 focus:ring-krgold" placeholder="Description" value={desc} onChange={e=>setDesc(e.target.value)} rows={3} />
-          <input className="w-full mb-2 p-2 rounded bg-transparent text-krtext border border-krborder focus:border-krgold focus:ring-1 focus:ring-krgold" placeholder="Target amount" value={target} onChange={e=>setTarget(e.target.value)} />
-          
-          <select 
-            className="w-full mb-2 p-2 rounded-xl bg-krcard text-krtext border border-krborder focus:border-krgold focus:ring-1 focus:ring-krgold" 
-            value={timeline} 
-            onChange={e=>setTimeline(e.target.value as GoalTimeline)}
-          >
-            <option value="Short Term (3-6 months)" className="bg-krcard text-krtext">Short Term (3-6 months)</option>
-            <option value="Mid Term (6-12 months)" className="bg-krcard text-krtext">Mid Term (6-12 months)</option>
-            <option value="Long Term (1-3 years)" className="bg-krcard text-krtext">Long Term (1-3 years)</option>
-          </select>
-          
-          <div className="mb-2">
-            <FileUploader value={img} onChange={setImg} accept="image/*" />
+        <div className="p-6 bg-krcard/90 backdrop-blur-md rounded-2xl shadow-2xl border border-krborder/50 self-start">
+          <div className="flex items-center gap-2 mb-4">
+            <span className="text-2xl">{editingGoal ? '✏️' : '➕'}</span>
+            <h2 className="text-lg font-semibold text-krtext">{editingGoal ? 'Edit Goal' : 'Add New Goal'}</h2>
           </div>
-          <button className="w-full px-4 py-2 bg-krgold text-krblack rounded font-bold hover:bg-kryellow transition-colors" onClick={add}>
-            {editingGoal ? 'Update Goal' : 'Add Goal'}
-          </button>
-          {editingGoal && (
-            <button className="w-full mt-2 px-4 py-2 bg-krgray text-krtext rounded font-medium hover:bg-krgray/80 transition-colors" onClick={() => {
-              setEditingGoal(null)
-              setTitle(''); setDesc(''); setTarget(''); setTimeline('Short Term (3-6 months)'); setImg('')
-            }}>
-              Cancel
+          
+          <div className="space-y-3">
+            <input 
+              className="w-full p-3 rounded-xl bg-krblack/30 text-krtext border border-krborder/30 focus:border-krgold/50 focus:ring-2 focus:ring-krgold/20 transition-all placeholder:text-krmuted" 
+              placeholder="🎯 Goal title" 
+              value={title} 
+              onChange={e=>setTitle(e.target.value)} 
+            />
+            
+            <textarea 
+              className="w-full p-3 rounded-xl bg-krblack/30 text-krtext border border-krborder/30 focus:border-krgold/50 focus:ring-2 focus:ring-krgold/20 transition-all placeholder:text-krmuted" 
+              placeholder="📝 Description" 
+              value={desc} 
+              onChange={e=>setDesc(e.target.value)} 
+              rows={3} 
+            />
+            
+            <input 
+              className="w-full p-3 rounded-xl bg-krblack/30 text-krtext border border-krborder/30 focus:border-krgold/50 focus:ring-2 focus:ring-krgold/20 transition-all placeholder:text-krmuted" 
+              placeholder="💰 Target amount" 
+              value={target} 
+              onChange={e=>setTarget(e.target.value)} 
+            />
+            
+            <select 
+              className="w-full p-3 rounded-xl bg-krblack/30 text-krtext border border-krborder/30 focus:border-krgold/50 focus:ring-2 focus:ring-krgold/20 transition-all" 
+              value={timeline} 
+              onChange={e=>setTimeline(e.target.value as GoalTimeline)}
+            >
+              <option value="Short Term (3-6 months)" className="bg-krcard text-krtext">⚡ Short Term (3-6 months)</option>
+              <option value="Mid Term (6-12 months)" className="bg-krcard text-krtext">📅 Mid Term (6-12 months)</option>
+              <option value="Long Term (1-3 years)" className="bg-krcard text-krtext">🚀 Long Term (1-3 years)</option>
+            </select>
+            
+            <div className="pt-1">
+              <FileUploader value={img} onChange={setImg} accept="image/*" />
+            </div>
+            
+            <button 
+              className="w-full px-4 py-3 bg-gradient-to-r from-krgold to-kryellow text-krblack rounded-xl font-bold hover:shadow-lg hover:shadow-krgold/30 transition-all duration-200" 
+              onClick={add}
+            >
+              {editingGoal ? '💾 Update Goal' : '✨ Add Goal'}
             </button>
-          )}
+            
+            {editingGoal && (
+              <button 
+                className="w-full px-4 py-2 bg-krgray/50 text-krtext rounded-xl font-medium hover:bg-krgray/70 transition-colors border border-krborder/30" 
+                onClick={() => {
+                  setEditingGoal(null)
+                  setTitle(''); setDesc(''); setTarget(''); setTimeline('Short Term (3-6 months)'); setImg('')
+                }}
+              >
+                Cancel
+              </button>
+            )}
+          </div>
         </div>
 
         <div className="space-y-6">
