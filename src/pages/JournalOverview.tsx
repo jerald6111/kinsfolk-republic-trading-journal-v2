@@ -11,7 +11,8 @@ export default function JournalOverview() {
   const wins = journal.filter(j => j.pnlAmount > 0).length
   const losses = journal.filter(j => j.pnlAmount < 0).length
   const winRate = totalTrades ? Math.round((wins / totalTrades) * 100) : 0
-  const totalPnl = journal.reduce((s, j) => s + (j.pnlAmount || 0), 0)
+  // Total PnL = sum of (pnlAmount - fee) for each trade
+  const totalPnl = journal.reduce((s, j) => s + (j.pnlAmount || 0) - (j.fee || 0), 0)
   
   // Recent entries (last 5)
   const recentEntries = [...journal].reverse().slice(0, 5)
@@ -75,19 +76,19 @@ export default function JournalOverview() {
             <div className="bg-krblack/30 rounded-lg p-3">
               <div className="text-xs text-gray-400">Avg Win</div>
               <div className="text-lg font-semibold text-green-500">
-                ${wins > 0 ? (journal.filter(j => j.pnlAmount > 0).reduce((s, j) => s + j.pnlAmount, 0) / wins).toFixed(2) : '0.00'}
+                ${wins > 0 ? (journal.filter(j => j.pnlAmount > 0).reduce((s, j) => s + j.pnlAmount - (j.fee || 0), 0) / wins).toFixed(2) : '0.00'}
               </div>
             </div>
             <div className="bg-krblack/30 rounded-lg p-3">
               <div className="text-xs text-gray-400">Avg Loss</div>
               <div className="text-lg font-semibold text-red-500">
-                ${losses > 0 ? (journal.filter(j => j.pnlAmount < 0).reduce((s, j) => s + j.pnlAmount, 0) / losses).toFixed(2) : '0.00'}
+                ${losses > 0 ? (journal.filter(j => j.pnlAmount < 0).reduce((s, j) => s + j.pnlAmount - (j.fee || 0), 0) / losses).toFixed(2) : '0.00'}
               </div>
             </div>
             <div className="bg-krblack/30 rounded-lg p-3">
               <div className="text-xs text-gray-400">Risk/Reward</div>
               <div className="text-lg font-semibold text-krgold">
-                {wins > 0 && losses > 0 ? (Math.abs(journal.filter(j => j.pnlAmount > 0).reduce((s, j) => s + j.pnlAmount, 0) / wins) / Math.abs(journal.filter(j => j.pnlAmount < 0).reduce((s, j) => s + j.pnlAmount, 0) / losses)).toFixed(2) : '0.00'}
+                {wins > 0 && losses > 0 ? (Math.abs(journal.filter(j => j.pnlAmount > 0).reduce((s, j) => s + j.pnlAmount - (j.fee || 0), 0) / wins) / Math.abs(journal.filter(j => j.pnlAmount < 0).reduce((s, j) => s + j.pnlAmount - (j.fee || 0), 0) / losses)).toFixed(2) : '0.00'}
               </div>
             </div>
           </div>
@@ -114,17 +115,20 @@ export default function JournalOverview() {
             {recentEntries.length === 0 ? (
               <div className="text-center py-4 text-gray-400">No entries yet</div>
             ) : (
-              recentEntries.slice(0, 3).map(entry => (
-                <div key={entry.id} className="bg-krblack/30 rounded-lg p-3 flex items-center justify-between">
-                  <div>
-                    <div className="font-medium">{entry.ticker}</div>
-                    <div className="text-xs text-gray-400">{entry.date}</div>
+              recentEntries.slice(0, 3).map(entry => {
+                const netPnl = (entry.pnlAmount || 0) - (entry.fee || 0)
+                return (
+                  <div key={entry.id} className="bg-krblack/30 rounded-lg p-3 flex items-center justify-between">
+                    <div>
+                      <div className="font-medium">{entry.ticker}</div>
+                      <div className="text-xs text-gray-400">{entry.date}</div>
+                    </div>
+                    <div className={`font-semibold ${netPnl >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                      ${netPnl.toFixed(2)}
+                    </div>
                   </div>
-                  <div className={`font-semibold ${entry.pnlAmount >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                    ${entry.pnlAmount?.toFixed(2) || '0.00'}
-                  </div>
-                </div>
-              ))
+                )
+              })
             )}
           </div>
         </Link>
@@ -153,7 +157,8 @@ export default function JournalOverview() {
               {journal.length > 0
                 ? (Object.entries(journal.reduce((acc: any, j) => {
                     const date = j.date?.split('T')[0] || j.date
-                    acc[date] = (acc[date] || 0) + (j.pnlAmount || 0)
+                    // Subtract fee from pnlAmount for each trade
+                    acc[date] = (acc[date] || 0) + (j.pnlAmount || 0) - (j.fee || 0)
                     return acc
                   }, {}))
                   .sort(([,a], [,b]) => (b as number) - (a as number))[0]?.[1] as number || 0).toFixed(2)
@@ -166,7 +171,8 @@ export default function JournalOverview() {
               {(() => {
                 let streak = 0
                 for (let i = journal.length - 1; i >= 0; i--) {
-                  if (journal[i].pnlAmount > 0) streak++
+                  const netPnl = (journal[i].pnlAmount || 0) - (journal[i].fee || 0)
+                  if (netPnl > 0) streak++
                   else break
                 }
                 return `${streak} ${streak === 1 ? 'Win' : 'Wins'}`

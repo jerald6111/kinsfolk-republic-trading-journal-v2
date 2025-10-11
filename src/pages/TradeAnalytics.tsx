@@ -17,10 +17,11 @@ export default function TradeAnalytics() {
   const wins = journal.filter(j => j.pnlAmount > 0).length
   const losses = journal.filter(j => j.pnlAmount < 0).length
   const winRate = totalTrades ? Math.round((wins / totalTrades) * 100) : 0
-  const totalPnl = journal.reduce((s, j) => s + (j.pnlAmount || 0), 0)
+  // Total PnL = sum of (pnlAmount - fee) for each trade
+  const totalPnl = journal.reduce((s, j) => s + (j.pnlAmount || 0) - (j.fee || 0), 0)
   
-  const avgWin = wins > 0 ? journal.filter(j => j.pnlAmount > 0).reduce((s, j) => s + j.pnlAmount, 0) / wins : 0
-  const avgLoss = losses > 0 ? journal.filter(j => j.pnlAmount < 0).reduce((s, j) => s + j.pnlAmount, 0) / losses : 0
+  const avgWin = wins > 0 ? journal.filter(j => j.pnlAmount > 0).reduce((s, j) => s + j.pnlAmount - (j.fee || 0), 0) / wins : 0
+  const avgLoss = losses > 0 ? journal.filter(j => j.pnlAmount < 0).reduce((s, j) => s + j.pnlAmount - (j.fee || 0), 0) / losses : 0
   const riskReward = wins > 0 && losses > 0 ? Math.abs(avgWin / avgLoss) : 0
   
   const profitFactor = losses > 0 && avgLoss !== 0
@@ -33,7 +34,8 @@ export default function TradeAnalytics() {
       acc[trade.ticker] = { trades: 0, pnl: 0, wins: 0, losses: 0 }
     }
     acc[trade.ticker].trades++
-    acc[trade.ticker].pnl += trade.pnlAmount || 0
+    // Subtract fee from pnl for ticker performance
+    acc[trade.ticker].pnl += (trade.pnlAmount || 0) - (trade.fee || 0)
     if (trade.pnlAmount > 0) acc[trade.ticker].wins++
     else if (trade.pnlAmount < 0) acc[trade.ticker].losses++
     return acc
@@ -73,7 +75,8 @@ export default function TradeAnalytics() {
       const tradeDate = new Date(j.date).toISOString().split('T')[0]
       return tradeDate === dateStr
     })
-    const pnl = dayTrades.reduce((sum: number, j: any) => sum + (j.pnlAmount || 0), 0)
+    // Subtract fees from PnL for each trade
+    const pnl = dayTrades.reduce((sum: number, j: any) => sum + (j.pnlAmount || 0) - (j.fee || 0), 0)
     return { pnl, trades: dayTrades.length, tradeData: dayTrades }
   }
 
@@ -488,13 +491,14 @@ export default function TradeAnalytics() {
                       <h3 className="text-lg font-semibold mb-3">Trades ({trades})</h3>
                       {tradeData.map((trade: any) => {
                         const isWin = trade.pnlAmount >= 0
+                        const netPnl = (trade.pnlAmount || 0) - (trade.fee || 0)
                         return (
                           <div key={trade.id} className="bg-krblack/30 rounded-lg p-4 border border-krborder hover:border-krgold/50 transition-colors">
                             <div className="flex items-start justify-between mb-3">
                               <div>
                                 <div className="flex items-center gap-2">
                                   <h4 className="text-lg font-semibold text-krtext">{trade.ticker}</h4>
-                                  {isWin ? (
+                                  {netPnl >= 0 ? (
                                     <TrendingUp className="text-green-500" size={20} />
                                   ) : (
                                     <TrendingDown className="text-red-500" size={20} />
@@ -505,8 +509,8 @@ export default function TradeAnalytics() {
                                 </div>
                               </div>
                               <div className="text-right">
-                                <div className={`text-xl font-bold ${isWin ? 'text-green-500' : 'text-red-500'}`}>
-                                  {isWin ? '+' : ''}{formatAmount(trade.pnlAmount)}
+                                <div className={`text-xl font-bold ${netPnl >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                                  {netPnl >= 0 ? '+' : ''}{formatAmount(netPnl)}
                                 </div>
                                 <div className="text-xs text-gray-400 mt-1">
                                   {trade.timeframe || 'N/A'}

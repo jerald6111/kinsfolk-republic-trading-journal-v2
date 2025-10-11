@@ -71,11 +71,11 @@ export default function Wallet() {
   // Calculate wallet balance from deposits/withdrawals
   const walletBalance = items.reduce((s, it)=> s + (it.type==='deposit'? Number(it.amount): -Number(it.amount)), 0)
   
-  // Calculate total PnL from journal trades
+  // Calculate total PnL from journal trades (pnlAmount - fee for each trade)
   const journal = data.journal || []
-  const totalTradingPnl = journal.reduce((s: number, j: any) => s + (j.pnlAmount || 0), 0)
+  const totalTradingPnl = journal.reduce((s: number, j: any) => s + (j.pnlAmount || 0) - (j.fee || 0), 0)
   
-  // Current balance = wallet balance + trading PnL
+  // Current balance = wallet balance + trading PnL (after fees)
   const balance = walletBalance + totalTradingPnl
 
   return (

@@ -69,16 +69,13 @@ export default function Journal() {
       amount = form.marginCost ? (form.marginCost * percent) / 100 : diff * (form.leverage || 1)
     }
     
-    // Subtract fees from PnL amount
-    const fee = form.fee || 0
-    amount = amount - fee
-    
+    // DO NOT subtract fees here - fees are applied separately in balance calculations
     setForm({ ...form, pnlAmount: amount, pnlPercent: percent })
   }
 
   useEffect(() => {
     calculatePnL()
-  }, [form.entryPrice, form.exitPrice, form.leverage, form.position, form.type, form.marginCost, form.fee])
+  }, [form.entryPrice, form.exitPrice, form.leverage, form.position, form.type, form.marginCost])
 
   const save = () => {
     let next: JournalEntry[]
@@ -381,7 +378,8 @@ export default function Journal() {
               </div>
             )}
             {items.map((it) => {
-              const isProfit = it.pnlAmount > 0
+              const netPnl = (it.pnlAmount || 0) - (it.fee || 0)
+              const isProfit = netPnl > 0
               return (
                 <div 
                   key={it.id} 
@@ -409,7 +407,7 @@ export default function Journal() {
                     <div>
                       <strong className="text-krtext">Entry:</strong> {formatAmount(it.entryPrice)} → <strong className="text-krtext">Exit:</strong> {formatAmount(it.exitPrice)}
                     </div>
-                    <div><strong className="text-krtext">P&L:</strong> {formatAmount(it.pnlAmount)} ({it.pnlPercent.toFixed(2)}%)</div>
+                    <div><strong className="text-krtext">Net P&L:</strong> {formatAmount(netPnl)} ({it.pnlPercent.toFixed(2)}%)</div>
                   </div>
                 </div>
               )
@@ -422,16 +420,23 @@ export default function Journal() {
       {viewingTrade && (
         <Modal isOpen={!!viewingTrade} onClose={() => setViewingTrade(null)} title="Trade Details" maxWidth="max-w-4xl">
           <div className="max-w-4xl mx-auto">
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <h2 className="text-2xl font-bold text-krtext">{viewingTrade.ticker}</h2>
-                <p className="text-sm text-gray-400">{viewingTrade.date} {viewingTrade.time}</p>
-              </div>
-              <span className={`text-lg px-3 py-1.5 rounded font-semibold ${viewingTrade.pnlAmount > 0 ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
-                {viewingTrade.pnlAmount > 0 ? <TrendingUp className="inline-block w-5 h-5 mr-1" /> : <TrendingDown className="inline-block w-5 h-5 mr-1" />}
-                {viewingTrade.pnlPercent.toFixed(2)}%
-              </span>
-            </div>
+            {(() => {
+              const netPnl = (viewingTrade.pnlAmount || 0) - (viewingTrade.fee || 0)
+              return (
+                <>
+                  <div className="flex items-start justify-between mb-4">
+                    <div>
+                      <h2 className="text-2xl font-bold text-krtext">{viewingTrade.ticker}</h2>
+                      <p className="text-sm text-gray-400">{viewingTrade.date} {viewingTrade.time}</p>
+                    </div>
+                    <span className={`text-lg px-3 py-1.5 rounded font-semibold ${netPnl > 0 ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
+                      {netPnl > 0 ? <TrendingUp className="inline-block w-5 h-5 mr-1" /> : <TrendingDown className="inline-block w-5 h-5 mr-1" />}
+                      {viewingTrade.pnlPercent.toFixed(2)}%
+                    </span>
+                  </div>
+                </>
+              )
+            })()}
 
             {/* Images */}
             <div className="grid grid-cols-2 gap-4 mb-6">
@@ -490,14 +495,20 @@ export default function Journal() {
                   </div>
                 )}
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-1">P&L</label>
+                  <label className="block text-sm font-medium text-gray-400 mb-1">Gross P&L</label>
                   <div className={`font-semibold ${viewingTrade.pnlAmount > 0 ? 'text-green-400' : 'text-red-400'}`}>
                     {formatAmount(viewingTrade.pnlAmount)} ({viewingTrade.pnlPercent.toFixed(2)}%)
                   </div>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-400 mb-1">Fee</label>
-                  <div className="text-krtext">{formatAmount(viewingTrade.fee || 0)}</div>
+                  <div className="text-red-400">{formatAmount(viewingTrade.fee || 0)}</div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-1">Net P&L</label>
+                  <div className={`font-bold text-xl ${(viewingTrade.pnlAmount - (viewingTrade.fee || 0)) > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                    {formatAmount((viewingTrade.pnlAmount || 0) - (viewingTrade.fee || 0))}
+                  </div>
                 </div>
               </div>
             </div>
