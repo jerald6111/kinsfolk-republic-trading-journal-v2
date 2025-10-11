@@ -14,7 +14,6 @@ import {
 import { useCurrency } from '../context/CurrencyContext'
 import Modal from '../components/Modal'
 import { AlertTriangle, Save, Link2, Trash2, Mail, Shield, Download, Send, CheckCircle2 } from 'lucide-react'
-import emailjs from '@emailjs/browser'
 
 type EmailFrequency = 'disabled' | 'every-update' | 'every-trade' | 'daily' | 'weekly'
 
@@ -135,56 +134,104 @@ export default function DataSettings(){
       // Export data
       const dataStr = JSON.stringify(localStorage, null, 2)
       
-      // EmailJS configuration
-      // You can get these for FREE at https://www.emailjs.com/
-      // 1. Create account (free)
-      // 2. Add email service (Gmail, Outlook, etc.)
-      // 3. Create email template
-      // 4. Get your Public Key, Service ID, and Template ID
+      // Resend API Configuration
+      const RESEND_API_KEY = 're_D145aHmt_8nxXgKGfrUwfUeyP34SrujjN'
+      const FROM_EMAIL = 'onboarding@resend.dev' // Default Resend email (you can add your own domain later)
       
-      const EMAILJS_PUBLIC_KEY = 'YOUR_PUBLIC_KEY' // Replace with your EmailJS public key
-      const EMAILJS_SERVICE_ID = 'YOUR_SERVICE_ID' // Replace with your EmailJS service ID
-      const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID' // Replace with your EmailJS template ID
+      // Prepare email HTML with anti-phishing code
+      const emailHTML = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: linear-gradient(135deg, #D4AF37 0%, #F4E157 100%); color: #1E2329; padding: 20px; border-radius: 10px; text-align: center; }
+            .content { background: #f9f9f9; padding: 20px; border-radius: 10px; margin: 20px 0; }
+            .phishing-code { background: #1E2329; color: #D4AF37; padding: 15px; border-radius: 8px; text-align: center; font-size: 24px; font-weight: bold; letter-spacing: 3px; margin: 20px 0; }
+            .warning { background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; }
+            .footer { text-align: center; color: #666; font-size: 12px; margin-top: 20px; }
+            .button { display: inline-block; background: #D4AF37; color: #1E2329; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; margin: 10px 0; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>🔒 Trading Journal Backup</h1>
+              <p>Kinsfolk Republic Trading Journal</p>
+            </div>
+            
+            <div class="content">
+              <h2>Your Data Backup is Ready</h2>
+              <p>Hi there! 👋</p>
+              <p>Your trading journal data has been successfully backed up.</p>
+              
+              <div class="phishing-code">
+                🛡️ SECURITY CODE: ${antiPhishingCode}
+              </div>
+              
+              <div class="warning">
+                <strong>⚠️ IMPORTANT SECURITY NOTICE:</strong><br>
+                Always verify this anti-phishing code matches your saved code. If the code doesn't match, 
+                <strong>DO NOT TRUST THIS EMAIL</strong> - it may be a phishing attempt!
+              </div>
+              
+              <p><strong>📅 Backup Date:</strong> ${new Date().toLocaleString()}</p>
+              <p><strong>📊 Auto-Send Frequency:</strong> ${emailFrequency === 'disabled' ? 'Manual Only' : emailFrequency.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}</p>
+              
+              <h3>📥 How to Restore Your Backup:</h3>
+              <ol>
+                <li>Go to your Trading Journal Settings page</li>
+                <li>Navigate to "Data Management" section</li>
+                <li>Click "Import Data"</li>
+                <li>Upload the backup file</li>
+                <li>Choose "Merge" to combine with existing data, or "Overwrite" to replace all data</li>
+              </ol>
+              
+              <p><strong>💾 Your Data:</strong><br>
+              The backup is included below in JSON format. You can copy it and save it as a .json file.</p>
+              
+              <div style="background: #1E2329; color: #D4AF37; padding: 15px; border-radius: 8px; overflow-x: auto; max-height: 300px; overflow-y: auto;">
+                <pre style="margin: 0; white-space: pre-wrap; word-wrap: break-word; font-size: 11px;">${dataStr}</pre>
+              </div>
+            </div>
+            
+            <div class="footer">
+              <p>This is an automated email from your Kinsfolk Republic Trading Journal.</p>
+              <p>Keep your backups safe and secure! 🔐</p>
+              <p style="margin-top: 20px;">
+                <strong>Need Help?</strong><br>
+                Visit your Settings page for more options and support.
+              </p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `
       
-      // Check if EmailJS is configured
-      if (EMAILJS_PUBLIC_KEY === 'YOUR_PUBLIC_KEY') {
-        // Not configured yet - download file instead
-        const blob = new Blob([dataStr], { type: 'application/json' })
-        const url = URL.createObjectURL(blob)
-        const link = document.createElement('a')
-        link.href = url
-        link.download = `trading-journal-backup-${new Date().toISOString().split('T')[0]}.json`
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
-        URL.revokeObjectURL(url)
-        
+      // Send email using Resend API
+      const response = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${RESEND_API_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          from: FROM_EMAIL,
+          to: email,
+          subject: `🔒 Trading Journal Backup - ${new Date().toLocaleDateString()} - Code: ${antiPhishingCode}`,
+          html: emailHTML
+        })
+      })
+      
+      const result = await response.json()
+      
+      if (response.ok) {
         setSendingEmail(false)
-        alert(`📥 Backup downloaded!\n\n⚠️ EmailJS Not Configured Yet\n\nTo enable automatic email sending:\n\n1. Go to https://www.emailjs.com/ (FREE)\n2. Create an account\n3. Add an email service (Gmail, Outlook, etc.)\n4. Create an email template\n5. Update the EmailJS keys in DataSettings.tsx\n\nFor now, your data has been downloaded. You can manually attach it to an email to ${email}`)
-        return
+        alert(`✅ Email sent successfully to ${email}!\n\n🛡️ Anti-Phishing Code: ${antiPhishingCode}\n\nYour backup has been sent. Please check your inbox (and spam folder if needed).\n\nEmail ID: ${result.id}`)
+      } else {
+        throw new Error(result.message || 'Failed to send email')
       }
-      
-      // Initialize EmailJS
-      emailjs.init(EMAILJS_PUBLIC_KEY)
-      
-      // Prepare email parameters
-      const templateParams = {
-        to_email: email,
-        anti_phishing_code: antiPhishingCode,
-        backup_date: new Date().toLocaleString(),
-        data_content: dataStr,
-        frequency: emailFrequency
-      }
-      
-      // Send email using EmailJS
-      await emailjs.send(
-        EMAILJS_SERVICE_ID,
-        EMAILJS_TEMPLATE_ID,
-        templateParams
-      )
-      
-      setSendingEmail(false)
-      alert(`✅ Email sent successfully to ${email}!\n\n🛡️ Anti-Phishing Code: ${antiPhishingCode}\n\nYour backup has been sent. Please check your inbox.`)
       
     } catch (error) {
       console.error('Error sending email:', error)
@@ -202,7 +249,7 @@ export default function DataSettings(){
       document.body.removeChild(link)
       URL.revokeObjectURL(url)
       
-      alert(`⚠️ Email sending failed\n\nYour backup has been downloaded instead. You can manually send it to ${email}\n\nError: ${error}`)
+      alert(`⚠️ Email sending failed\n\nYour backup has been downloaded instead. You can manually send it to ${email}\n\nError: ${error instanceof Error ? error.message : 'Unknown error'}`)
     }
   }
 
@@ -365,32 +412,28 @@ export default function DataSettings(){
           </div>
 
           {/* Info Note */}
-          <div className="p-4 bg-blue-500/10 border border-blue-500/30 rounded-xl">
-            <h3 className="text-sm font-semibold text-blue-400 mb-2">📧 Free Email Service Setup (EmailJS)</h3>
-            <div className="text-xs text-blue-300 space-y-2 leading-relaxed">
-              <p><strong>Steps to enable FREE email sending:</strong></p>
-              <ol className="list-decimal list-inside space-y-1 ml-2">
-                <li>Go to <a href="https://www.emailjs.com/" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-200">emailjs.com</a> (100% Free - 200 emails/month)</li>
-                <li>Create a free account</li>
-                <li>Add an email service (Gmail, Outlook, Yahoo, etc.)</li>
-                <li>Create an email template with these variables:
-                  <ul className="list-disc list-inside ml-4 mt-1">
-                    <li>{'{{to_email}}'} - recipient email</li>
-                    <li>{'{{anti_phishing_code}}'} - your security code</li>
-                    <li>{'{{backup_date}}'} - backup timestamp</li>
-                    <li>{'{{data_content}}'} - your data (as attachment)</li>
-                  </ul>
-                </li>
-                <li>Copy your Public Key, Service ID, and Template ID</li>
-                <li>Update these in <code className="bg-krblack px-1 py-0.5 rounded">src/pages/DataSettings.tsx</code> (lines ~115-117)</li>
-              </ol>
-              <p className="mt-3"><strong>Alternative Free Options:</strong></p>
-              <ul className="list-disc list-inside ml-2">
-                <li>Web3Forms - Unlimited free emails</li>
-                <li>FormSubmit - No registration required</li>
-                <li>Resend - 3,000 free emails/month</li>
+          <div className="p-4 bg-green-500/10 border border-green-500/30 rounded-xl">
+            <h3 className="text-sm font-semibold text-green-400 mb-2">✅ Resend Email Service Active</h3>
+            <div className="text-xs text-green-300 space-y-2 leading-relaxed">
+              <p><strong>Status:</strong> Email sending is fully configured and ready to use!</p>
+              <p><strong>Service:</strong> Resend (3,000 free emails/month)</p>
+              <p><strong>Features:</strong></p>
+              <ul className="list-disc list-inside ml-2 space-y-1">
+                <li>Professional HTML emails with your anti-phishing code</li>
+                <li>Automatic backup delivery to your inbox</li>
+                <li>Beautiful formatted emails with instructions</li>
+                <li>Inline JSON data for easy restoration</li>
+                <li>Secure and reliable delivery</li>
               </ul>
-              <p className="mt-2 text-krgold">💡 Until configured, "Send Now" will download the backup file for manual emailing.</p>
+              <p className="mt-2"><strong>💡 How to use:</strong></p>
+              <ol className="list-decimal list-inside ml-2 space-y-1">
+                <li>Enter your email address above</li>
+                <li>Set your anti-phishing code</li>
+                <li>Choose auto-send frequency (or keep as manual)</li>
+                <li>Click "Save Email Settings"</li>
+                <li>Click "Send Now" to test!</li>
+              </ol>
+              <p className="mt-3 text-yellow-300"><strong>� Note:</strong> Emails are sent from <code className="bg-krblack px-1 py-0.5 rounded">onboarding@resend.dev</code>. Check your spam folder if you don't see it in your inbox!</p>
             </div>
           </div>
         </div>
