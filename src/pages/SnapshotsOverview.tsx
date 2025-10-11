@@ -19,8 +19,8 @@ export default function SnapshotsOverview() {
   const wins = chartsData.filter((j: any) => ((j.pnlAmount || 0) - (j.fee || 0)) > 0).length
   const winRate = totalSnapshots ? Math.round((wins / totalSnapshots) * 100) : 0
 
-  // Recent snapshots
-  const recentSnapshots = [...chartsData].reverse().slice(0, 6)
+  // Recent snapshots - newest first (already in newest-first order from journal)
+  const recentSnapshots = chartsData.slice(0, 6)
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-950 via-krblack to-gray-950 text-krtext relative overflow-hidden">
