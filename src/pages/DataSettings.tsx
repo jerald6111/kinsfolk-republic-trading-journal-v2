@@ -14,6 +14,7 @@ import {
 import { useCurrency } from '../context/CurrencyContext'
 import Modal from '../components/Modal'
 import { AlertTriangle, Save, Link2, Trash2, Mail, Shield, Download, Send, CheckCircle2 } from 'lucide-react'
+import emailjs from '@emailjs/browser'
 
 type EmailFrequency = 'disabled' | 'every-update' | 'every-trade' | 'daily' | 'weekly'
 
@@ -130,14 +131,68 @@ export default function DataSettings(){
 
     setSendingEmail(true)
     
-    // Export data
-    const dataStr = JSON.stringify(localStorage, null, 2)
-    const blob = new Blob([dataStr], { type: 'application/json' })
-    
-    // In a real implementation, you would send this to a backend service
-    // For now, we'll simulate the email being sent and download the file
-    setTimeout(() => {
-      // Create download link
+    try {
+      // Export data
+      const dataStr = JSON.stringify(localStorage, null, 2)
+      
+      // EmailJS configuration
+      // You can get these for FREE at https://www.emailjs.com/
+      // 1. Create account (free)
+      // 2. Add email service (Gmail, Outlook, etc.)
+      // 3. Create email template
+      // 4. Get your Public Key, Service ID, and Template ID
+      
+      const EMAILJS_PUBLIC_KEY = 'YOUR_PUBLIC_KEY' // Replace with your EmailJS public key
+      const EMAILJS_SERVICE_ID = 'YOUR_SERVICE_ID' // Replace with your EmailJS service ID
+      const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID' // Replace with your EmailJS template ID
+      
+      // Check if EmailJS is configured
+      if (EMAILJS_PUBLIC_KEY === 'YOUR_PUBLIC_KEY') {
+        // Not configured yet - download file instead
+        const blob = new Blob([dataStr], { type: 'application/json' })
+        const url = URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = url
+        link.download = `trading-journal-backup-${new Date().toISOString().split('T')[0]}.json`
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        URL.revokeObjectURL(url)
+        
+        setSendingEmail(false)
+        alert(`📥 Backup downloaded!\n\n⚠️ EmailJS Not Configured Yet\n\nTo enable automatic email sending:\n\n1. Go to https://www.emailjs.com/ (FREE)\n2. Create an account\n3. Add an email service (Gmail, Outlook, etc.)\n4. Create an email template\n5. Update the EmailJS keys in DataSettings.tsx\n\nFor now, your data has been downloaded. You can manually attach it to an email to ${email}`)
+        return
+      }
+      
+      // Initialize EmailJS
+      emailjs.init(EMAILJS_PUBLIC_KEY)
+      
+      // Prepare email parameters
+      const templateParams = {
+        to_email: email,
+        anti_phishing_code: antiPhishingCode,
+        backup_date: new Date().toLocaleString(),
+        data_content: dataStr,
+        frequency: emailFrequency
+      }
+      
+      // Send email using EmailJS
+      await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
+        templateParams
+      )
+      
+      setSendingEmail(false)
+      alert(`✅ Email sent successfully to ${email}!\n\n🛡️ Anti-Phishing Code: ${antiPhishingCode}\n\nYour backup has been sent. Please check your inbox.`)
+      
+    } catch (error) {
+      console.error('Error sending email:', error)
+      setSendingEmail(false)
+      
+      // Fallback: download file if email fails
+      const dataStr = JSON.stringify(localStorage, null, 2)
+      const blob = new Blob([dataStr], { type: 'application/json' })
       const url = URL.createObjectURL(blob)
       const link = document.createElement('a')
       link.href = url
@@ -147,9 +202,8 @@ export default function DataSettings(){
       document.body.removeChild(link)
       URL.revokeObjectURL(url)
       
-      setSendingEmail(false)
-      alert(`Data prepared for email to ${email}\n\nNote: For actual email functionality, you need to integrate with an email service provider (e.g., SendGrid, EmailJS, or your own backend).\n\nFor now, the file has been downloaded. You can manually attach it to an email.`)
-    }, 1500)
+      alert(`⚠️ Email sending failed\n\nYour backup has been downloaded instead. You can manually send it to ${email}\n\nError: ${error}`)
+    }
   }
 
   const generateRandomPhishingCode = () => {
@@ -311,12 +365,33 @@ export default function DataSettings(){
           </div>
 
           {/* Info Note */}
-          <div className="p-3 bg-krgold/10 border border-krgold/30 rounded-xl">
-            <p className="text-xs text-krgold leading-relaxed">
-              <strong>Note:</strong> The "Send Now" button will prepare your data for email. 
-              For full email functionality, integration with an email service (SendGrid, EmailJS, etc.) is required. 
-              Currently, the file will be downloaded for you to manually attach to an email.
-            </p>
+          <div className="p-4 bg-blue-500/10 border border-blue-500/30 rounded-xl">
+            <h3 className="text-sm font-semibold text-blue-400 mb-2">📧 Free Email Service Setup (EmailJS)</h3>
+            <div className="text-xs text-blue-300 space-y-2 leading-relaxed">
+              <p><strong>Steps to enable FREE email sending:</strong></p>
+              <ol className="list-decimal list-inside space-y-1 ml-2">
+                <li>Go to <a href="https://www.emailjs.com/" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-200">emailjs.com</a> (100% Free - 200 emails/month)</li>
+                <li>Create a free account</li>
+                <li>Add an email service (Gmail, Outlook, Yahoo, etc.)</li>
+                <li>Create an email template with these variables:
+                  <ul className="list-disc list-inside ml-4 mt-1">
+                    <li>{'{{to_email}}'} - recipient email</li>
+                    <li>{'{{anti_phishing_code}}'} - your security code</li>
+                    <li>{'{{backup_date}}'} - backup timestamp</li>
+                    <li>{'{{data_content}}'} - your data (as attachment)</li>
+                  </ul>
+                </li>
+                <li>Copy your Public Key, Service ID, and Template ID</li>
+                <li>Update these in <code className="bg-krblack px-1 py-0.5 rounded">src/pages/DataSettings.tsx</code> (lines ~115-117)</li>
+              </ol>
+              <p className="mt-3"><strong>Alternative Free Options:</strong></p>
+              <ul className="list-disc list-inside ml-2">
+                <li>Web3Forms - Unlimited free emails</li>
+                <li>FormSubmit - No registration required</li>
+                <li>Resend - 3,000 free emails/month</li>
+              </ul>
+              <p className="mt-2 text-krgold">💡 Until configured, "Send Now" will download the backup file for manual emailing.</p>
+            </div>
           </div>
         </div>
       </div>
