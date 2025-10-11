@@ -2,10 +2,49 @@ import React, { useState } from 'react'
 import FileUploader from '../components/FileUploader'
 import Modal from '../components/Modal'
 import { loadData, saveData } from '../utils/storage'
-import { Trash2, Edit2, CheckCircle2 } from 'lucide-react'
+import { Trash2, Edit2, CheckCircle2, X, Image as ImageIcon } from 'lucide-react'
 import { useCurrency } from '../context/CurrencyContext'
 
 type GoalTimeline = 'Short Term (3-6 months)' | 'Mid Term (6-12 months)' | 'Long Term (1-3 years)'
+
+const congratsMessages = [
+  {
+    emoji: '🎉',
+    title: 'Outstanding Achievement!',
+    message: 'You did it! Another milestone conquered. Your dedication is truly inspiring!',
+    color: 'text-krgold'
+  },
+  {
+    emoji: '🏆',
+    title: 'Victory Unlocked!',
+    message: 'Incredible work! You\'ve turned your vision into reality. Celebrate this win!',
+    color: 'text-yellow-400'
+  },
+  {
+    emoji: '⭐',
+    title: 'Goal Crushed!',
+    message: 'Amazing! You\'re one step closer to your dreams. Keep up the momentum!',
+    color: 'text-green-400'
+  },
+  {
+    emoji: '💪',
+    title: 'Success Achieved!',
+    message: 'You showed determination and won! This is proof of your commitment to growth.',
+    color: 'text-blue-400'
+  },
+  {
+    emoji: '🚀',
+    title: 'Mission Accomplished!',
+    message: 'Fantastic! You\'ve reached new heights. The sky is no longer the limit!',
+    color: 'text-purple-400'
+  },
+  {
+    emoji: '🎯',
+    title: 'Bullseye!',
+    message: 'Perfect execution! You hit your target with precision. Onwards and upwards!',
+    color: 'text-red-400'
+  }
+]
 
 export default function VisionBoard(){
   const data = loadData()
@@ -19,6 +58,15 @@ export default function VisionBoard(){
   const [editingGoal, setEditingGoal] = useState<any>(null)
   const [showCongratsModal, setShowCongratsModal] = useState(false)
   const [completedGoalTitle, setCompletedGoalTitle] = useState('')
+  const [currentCongratsMessage, setCurrentCongratsMessage] = useState(congratsMessages[0])
+  
+  // New states for enhanced features
+  const [viewingGoal, setViewingGoal] = useState<any>(null)
+  const [showCompletionModal, setShowCompletionModal] = useState(false)
+  const [completingGoal, setCompletingGoal] = useState<any>(null)
+  const [completionReflection, setCompletionReflection] = useState('')
+  const [completionImages, setCompletionImages] = useState<string[]>([])
+  const [uploadingImageIndex, setUploadingImageIndex] = useState<number | null>(null)
 
   const add = () => {
     if (editingGoal) {
@@ -40,13 +88,47 @@ export default function VisionBoard(){
   }
 
   const markComplete = (goal: any) => {
+    setCompletingGoal(goal)
+    setShowCompletionModal(true)
+    setCompletionReflection('')
+    setCompletionImages([])
+  }
+
+  const finalizeCompletion = () => {
+    if (!completingGoal) return
+    
+    const randomMessage = congratsMessages[Math.floor(Math.random() * congratsMessages.length)]
+    setCurrentCongratsMessage(randomMessage)
+    
     const next = items.map((it: any) => 
-      it.id === goal.id ? { ...it, status: 'completed', completedDate: new Date().toISOString() } : it
+      it.id === completingGoal.id ? { 
+        ...it, 
+        status: 'completed', 
+        completedDate: new Date().toISOString(),
+        completionReflection,
+        completionImages
+      } : it
     )
     setItems(next)
     saveData({ vision: next })
-    setCompletedGoalTitle(goal.title)
+    setCompletedGoalTitle(completingGoal.title)
+    setShowCompletionModal(false)
     setShowCongratsModal(true)
+    setCompletingGoal(null)
+    setCompletionReflection('')
+    setCompletionImages([])
+  }
+
+  const handleCompletionImageUpload = (index: number, imageUrl: string) => {
+    const newImages = [...completionImages]
+    newImages[index] = imageUrl
+    setCompletionImages(newImages)
+    setUploadingImageIndex(null)
+  }
+
+  const removeCompletionImage = (index: number) => {
+    const newImages = completionImages.filter((_, i) => i !== index)
+    setCompletionImages(newImages)
   }
 
   const deleteGoal = (id: number) => {
@@ -112,15 +194,19 @@ export default function VisionBoard(){
             <h2 className="text-xl font-semibold mb-4 text-krtext">Active Goals</h2>
             <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
               {activeGoals.map((it:any)=> (
-                <div key={it.id} className="bg-krcard rounded-xl border border-krborder p-3 hover:border-krgold transition-colors">
+                <div 
+                  key={it.id} 
+                  className="bg-krcard rounded-xl border border-krborder p-3 hover:border-krgold transition-colors cursor-pointer"
+                  onClick={() => setViewingGoal(it)}
+                >
                   {it.img && <img src={it.img} alt={it.title} className="w-full h-40 object-cover rounded mb-2" />}
                   <div className="font-bold text-krtext">{it.title}</div>
-                  <div className="text-sm text-krmuted mt-1">{it.desc}</div>
+                  <div className="text-sm text-krmuted mt-1 line-clamp-2">{it.desc}</div>
                   <div className="text-sm mt-2 text-krtext">
                     <div>Target: {formatAmount(parseFloat(it.target) || 0)}</div>
                     <div className="text-krgold">{it.timeline}</div>
                   </div>
-                  <div className="flex gap-2 mt-3">
+                  <div className="flex gap-2 mt-3" onClick={(e) => e.stopPropagation()}>
                     <button 
                       onClick={() => markComplete(it)}
                       className="flex-1 px-2 py-1 bg-krsuccess text-white rounded text-sm hover:opacity-80 transition-opacity flex items-center justify-center gap-1"
@@ -155,20 +241,27 @@ export default function VisionBoard(){
               <h2 className="text-xl font-semibold mb-4 text-krtext">🏆 Achievements</h2>
               <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {completedGoals.map((it:any)=> (
-                  <div key={it.id} className="bg-krcard/50 rounded-xl border border-krborder p-3 opacity-60 hover:opacity-80 transition-opacity">
-                    {it.img && <img src={it.img} alt={it.title} className="w-full h-40 object-cover rounded mb-2 grayscale" />}
-                    <div className="font-bold text-krtext line-through">{it.title}</div>
-                    <div className="text-sm text-krmuted mt-1">{it.desc}</div>
-                    <div className="text-sm mt-2 text-krsuccess font-medium">
-                      ✓ Completed {it.completedDate && new Date(it.completedDate).toLocaleDateString()}
+                  <div 
+                    key={it.id} 
+                    className="bg-krcard rounded-xl border border-krgold p-3 opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
+                    onClick={() => setViewingGoal(it)}
+                  >
+                    {it.img && <img src={it.img} alt={it.title} className="w-full h-40 object-cover rounded mb-2" />}
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 size={18} className="text-krgold flex-shrink-0" />
+                      <div className="font-bold text-krgold">{it.title}</div>
                     </div>
-                    <button 
-                      onClick={() => deleteGoal(it.id)}
-                      className="mt-2 px-2 py-1 bg-krdanger/50 text-white rounded text-sm hover:bg-krdanger transition-colors"
-                      title="Delete"
-                    >
-                      <Trash2 size={14} className="inline" /> Remove
-                    </button>
+                    <div className="text-sm text-krmuted mt-1 line-clamp-2">{it.desc}</div>
+                    <div className="text-xs text-krmuted mt-2">
+                      Completed: {it.completedDate ? new Date(it.completedDate).toLocaleDateString() : 'N/A'}
+                    </div>
+                    {it.completionImages && it.completionImages.length > 0 && (
+                      <div className="flex gap-1 mt-2">
+                        {it.completionImages.slice(0, 3).map((img: string, idx: number) => (
+                          <img key={idx} src={img} alt="" className="w-12 h-12 object-cover rounded" />
+                        ))}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -177,20 +270,165 @@ export default function VisionBoard(){
         </div>
       </div>
 
+      {/* View Goal Details Modal */}
+      <Modal
+        isOpen={!!viewingGoal}
+        onClose={() => setViewingGoal(null)}
+        title={viewingGoal?.status === 'completed' ? '🏆 Achievement' : '🎯 Goal Details'}
+        maxWidth="max-w-2xl"
+      >
+        {viewingGoal && (
+          <div className="p-6">
+            {viewingGoal.img && (
+              <img src={viewingGoal.img} alt={viewingGoal.title} className="w-full h-64 object-cover rounded-xl mb-4" />
+            )}
+            <h3 className="text-2xl font-bold text-krtext mb-3">{viewingGoal.title}</h3>
+            <p className="text-krmuted mb-4">{viewingGoal.desc}</p>
+            
+            <div className="grid grid-cols-2 gap-4 mb-4">
+              <div className="bg-krcard rounded-xl p-3 border border-krborder">
+                <div className="text-sm text-krmuted">Target Amount</div>
+                <div className="text-lg font-bold text-krgold">{formatAmount(parseFloat(viewingGoal.target) || 0)}</div>
+              </div>
+              <div className="bg-krcard rounded-xl p-3 border border-krborder">
+                <div className="text-sm text-krmuted">Timeline</div>
+                <div className="text-lg font-bold text-krtext">{viewingGoal.timeline}</div>
+              </div>
+            </div>
+
+            {viewingGoal.status === 'completed' && (
+              <div className="bg-krsuccess/10 border border-krsuccess/30 rounded-xl p-4 mb-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <CheckCircle2 className="text-krsuccess" size={20} />
+                  <span className="font-semibold text-krsuccess">
+                    Completed on {viewingGoal.completedDate ? new Date(viewingGoal.completedDate).toLocaleDateString() : 'N/A'}
+                  </span>
+                </div>
+                
+                {viewingGoal.completionReflection && (
+                  <div className="mt-3">
+                    <div className="text-sm text-krmuted mb-1">Reflection:</div>
+                    <p className="text-krtext italic">&quot;{viewingGoal.completionReflection}&quot;</p>
+                  </div>
+                )}
+
+                {viewingGoal.completionImages && viewingGoal.completionImages.length > 0 && (
+                  <div className="mt-3">
+                    <div className="text-sm text-krmuted mb-2">Success Photos:</div>
+                    <div className="grid grid-cols-3 gap-2">
+                      {viewingGoal.completionImages.map((img: string, idx: number) => (
+                        <img key={idx} src={img} alt={`Success ${idx + 1}`} className="w-full h-32 object-cover rounded-lg" />
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            <button
+              onClick={() => setViewingGoal(null)}
+              className="w-full px-6 py-2 bg-krgold text-krblack rounded-md font-semibold hover:bg-kryellow transition-colors"
+            >
+              Close
+            </button>
+          </div>
+        )}
+      </Modal>
+
+      {/* Completion Modal */}
+      <Modal
+        isOpen={showCompletionModal}
+        onClose={() => setShowCompletionModal(false)}
+        title="� Complete Your Goal"
+        maxWidth="max-w-2xl"
+      >
+        {completingGoal && (
+          <div className="p-6">
+            <h3 className="text-xl font-bold text-krtext mb-4">{completingGoal.title}</h3>
+            
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-krtext mb-2">
+                Reflection / Description
+              </label>
+              <textarea
+                value={completionReflection}
+                onChange={(e) => setCompletionReflection(e.target.value)}
+                placeholder="Share your thoughts on achieving this goal... What did you learn? How do you feel?"
+                className="w-full px-3 py-2 bg-krcard border border-krborder rounded-xl text-krtext placeholder-krmuted focus:outline-none focus:border-krgold resize-none"
+                rows={4}
+              />
+            </div>
+
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-krtext mb-2">
+                Success Photos (Upload up to 3)
+              </label>
+              <div className="grid grid-cols-3 gap-3">
+                {[0, 1, 2].map((index) => (
+                  <div key={index} className="relative">
+                    {completionImages[index] ? (
+                      <div className="relative group">
+                        <img 
+                          src={completionImages[index]} 
+                          alt={`Success ${index + 1}`} 
+                          className="w-full h-32 object-cover rounded-lg border-2 border-krgold"
+                        />
+                        <button
+                          onClick={() => removeCompletionImage(index)}
+                          className="absolute top-1 right-1 p-1 bg-krdanger rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <X size={16} className="text-white" />
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="h-32">
+                        <FileUploader 
+                          value="" 
+                          onChange={(url: string) => handleCompletionImageUpload(index, url)} 
+                          accept="image/*"
+                        />
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-krmuted mt-2">Add photos to celebrate your achievement!</p>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowCompletionModal(false)}
+                className="flex-1 px-6 py-2 bg-krcard border border-krborder text-krtext rounded-md font-semibold hover:bg-krborder transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={finalizeCompletion}
+                className="flex-1 px-6 py-2 bg-krsuccess text-white rounded-md font-semibold hover:opacity-90 transition-opacity"
+              >
+                Complete Goal
+              </button>
+            </div>
+          </div>
+        )}
+      </Modal>
+
       {/* Congratulations Modal */}
       <Modal
         isOpen={showCongratsModal}
         onClose={() => setShowCongratsModal(false)}
-        title="🎉 Congratulations!"
+        title={currentCongratsMessage.title}
       >
         <div className="p-6 text-center">
-          <div className="text-6xl mb-4">🏆</div>
-          <h3 className="text-2xl font-bold text-krtext mb-2">Goal Achieved!</h3>
+          <div className="text-6xl mb-4">{currentCongratsMessage.emoji}</div>
+          <h3 className={`text-2xl font-bold mb-2 ${currentCongratsMessage.color}`}>
+            {currentCongratsMessage.title}
+          </h3>
           <p className="text-krmuted mb-4">
             You've successfully completed: <strong className="text-krgold">{completedGoalTitle}</strong>
           </p>
           <p className="text-krtext mb-6">
-            Keep up the amazing work! Your goal has been moved to achievements.
+            {currentCongratsMessage.message}
           </p>
           <button
             onClick={() => setShowCongratsModal(false)}
