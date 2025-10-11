@@ -41,6 +41,22 @@ const nav = [
 export default function Navbar(){
   const loc = useLocation()
   const [hoveredDropdown, setHoveredDropdown] = useState<string | null>(null)
+  const [timeoutId, setTimeoutId] = useState<ReturnType<typeof setTimeout> | null>(null)
+
+  const handleMouseEnter = (path: string) => {
+    if (timeoutId) {
+      clearTimeout(timeoutId)
+      setTimeoutId(null)
+    }
+    setHoveredDropdown(path)
+  }
+
+  const handleMouseLeave = () => {
+    const id = setTimeout(() => {
+      setHoveredDropdown(null)
+    }, 200) // 200ms delay before closing
+    setTimeoutId(id)
+  }
   
   return (
     <header className="w-full bg-krblack border-b border-krgray">
@@ -58,8 +74,8 @@ export default function Navbar(){
                 <div 
                   key={n.to}
                   className="relative"
-                  onMouseEnter={() => setHoveredDropdown(n.to)}
-                  onMouseLeave={() => setHoveredDropdown(null)}
+                  onMouseEnter={() => handleMouseEnter(n.to)}
+                  onMouseLeave={handleMouseLeave}
                 >
                   <Link 
                     to={n.to} 
@@ -69,16 +85,18 @@ export default function Navbar(){
                     <ChevronDown size={16} className={`transition-transform ${hoveredDropdown === n.to ? 'rotate-180' : ''}`} />
                   </Link>
                   {hoveredDropdown === n.to && (
-                    <div className="absolute top-full left-0 mt-1 bg-krcard border border-krborder rounded-md shadow-lg min-w-[160px] overflow-hidden z-50">
-                      {n.dropdown.map(item => (
-                        <Link
-                          key={item.to}
-                          to={item.to}
-                          className="block px-4 py-2 text-krtext hover:bg-krgold/20 hover:text-krgold transition-colors"
-                        >
-                          {item.label}
-                        </Link>
-                      ))}
+                    <div className="absolute top-full left-0 pt-2 -mt-2 z-50">
+                      <div className="bg-krcard border border-krborder rounded-md shadow-lg min-w-[160px] overflow-hidden">
+                        {n.dropdown.map(item => (
+                          <Link
+                            key={item.to}
+                            to={item.to}
+                            className="block px-4 py-2 text-krtext hover:bg-krgold/20 hover:text-krgold transition-colors"
+                          >
+                            {item.label}
+                          </Link>
+                        ))}
+                      </div>
                     </div>
                   )}
                 </div>
