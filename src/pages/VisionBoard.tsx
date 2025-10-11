@@ -285,80 +285,101 @@ export default function VisionBoard(){
         <div className="space-y-6">
           {/* Active Goals */}
           <div>
-            <h2 className="text-xl font-semibold mb-4 text-krtext">Active Goals</h2>
-            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
-              {activeGoals.map((it:any)=> (
-                <div 
-                  key={it.id} 
-                  className="bg-krcard rounded-xl border border-krborder p-3 hover:border-krgold transition-colors cursor-pointer"
-                  onClick={() => setViewingGoal(it)}
-                >
-                  {it.img && <img src={it.img} alt={it.title} className="w-full h-40 object-cover rounded mb-2" />}
-                  <div className="font-bold text-krtext">{it.title}</div>
-                  <div className="text-sm text-krmuted mt-1 line-clamp-2">{it.desc}</div>
-                  <div className="text-sm mt-2 text-krtext">
-                    <div>Target: {formatAmount(parseFloat(it.target) || 0)}</div>
-                    <div className="text-krgold">{it.timeline}</div>
-                  </div>
-                  <div className="flex gap-2 mt-3" onClick={(e) => e.stopPropagation()}>
-                    <button 
-                      onClick={() => markComplete(it)}
-                      className="flex-1 px-2 py-1 bg-krsuccess text-white rounded text-sm hover:opacity-80 transition-opacity flex items-center justify-center gap-1"
-                      title="Mark as complete"
-                    >
-                      <CheckCircle2 size={14} />
-                      Complete
-                    </button>
-                    <button 
-                      onClick={() => editGoal(it)}
-                      className="px-2 py-1 bg-krgold text-krblack rounded text-sm hover:bg-kryellow transition-colors"
-                      title="Edit"
-                    >
-                      <Edit2 size={14} />
-                    </button>
-                    <button 
-                      onClick={() => deleteGoal(it.id)}
-                      className="px-2 py-1 bg-krdanger text-white rounded text-sm hover:opacity-80 transition-opacity"
-                      title="Delete"
-                    >
-                      <Trash2 size={14} />
-                    </button>
-                  </div>
-                </div>
-              ))}
+            <div className="flex items-center gap-2 mb-4">
+              <span className="text-2xl">🎯</span>
+              <h2 className="text-xl font-semibold text-krtext">Active Goals</h2>
             </div>
+            
+            {activeGoals.length === 0 ? (
+              <div className="bg-krcard/50 backdrop-blur-sm rounded-xl border border-krborder/30 p-8 text-center">
+                <span className="text-6xl mb-4 block">🎯</span>
+                <p className="text-krmuted">No active goals yet. Create your first goal to start visualizing your success!</p>
+              </div>
+            ) : (
+              <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
+                {activeGoals.map((it:any)=> (
+                  <div 
+                    key={it.id} 
+                    className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-4 cursor-pointer group"
+                    onClick={() => setViewingGoal(it)}
+                  >
+                    {it.img && <img src={it.img} alt={it.title} className="w-full h-40 object-cover rounded-lg mb-3 group-hover:scale-[1.02] transition-transform" />}
+                    <div className="font-bold text-krtext text-lg mb-2">{it.title}</div>
+                    <div className="text-sm text-krmuted mt-1 line-clamp-2 mb-3">{it.desc}</div>
+                    <div className="text-sm space-y-1 mb-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-krmuted">Target:</span>
+                        <span className="font-semibold text-krgold">{formatAmount(parseFloat(it.target) || 0)}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-krmuted">Timeline:</span>
+                        <span className="text-blue-400 text-xs">{it.timeline}</span>
+                      </div>
+                    </div>
+                    <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
+                      <button 
+                        onClick={() => markComplete(it)}
+                        className="flex-1 px-3 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg text-sm hover:shadow-md hover:shadow-green-500/30 transition-all flex items-center justify-center gap-1 font-medium"
+                        title="Mark as complete"
+                      >
+                        <CheckCircle2 size={14} />
+                        Complete
+                      </button>
+                      <button 
+                        onClick={() => editGoal(it)}
+                        className="px-3 py-2 bg-krgold/20 text-krgold rounded-lg text-sm hover:bg-krgold hover:text-krblack transition-colors border border-krgold/30"
+                        title="Edit"
+                      >
+                        <Edit2 size={14} />
+                      </button>
+                      <button 
+                        onClick={() => deleteGoal(it.id)}
+                        className="px-3 py-2 bg-red-500/20 text-red-400 rounded-lg text-sm hover:bg-red-500 hover:text-white transition-colors border border-red-500/30"
+                        title="Delete"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
-          {/* Achievements (Completed Goals) - Moved to bottom */}
+          {/* Achievements (Completed Goals) */}
           {completedGoals.length > 0 && (
             <div className="mt-8">
-              <h2 className="text-xl font-semibold mb-4 text-krtext">🏆 Achievements</h2>
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-2xl">🏆</span>
+                <h2 className="text-xl font-semibold text-krtext">Achievements</h2>
+              </div>
               <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {completedGoals.map((it:any)=> (
                   <div 
                     key={it.id} 
-                    className="bg-krcard rounded-xl border border-krgold p-3 opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
+                    className="bg-gradient-to-br from-krgold/10 to-kryellow/5 backdrop-blur-sm rounded-xl border border-krgold/50 p-4 hover:shadow-lg hover:shadow-krgold/20 transition-all duration-200 cursor-pointer group"
                     onClick={() => setViewingGoal(it)}
                   >
-                    {it.img && <img src={it.img} alt={it.title} className="w-full h-40 object-cover rounded mb-2" />}
-                    <div className="flex items-center gap-2">
-                      <CheckCircle2 size={18} className="text-krgold flex-shrink-0" />
-                      <div className="font-bold text-krgold">{it.title}</div>
+                    {it.img && <img src={it.img} alt={it.title} className="w-full h-40 object-cover rounded-lg mb-3 group-hover:scale-[1.02] transition-transform" />}
+                    <div className="flex items-center gap-2 mb-2">
+                      <CheckCircle2 size={20} className="text-krgold flex-shrink-0" />
+                      <div className="font-bold text-krgold text-lg">{it.title}</div>
                     </div>
-                    <div className="text-sm text-krmuted mt-1 line-clamp-2">{it.desc}</div>
-                    <div className="text-xs text-krmuted mt-2">
-                      Completed: {it.completedDate ? new Date(it.completedDate).toLocaleDateString() : 'N/A'}
+                    <div className="text-sm text-krmuted mt-1 line-clamp-2 mb-2">{it.desc}</div>
+                    <div className="text-xs text-krmuted mt-2 flex items-center gap-1">
+                      <span>✓ Completed:</span>
+                      <span className="text-krgold">{it.completedDate ? new Date(it.completedDate).toLocaleDateString() : 'N/A'}</span>
                     </div>
                     {it.completionImages && it.completionImages.length > 0 && (
-                      <div className="flex gap-1 mt-2">
+                      <div className="flex gap-1 mt-3">
                         {it.completionImages.slice(0, 3).map((img: string, idx: number) => (
-                          <img key={idx} src={img} alt="" className="w-12 h-12 object-cover rounded" />
+                          <img key={idx} src={img} alt="" className="w-12 h-12 object-cover rounded-lg ring-1 ring-krgold/30" />
                         ))}
                       </div>
                     )}
                     <button
                       onClick={(e) => handleDeleteAchievement(it, e)}
-                      className="mt-3 w-full px-2 py-1 bg-krdanger/20 text-krdanger rounded text-sm hover:bg-krdanger hover:text-white transition-colors flex items-center justify-center gap-1"
+                      className="mt-3 w-full px-3 py-2 bg-red-500/10 text-red-400 rounded-lg text-sm hover:bg-red-500 hover:text-white transition-colors flex items-center justify-center gap-1 border border-red-500/20"
                       title="Delete achievement"
                     >
                       <Trash2 size={14} />
