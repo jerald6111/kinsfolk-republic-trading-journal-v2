@@ -1,5 +1,4 @@
 import React, { useEffect, useRef } from 'react'
-import { Database, TrendingUp } from 'lucide-react'
 
 export default function DataMarket() {
   const screenerRef = useRef<HTMLDivElement>(null)
@@ -47,26 +46,33 @@ export default function DataMarket() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-krcard/30 backdrop-blur-sm text-krtext p-6">
-      <div className="mb-6">
-        <div className="flex items-center gap-3">
-          <Database className="text-krgold" size={32} />
-          <div>
-            <h1 className="text-2xl font-bold">Data Market</h1>
-            <p className="text-gray-400 mt-1">Powered by TradingView - Professional crypto market analysis tools</p>
+    <div className="min-h-screen bg-gradient-to-br from-krblack via-krblack to-krcard/20 text-krtext p-4 md:p-6">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="mb-6">
+          <div className="flex items-center gap-3 mb-2">
+            <span className="text-4xl">📊</span>
+            <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-krgold to-kryellow bg-clip-text text-transparent">
+              Data Market
+            </h1>
           </div>
+          <p className="text-krmuted text-sm md:text-base ml-14">
+            Powered by TradingView - Professional crypto market analysis tools
+          </p>
         </div>
-      </div>
 
-      {/* Crypto Screener */}
-      <div className="bg-krcard backdrop-blur-sm rounded-xl shadow-sm border border-krborder p-6">
-        <div className="flex items-center gap-2 mb-4">
-          <TrendingUp className="text-krgold" size={24} />
-          <h2 className="text-xl font-semibold">Perpetual Futures Screener</h2>
-          <span className="text-sm text-gray-400 ml-2">(Binance • Bybit • OKX)</span>
-        </div>
-        <div className="tradingview-widget-container">
-          <div ref={screenerRef} className="tradingview-widget-container__widget"></div>
+        {/* Crypto Screener */}
+        <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-5">
+          <div className="flex items-center gap-3 mb-4">
+            <span className="text-2xl">🔍</span>
+            <div>
+              <h2 className="text-lg font-semibold text-krtext">Perpetual Futures Screener</h2>
+              <p className="text-xs text-krmuted">Binance • Bybit • OKX</p>
+            </div>
+          </div>
+          <div className="tradingview-widget-container">
+            <div ref={screenerRef} className="tradingview-widget-container__widget"></div>
+          </div>
         </div>
       </div>
     </div>

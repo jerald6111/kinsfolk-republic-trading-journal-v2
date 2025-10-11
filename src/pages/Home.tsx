@@ -74,9 +74,9 @@ export default function Home() {
   ]
 
   return (
-    <div className="min-h-screen bg-krbg">
+    <div className="min-h-screen bg-gradient-to-br from-krblack via-krblack to-krcard/20">
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-krblack to-krbg py-20">
+      <section className="relative overflow-hidden bg-gradient-to-b from-krblack to-transparent py-20">
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 bg-krgold/10 border border-krgold/20 rounded-full px-4 py-2 mb-6">
@@ -84,7 +84,7 @@ export default function Home() {
               <span className="text-sm text-krgold font-semibold">Professional Trading Journal Platform</span>
             </div>
             <h1 className="text-5xl md:text-6xl font-bold text-krwhite mb-6">
-              Master Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-krgold to-kryellow">Trading Journey</span>
+              Master Your <span className="bg-gradient-to-r from-krgold to-kryellow bg-clip-text text-transparent">Trading Journey</span>
             </h1>
             <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
               Track, analyze, and improve your trading performance with powerful analytics, comprehensive journaling, and intuitive visualizations.
@@ -92,13 +92,13 @@ export default function Home() {
             <div className="flex gap-4 justify-center">
               <Link
                 to="/journal/entries"
-                className="bg-gradient-to-r from-krgold to-kryellow text-krblack px-8 py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-krgold/50 transition-all"
+                className="bg-gradient-to-r from-krgold to-kryellow text-krblack px-8 py-3 rounded-xl font-semibold hover:shadow-lg hover:shadow-krgold/50 transition-all"
               >
                 Start Trading Journal
               </Link>
               <Link
                 to="/journal/analytics"
-                className="bg-krcard border border-krborder text-krwhite px-8 py-3 rounded-lg font-semibold hover:border-krgold transition-all"
+                className="bg-krcard/80 backdrop-blur-sm border border-krborder text-krwhite px-8 py-3 rounded-xl font-semibold hover:border-krgold hover:shadow-lg hover:shadow-krgold/10 transition-all"
               >
                 View Analytics
               </Link>
@@ -108,11 +108,11 @@ export default function Home() {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 bg-krbg">
+      <section className="py-20">
         <div className="container mx-auto px-6">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-krwhite mb-4">
-              Everything You Need to <span className="text-krgold">Trade Better</span>
+              Everything You Need to <span className="bg-gradient-to-r from-krgold to-kryellow bg-clip-text text-transparent">Trade Better</span>
             </h2>
             <p className="text-gray-400 max-w-2xl mx-auto">
               Our comprehensive suite of tools helps you track, analyze, and improve your trading performance
@@ -123,7 +123,7 @@ export default function Home() {
             {features.map((feature, index) => (
               <div
                 key={index}
-                className="bg-krcard border border-krborder rounded-xl p-6 hover:border-krgold/50 transition-all group"
+                className="bg-krcard/80 backdrop-blur-sm border border-krborder rounded-xl p-6 hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 group"
               >
                 <div className="relative h-48 mb-4 rounded-lg overflow-hidden">
                   <img
@@ -145,11 +145,11 @@ export default function Home() {
       </section>
 
       {/* News Section */}
-      <section className="py-20 bg-krblack/30">
+      <section className="py-20 bg-krblack/20">
         <div className="container mx-auto px-6">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-krwhite mb-4">
-              Latest <span className="text-krgold">Updates</span>
+              Latest <span className="bg-gradient-to-r from-krgold to-kryellow bg-clip-text text-transparent">Updates</span>
             </h2>
             <p className="text-gray-400 max-w-2xl mx-auto">
               Stay informed about new features and improvements
@@ -160,7 +160,7 @@ export default function Home() {
             {news.map((item, index) => (
               <div
                 key={index}
-                className="bg-krcard border border-krborder rounded-xl overflow-hidden hover:border-krgold/50 transition-all group"
+                className="bg-krcard/80 backdrop-blur-sm border border-krborder rounded-xl overflow-hidden hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 group"
               >
                 <div className="relative h-48 overflow-hidden">
                   <img
@@ -193,7 +193,7 @@ export default function Home() {
             </p>
             <Link
               to="/journal/entries"
-              className="inline-block bg-gradient-to-r from-krgold to-kryellow text-krblack px-8 py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-krgold/50 transition-all"
+              className="inline-block bg-gradient-to-r from-krgold to-kryellow text-krblack px-8 py-3 rounded-xl font-semibold hover:shadow-lg hover:shadow-krgold/50 transition-all"
             >
               Get Started Now
             </Link>
