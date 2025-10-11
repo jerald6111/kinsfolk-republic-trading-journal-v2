@@ -834,11 +834,12 @@ export default function TradeAnalytics() {
       {/* Visualization Charts */}
       <div>
         {/* PnL Over Time - Equity Curve - Full Width */}
-        <div className="bg-krcard backdrop-blur-sm rounded-xl border border-krborder p-6">
-          <h2 className="text-lg font-semibold mb-4">PnL Over Time (Equity Curve)</h2>
+        <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-5 hover:border-krgold/50 transition-all">
+          <h3 className="text-base font-semibold mb-4 text-krtext">PnL Over Time (Equity Curve)</h3>
           {journal.length === 0 ? (
-            <div className="bg-krblack/30 rounded-lg p-8 text-center text-gray-400">
-              No trading data available
+            <div className="bg-krblack/50 rounded-lg p-8 text-center border border-krborder/30">
+              <span className="text-5xl mb-3 block">📊</span>
+              <p className="text-krmuted">No trading data available</p>
             </div>
           ) : (
             <div className="space-y-2">
@@ -864,10 +865,10 @@ export default function TradeAnalytics() {
                 
                 return (
                   <>
-                    <div className="text-sm text-gray-400 mb-2">
+                    <div className="text-sm text-krmuted mb-3">
                       Starting Balance: {formatAmount(walletBalance)} → Current: {formatAmount(currentBalance)}
                     </div>
-                    <div className="relative h-80 bg-krblack/30 rounded-lg p-4">
+                    <div className="relative h-80 bg-krblack/40 rounded-lg p-4 border border-krborder/30">
                       {/* Y-axis labels */}
                       <div className="absolute left-0 top-0 bottom-0 w-16 flex flex-col justify-between text-xs text-gray-500">
                         <div>{formatAmount(maxPnl)}</div>
@@ -974,16 +975,16 @@ export default function TradeAnalytics() {
                       const currentDD = currentPeak > 0 ? ((currentPeak - currentBalance) / currentPeak) * 100 : 0
                       
                       return (
-                        <div className="grid grid-cols-2 gap-2 mt-3">
-                          <div className="bg-krblack/30 rounded-lg p-2">
-                            <div className="text-xs text-gray-400">Max Drawdown</div>
-                            <div className="text-sm font-bold text-red-400">-{maxDrawdown.toFixed(2)}%</div>
+                        <div className="grid grid-cols-2 gap-3 mt-3">
+                          <div className="bg-krblack/40 rounded-lg p-3 border border-krborder/30">
+                            <p className="text-xs text-krmuted mb-1">Max Drawdown</p>
+                            <p className="text-sm font-bold text-red-400">-{maxDrawdown.toFixed(2)}%</p>
                           </div>
-                          <div className="bg-krblack/30 rounded-lg p-2">
-                            <div className="text-xs text-gray-400">Current Drawdown</div>
-                            <div className={`text-sm font-bold ${currentDD > 0 ? 'text-red-400' : 'text-green-400'}`}>
+                          <div className="bg-krblack/40 rounded-lg p-3 border border-krborder/30">
+                            <p className="text-xs text-krmuted mb-1">Current Drawdown</p>
+                            <p className={`text-sm font-bold ${currentDD > 0 ? 'text-red-400' : 'text-green-400'}`}>
                               {currentDD > 0 ? `-${currentDD.toFixed(2)}%` : '0.00%'}
-                            </div>
+                            </p>
                           </div>
                         </div>
                       )
@@ -1038,24 +1039,24 @@ export default function TradeAnalytics() {
 
       {/* Trade Details Modal */}
       {showModal && selectedDate && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={closeModal}>
-          <div className="bg-krcard border border-krborder rounded-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-            <div className="sticky top-0 bg-krcard border-b border-krborder p-6 flex items-center justify-between">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4" onClick={closeModal}>
+          <div className="bg-krcard/95 backdrop-blur-xl border border-krborder/50 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="sticky top-0 bg-krcard/95 backdrop-blur-xl border-b border-krborder/50 p-5 flex items-center justify-between">
               <div>
-                <h2 className="text-2xl font-bold text-krtext">
+                <h2 className="text-xl font-bold text-krtext">
                   {selectedDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
                 </h2>
-                <p className="text-gray-400 text-sm mt-1">Trade Details</p>
+                <p className="text-krmuted text-sm mt-1">Trade Details</p>
               </div>
               <button
                 onClick={closeModal}
                 className="p-2 hover:bg-krgold/20 rounded-lg transition-colors"
               >
-                <X size={24} className="text-gray-400 hover:text-krtext" />
+                <X size={20} className="text-krmuted hover:text-krtext" />
               </button>
             </div>
             
-            <div className="p-6">
+            <div className="p-5">
               {(() => {
                 const { pnl, trades, tradeData } = getPnlForDate(selectedDate)
                 const dayWins = tradeData.filter((t: any) => t.pnlAmount > 0).length
@@ -1064,39 +1065,39 @@ export default function TradeAnalytics() {
                 return (
                   <>
                     {/* Day Summary */}
-                    <div className="grid grid-cols-3 gap-4 mb-6">
-                      <div className="bg-krblack/30 rounded-lg p-4 text-center">
-                        <div className="text-sm text-gray-400 mb-1">Total PnL</div>
-                        <div className={`text-2xl font-bold ${pnl >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                    <div className="grid grid-cols-3 gap-3 mb-5">
+                      <div className="bg-krblack/40 rounded-lg p-3 text-center border border-krborder/30">
+                        <p className="text-xs text-krmuted mb-1">Total PnL</p>
+                        <p className={`text-xl font-bold ${pnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
                           {formatAmount(pnl)}
-                        </div>
+                        </p>
                       </div>
-                      <div className="bg-krblack/30 rounded-lg p-4 text-center">
-                        <div className="text-sm text-gray-400 mb-1">Total Trades</div>
-                        <div className="text-2xl font-bold text-krtext">{trades}</div>
+                      <div className="bg-krblack/40 rounded-lg p-3 text-center border border-krborder/30">
+                        <p className="text-xs text-krmuted mb-1">Total Trades</p>
+                        <p className="text-xl font-bold text-krtext">{trades}</p>
                       </div>
-                      <div className="bg-krblack/30 rounded-lg p-4 text-center">
-                        <div className="text-sm text-gray-400 mb-1">Win Rate</div>
-                        <div className={`text-2xl font-bold ${dayWins / trades >= 0.5 ? 'text-green-500' : 'text-red-500'}`}>
+                      <div className="bg-krblack/40 rounded-lg p-3 text-center border border-krborder/30">
+                        <p className="text-xs text-krmuted mb-1">Win Rate</p>
+                        <p className={`text-xl font-bold ${dayWins / trades >= 0.5 ? 'text-green-400' : 'text-red-400'}`}>
                           {((dayWins / trades) * 100).toFixed(0)}%
-                        </div>
+                        </p>
                       </div>
                     </div>
 
                     {/* Trade List */}
                     <div className="space-y-3">
-                      <h3 className="text-lg font-semibold mb-3">Trades ({trades})</h3>
+                      <h3 className="text-base font-semibold mb-3 text-krtext">Trades ({trades})</h3>
                       {tradeData.map((trade: any) => {
                         const isWin = trade.pnlAmount >= 0
                         const netPnl = (trade.pnlAmount || 0) - (trade.fee || 0)
                         return (
-                          <div key={trade.id} className="bg-krblack/30 rounded-lg p-4 border border-krborder hover:border-krgold/50 transition-colors">
+                          <div key={trade.id} className="bg-krblack/40 rounded-lg p-4 border border-krborder/30 hover:border-krgold/50 transition-all">
                             <div className="flex items-start justify-between mb-3">
                               <div>
                                 <div className="flex items-center gap-2">
-                                  <h4 className="text-lg font-semibold text-krtext">{trade.ticker}</h4>
+                                  <h4 className="text-base font-semibold text-krtext">{trade.ticker}</h4>
                                   {netPnl >= 0 ? (
-                                    <TrendingUp className="text-green-500" size={20} />
+                                    <TrendingUp className="text-green-400" size={18} />
                                   ) : (
                                     <TrendingDown className="text-red-500" size={20} />
                                   )}
@@ -1202,22 +1203,22 @@ export default function TradeAnalytics() {
 
       {/* Ticker Details Modal */}
       {showTickerModal && selectedTicker && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowTickerModal(false)}>
-          <div className="bg-krcard border border-krborder rounded-xl max-w-4xl w-full max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-            <div className="sticky top-0 bg-krcard border-b border-krborder p-6 flex items-center justify-between">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4" onClick={() => setShowTickerModal(false)}>
+          <div className="bg-krcard/95 backdrop-blur-xl border border-krborder/50 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="sticky top-0 bg-krcard/95 backdrop-blur-xl border-b border-krborder/50 p-5 flex items-center justify-between">
               <div>
-                <h2 className="text-2xl font-bold text-krtext">{selectedTicker}</h2>
-                <p className="text-gray-400 text-sm mt-1">All Trades</p>
+                <h2 className="text-xl font-bold text-krtext">{selectedTicker}</h2>
+                <p className="text-krmuted text-sm mt-1">All Trades</p>
               </div>
               <button
                 onClick={() => setShowTickerModal(false)}
                 className="p-2 hover:bg-krgold/20 rounded-lg transition-colors"
               >
-                <X size={24} className="text-gray-400 hover:text-krtext" />
+                <X size={20} className="text-krmuted hover:text-krtext" />
               </button>
             </div>
             
-            <div className="p-6">
+            <div className="p-5">
               {(() => {
                 const tickerTrades = journal.filter((j: any) => j.ticker === selectedTicker)
                 const tickerStats = tickerPerformance[selectedTicker]
@@ -1227,34 +1228,34 @@ export default function TradeAnalytics() {
                 return (
                   <>
                     {/* Ticker Summary */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                      <div className="bg-krblack/30 rounded-lg p-4 text-center">
-                        <div className="text-sm text-gray-400 mb-1">Total PnL</div>
-                        <div className={`text-2xl font-bold ${tickerStats.pnl >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
+                      <div className="bg-krblack/40 rounded-lg p-3 text-center border border-krborder/30">
+                        <p className="text-xs text-krmuted mb-1">Total PnL</p>
+                        <p className={`text-xl font-bold ${tickerStats.pnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
                           {formatAmount(tickerStats.pnl)}
-                        </div>
+                        </p>
                       </div>
-                      <div className="bg-krblack/30 rounded-lg p-4 text-center">
-                        <div className="text-sm text-gray-400 mb-1">Total Trades</div>
-                        <div className="text-2xl font-bold text-krtext">{tickerStats.trades}</div>
+                      <div className="bg-krblack/40 rounded-lg p-3 text-center border border-krborder/30">
+                        <p className="text-xs text-krmuted mb-1">Total Trades</p>
+                        <p className="text-xl font-bold text-krtext">{tickerStats.trades}</p>
                       </div>
-                      <div className="bg-krblack/30 rounded-lg p-4 text-center">
-                        <div className="text-sm text-gray-400 mb-1">Win Rate</div>
-                        <div className={`text-2xl font-bold ${tickerWins / tickerStats.trades >= 0.5 ? 'text-green-500' : 'text-red-500'}`}>
+                      <div className="bg-krblack/40 rounded-lg p-3 text-center border border-krborder/30">
+                        <p className="text-xs text-krmuted mb-1">Win Rate</p>
+                        <p className={`text-xl font-bold ${tickerWins / tickerStats.trades >= 0.5 ? 'text-green-400' : 'text-red-400'}`}>
                           {((tickerWins / tickerStats.trades) * 100).toFixed(0)}%
-                        </div>
+                        </p>
                       </div>
-                      <div className="bg-krblack/30 rounded-lg p-4 text-center">
-                        <div className="text-sm text-gray-400 mb-1">Avg PnL</div>
-                        <div className={`text-2xl font-bold ${tickerStats.pnl / tickerStats.trades >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                      <div className="bg-krblack/40 rounded-lg p-3 text-center border border-krborder/30">
+                        <p className="text-xs text-krmuted mb-1">Avg PnL</p>
+                        <p className={`text-xl font-bold ${tickerStats.pnl / tickerStats.trades >= 0 ? 'text-green-400' : 'text-red-400'}`}>
                           {formatAmount(tickerStats.pnl / tickerStats.trades)}
-                        </div>
+                        </p>
                       </div>
                     </div>
 
                     {/* Trade List */}
                     <div className="space-y-3">
-                      <h3 className="text-lg font-semibold mb-3">All Trades ({tickerStats.trades})</h3>
+                      <h3 className="text-base font-semibold mb-3 text-krtext">All Trades ({tickerStats.trades})</h3>
                       {tickerTrades.map((trade: any) => {
                         const netPnl = (trade.pnlAmount || 0) - (trade.fee || 0)
                         return (
