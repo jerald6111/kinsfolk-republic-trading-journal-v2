@@ -13,6 +13,7 @@ import News from './pages/News'
 import DataMarket from './pages/DataMarket'
 import DataSettings from './pages/DataSettings'
 import Navbar from './components/Navbar'
+import Footer from './components/Footer'
 import { CurrencyProvider } from './context/CurrencyContext'
 
 export default function App() {
@@ -21,14 +22,14 @@ export default function App() {
 
   return (
     <CurrencyProvider>
-      <div className="min-h-screen bg-krbg">
+      <div className="min-h-screen bg-gradient-to-b from-krblack to-krbg flex flex-col">
         <Navbar />
         {isHomePage ? (
           <Routes>
             <Route path="/" element={<Home />} />
           </Routes>
         ) : (
-          <div className="container mx-auto px-6 py-8">
+          <div className="container mx-auto px-6 py-8 flex-1">
             <Routes>
               <Route path="/vision" element={<VisionBoard />} />
               <Route path="/news" element={<News />} />
@@ -46,6 +47,7 @@ export default function App() {
             </Routes>
           </div>
         )}
+        <Footer />
       </div>
     </CurrencyProvider>
   )
