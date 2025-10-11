@@ -87,9 +87,10 @@ export async function sendToDiscord(data: any, webhookId?: string) {
   if (!url) return false
 
   try {
-    // Build title: TICKER | Position | Leverage
+    // Build title: TICKER | POSITION | LEVERAGEx
+    const position = data.position.toUpperCase();
     const leverage = data.type === 'Futures' ? `${data.leverage}x` : '';
-    const title = `${data.ticker} | ${data.position} ${leverage}`.trim();
+    const title = `${data.ticker.toUpperCase()} | ${position} ${leverage}`.trim();
     
     // Determine color based on PnL
     const isProfitable = data.pnlAmount > 0;
@@ -105,7 +106,6 @@ export async function sendToDiscord(data: any, webhookId?: string) {
       body: JSON.stringify({
         embeds: [{
           title: title,
-          description: `**${data.type}** ${data.type === 'Futures' ? `• Leverage: ${data.leverage}x` : ''}`,
           color: embedColor,
           fields: [
             { 
