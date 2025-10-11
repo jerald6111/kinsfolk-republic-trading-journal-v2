@@ -483,7 +483,7 @@ export default function Journal() {
                 <p className="text-xs text-krmuted/60 mt-2">Add your first trade to start tracking!</p>
               </div>
             )}
-            {items.slice().reverse().map((it) => {
+            {items.map((it) => {
               const netPnl = (it.pnlAmount || 0) - (it.fee || 0)
               const isProfit = netPnl > 0
               return (
