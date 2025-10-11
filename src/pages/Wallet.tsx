@@ -150,22 +150,8 @@ export default function Wallet() {
         {/* Transactions List */}
         <div className="md:col-span-2">
           <div className="bg-krcard backdrop-blur-sm rounded-xl shadow-sm border border-krborder p-6 mb-6">
-            <div className="space-y-3">
-              <div className="text-lg text-krtext">
-                Current Balance: <span className="font-bold text-krgold text-2xl">{formatAmount(balance)}</span>
-              </div>
-              <div className="grid grid-cols-2 gap-4 pt-3 border-t border-krborder text-sm">
-                <div>
-                  <div className="text-gray-400 mb-1">Wallet Balance</div>
-                  <div className="text-krtext font-semibold">{formatAmount(walletBalance)}</div>
-                </div>
-                <div>
-                  <div className="text-gray-400 mb-1">Trading P&L</div>
-                  <div className={`font-semibold ${totalTradingPnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                    {totalTradingPnl >= 0 ? '+' : ''}{formatAmount(totalTradingPnl)}
-                  </div>
-                </div>
-              </div>
+            <div className="text-lg text-krtext">
+              Current Balance: <span className="font-bold text-krgold text-2xl">{formatAmount(balance)}</span>
             </div>
           </div>
           
