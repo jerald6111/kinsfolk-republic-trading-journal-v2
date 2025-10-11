@@ -61,37 +61,45 @@ export default function Charts(){
   }
 
   return (
-    <div className="min-h-screen bg-krcard/30 backdrop-blur-sm text-krtext p-6">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">Snapshots - {activeTab === 'Charts' ? 'Charts' : 'PNL Overview'}</h1>
+    <div className="min-h-screen bg-gradient-to-br from-krblack via-krblack to-krcard/20 text-krtext p-4 md:p-6">
+      <div className="mb-6">
+        <div className="flex items-center gap-3">
+          <span className="text-4xl">{activeTab === 'Charts' ? '📊' : '💰'}</span>
+          <div>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-krgold to-kryellow bg-clip-text text-transparent">
+              Snapshots - {activeTab === 'Charts' ? 'Charts' : 'PNL Overview'}
+            </h1>
+            <p className="text-krmuted text-sm mt-1">Visual trading documentation</p>
+          </div>
+        </div>
       </div>
 
       {/* Filters Section */}
-      <div className="bg-krcard backdrop-blur-sm rounded-xl shadow-sm border border-krborder p-4 mb-6">
+      <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4 mb-6">
         <div className="flex items-center gap-2 mb-3">
           <Filter size={18} className="text-krgold" />
-          <h2 className="text-lg font-semibold">Filters</h2>
+          <h2 className="text-base font-semibold text-krtext">Filters</h2>
           {hasActiveFilters && (
             <button
               onClick={clearFilters}
-              className="ml-auto text-sm px-3 py-1 text-gray-400 hover:text-krtext border border-krborder rounded-md transition-colors flex items-center gap-1"
+              className="ml-auto text-sm px-3 py-1 text-krmuted hover:text-krtext border border-krborder/50 rounded-lg transition-colors flex items-center gap-1 hover:border-krgold/50"
             >
               <X size={14} />
               Clear Filters
             </button>
           )}
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <div className="space-y-1">
             <label className="text-sm font-medium text-krtext">Ticker</label>
             <select
               value={filterTicker}
               onChange={e => setFilterTicker(e.target.value)}
-              className="w-full px-3 py-2 border border-krborder rounded-md bg-transparent text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
+              className="w-full px-3 py-2 border border-krborder/30 rounded-lg bg-krblack/30 text-krtext focus:border-krgold focus:ring-2 focus:ring-krgold/20 transition-all"
             >
-              <option value="">All Tickers</option>
+              <option value="" className="bg-krcard text-krtext">All Tickers</option>
               {uniqueTickers.map(ticker => (
-                <option key={ticker} value={ticker}>{ticker}</option>
+                <option key={ticker} value={ticker} className="bg-krcard text-krtext">{ticker}</option>
               ))}
             </select>
           </div>
@@ -101,7 +109,7 @@ export default function Charts(){
               type="date"
               value={filterStartDate}
               onChange={e => setFilterStartDate(e.target.value)}
-              className="w-full px-3 py-2 border border-krborder rounded-md bg-transparent text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
+              className="w-full px-3 py-2 border border-krborder/30 rounded-lg bg-krblack/30 text-krtext focus:border-krgold focus:ring-2 focus:ring-krgold/20 transition-all"
             />
           </div>
           <div className="space-y-1">
@@ -110,20 +118,23 @@ export default function Charts(){
               type="date"
               value={filterEndDate}
               onChange={e => setFilterEndDate(e.target.value)}
-              className="w-full px-3 py-2 border border-krborder rounded-md bg-transparent text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
+              className="w-full px-3 py-2 border border-krborder/30 rounded-lg bg-krblack/30 text-krtext focus:border-krgold focus:ring-2 focus:ring-krgold/20 transition-all"
             />
           </div>
         </div>
-        <div className="mt-3 text-sm text-gray-400">
+        <div className="mt-3 text-sm text-krmuted">
           Showing {filteredItems.length} of {items.length} charts
         </div>
       </div>
 
       {/* Snapshots Grid */}
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredItems.length === 0 && (
-          <div className="col-span-full text-center text-gray-400 py-12">
-            {hasActiveFilters ? `No ${activeTab.toLowerCase()} snapshots match the selected filters.` : `No ${activeTab.toLowerCase()} snapshots available.`}
+          <div className="col-span-full text-center bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-12">
+            <span className="text-6xl mb-3 block">{activeTab === 'Charts' ? '📊' : '💰'}</span>
+            <p className="text-krmuted">
+              {hasActiveFilters ? `No ${activeTab.toLowerCase()} snapshots match the selected filters.` : `No ${activeTab.toLowerCase()} snapshots available.`}
+            </p>
           </div>
         )}
         {filteredItems.map((it:any)=> {
@@ -136,41 +147,43 @@ export default function Charts(){
             <div 
               key={it.id} 
               onClick={() => setViewingTrade(it)}
-              className="bg-krcard backdrop-blur-sm rounded-xl border border-krborder overflow-hidden hover:border-krgold/50 transition-colors cursor-pointer"
+              className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder overflow-hidden hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 cursor-pointer group"
             >
-              <img src={displayImage} className="w-full h-56 object-cover" alt={`${it.ticker} ${activeTab.toLowerCase()}`} />
+              <div className="relative overflow-hidden">
+                <img src={displayImage} className="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-200" alt={`${it.ticker} ${activeTab.toLowerCase()}`} />
+              </div>
               
               <div className="p-4 space-y-3">
                 {/* Header */}
                 <div className="flex items-start justify-between">
                   <div>
-                    <h3 className="font-bold text-lg text-krtext">{it.ticker || it.coin}</h3>
+                    <h3 className="font-bold text-base text-krtext">{it.ticker || it.coin}</h3>
                     {it.date && (
-                      <div className="flex items-center gap-1 text-sm text-gray-400 mt-1">
+                      <div className="flex items-center gap-1 text-sm text-krmuted mt-1">
                         <Calendar size={14} />
                         {it.date} {it.time}
                       </div>
                     )}
                   </div>
-                  <span className={`px-2 py-1 rounded text-sm font-semibold ${isProfit ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
-                    {isProfit ? <TrendingUp className="inline-block w-4 h-4" /> : <TrendingDown className="inline-block w-4 h-4" />}
+                  <span className={`px-2 py-1 rounded-lg text-xs font-semibold ${isProfit ? 'bg-green-400/20 text-green-400' : 'bg-red-400/20 text-red-400'}`}>
+                    {isProfit ? <TrendingUp className="inline-block w-3 h-3" /> : <TrendingDown className="inline-block w-3 h-3" />}
                     {pnlPercent.toFixed(2)}%
                   </span>
                 </div>
 
                 {/* Trade Details Summary */}
-                <div className="grid grid-cols-2 gap-3 text-sm">
-                  <div className="bg-krblack/50 rounded-lg p-2">
-                    <div className="text-gray-400 text-xs mb-1">Entry Price</div>
+                <div className="grid grid-cols-2 gap-2 text-sm">
+                  <div className="bg-krblack/40 rounded-lg p-2 border border-krborder/30">
+                    <div className="text-krmuted text-xs mb-1">Entry</div>
                     <div className="text-krtext font-semibold flex items-center gap-1">
-                      <DollarSign size={14} />
+                      <DollarSign size={12} />
                       {formatAmount(it.entryPrice)}
                     </div>
                   </div>
-                  <div className="bg-krblack/50 rounded-lg p-2">
-                    <div className="text-gray-400 text-xs mb-1">Exit Price</div>
+                  <div className="bg-krblack/40 rounded-lg p-2 border border-krborder/30">
+                    <div className="text-krmuted text-xs mb-1">Exit</div>
                     <div className="text-krtext font-semibold flex items-center gap-1">
-                      <DollarSign size={14} />
+                      <DollarSign size={12} />
                       {formatAmount(it.exitPrice)}
                     </div>
                   </div>
@@ -178,7 +191,7 @@ export default function Charts(){
 
                 {/* Additional Details */}
                 {(it.objective || it.setup || it.position) && (
-                  <div className="text-xs text-gray-400 space-y-1 bg-krblack/30 rounded-lg p-2">
+                  <div className="text-xs text-krmuted space-y-1 bg-krblack/30 rounded-lg p-2 border border-krborder/30">
                     {it.objective && <div><strong className="text-krtext">Objective:</strong> {it.objective}</div>}
                     {it.setup && <div><strong className="text-krtext">Strategy:</strong> {it.setup}</div>}
                     {it.position && <div><strong className="text-krtext">Position:</strong> {it.position}</div>}
