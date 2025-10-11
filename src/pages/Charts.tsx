@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { loadData, saveData } from '../utils/storage'
-import FileUploader from '../components/FileUploader'
 import Modal from '../components/Modal'
 import { TrendingUp, TrendingDown, Calendar, DollarSign, Percent, Filter, X } from 'lucide-react'
 import { useCurrency } from '../context/CurrencyContext'
@@ -13,22 +12,11 @@ export default function Charts(){
   const journal = data.journal || []
   const charts = journal.filter((j:any)=> j.chartImg || j.pnlImg)
   const [items, setItems] = useState(charts)
-  const [showUpload, setShowUpload] = useState(false)
-  const [activeTab, setActiveTab] = useState<'Chart' | 'PNL'>('Chart')
+  const [activeTab, setActiveTab] = useState<'Charts' | 'PNL'>('Charts')
   const [viewingTrade, setViewingTrade] = useState<any>(null)
   const [filterTicker, setFilterTicker] = useState('')
   const [filterStartDate, setFilterStartDate] = useState('')
   const [filterEndDate, setFilterEndDate] = useState('')
-  const [uploadForm, setUploadForm] = useState({
-    ticker: '',
-    chartImg: '',
-    pnlImg: '',
-    date: '',
-    entryPrice: 0,
-    exitPrice: 0,
-    reasonIn: '',
-    reasonOut: ''
-  })
 
   // Set active tab based on URL parameter
   useEffect(() => {
@@ -36,7 +24,7 @@ export default function Charts(){
     if (tab === 'pnl') {
       setActiveTab('PNL')
     } else {
-      setActiveTab('Chart')
+      setActiveTab('Charts')
     }
   }, [searchParams])
 
@@ -52,7 +40,7 @@ export default function Charts(){
       const matchesTicker = !filterTicker || item.ticker === filterTicker
       const matchesStartDate = !filterStartDate || item.date >= filterStartDate
       const matchesEndDate = !filterEndDate || item.date <= filterEndDate
-      const hasCorrectImage = activeTab === 'Chart' ? item.chartImg : item.pnlImg
+      const hasCorrectImage = activeTab === 'Charts' ? item.chartImg : item.pnlImg
       return matchesTicker && matchesStartDate && matchesEndDate && hasCorrectImage
     })
   }, [items, filterTicker, filterStartDate, filterEndDate, activeTab])
@@ -71,48 +59,10 @@ export default function Charts(){
     setItems(j.filter((it:any)=> it.chartImg || it.pnlImg))
   }
 
-  const uploadChart = () => {
-    const imageToCheck = activeTab === 'Chart' ? uploadForm.chartImg : uploadForm.pnlImg
-    if (!uploadForm.ticker || !imageToCheck) {
-      alert(`Please provide at least a ticker and ${activeTab.toLowerCase()} image`)
-      return
-    }
-    
-    const newChart = {
-      id: Date.now(),
-      ...uploadForm,
-      pnlAmount: uploadForm.exitPrice - uploadForm.entryPrice,
-      pnlPercent: ((uploadForm.exitPrice - uploadForm.entryPrice) / uploadForm.entryPrice) * 100
-    }
-    
-    const updatedJournal = [newChart, ...journal]
-    saveData({ journal: updatedJournal })
-    setItems([newChart, ...items])
-    setShowUpload(false)
-    setUploadForm({
-      ticker: '',
-      chartImg: '',
-      pnlImg: '',
-      date: '',
-      entryPrice: 0,
-      exitPrice: 0,
-      reasonIn: '',
-      reasonOut: ''
-    })
-  }
-
   return (
     <div className="min-h-screen bg-krcard/30 backdrop-blur-sm text-krtext p-6">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">Snapshots - {activeTab === 'Chart' ? 'Chart' : 'PNL Overview'}</h1>
-        {activeTab === 'Chart' && (
-          <button
-            onClick={() => setShowUpload(!showUpload)}
-            className="px-4 py-2 bg-krgold hover:bg-kryellow text-krblack rounded-lg font-semibold transition-colors"
-          >
-            {showUpload ? 'Cancel' : 'Upload Snapshot'}
-          </button>
-        )}
+        <h1 className="text-2xl font-bold">Snapshots - {activeTab === 'Charts' ? 'Charts' : 'PNL Overview'}</h1>
       </div>
 
       {/* Filters Section */}
@@ -168,104 +118,18 @@ export default function Charts(){
         </div>
       </div>
 
-      {/* Upload Form */}
-      {showUpload && (
-        <div className="bg-krcard backdrop-blur-sm rounded-xl shadow-sm border border-krborder p-6 mb-6">
-          <h2 className="text-lg font-semibold mb-4">Upload New Snapshot</h2>
-          <div className="grid md:grid-cols-2 gap-4">
-            <div className="space-y-1">
-              <label className="text-sm font-medium text-krtext">Ticker</label>
-              <input
-                type="text"
-                className="w-full px-3 py-2 border border-krborder rounded-md bg-transparent text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
-                value={uploadForm.ticker}
-                onChange={e => setUploadForm({...uploadForm, ticker: e.target.value})}
-                placeholder="BTC/USDT"
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="text-sm font-medium text-krtext">Date</label>
-              <input
-                type="date"
-                className="w-full px-3 py-2 border border-krborder rounded-md bg-transparent text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
-                value={uploadForm.date}
-                onChange={e => setUploadForm({...uploadForm, date: e.target.value})}
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="text-sm font-medium text-krtext">Entry Price</label>
-              <input
-                type="number"
-                className="w-full px-3 py-2 border border-krborder rounded-md bg-transparent text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
-                value={uploadForm.entryPrice || ''}
-                onChange={e => setUploadForm({...uploadForm, entryPrice: Number(e.target.value)})}
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="text-sm font-medium text-krtext">Exit Price</label>
-              <input
-                type="number"
-                className="w-full px-3 py-2 border border-krborder rounded-md bg-transparent text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
-                value={uploadForm.exitPrice || ''}
-                onChange={e => setUploadForm({...uploadForm, exitPrice: Number(e.target.value)})}
-              />
-            </div>
-            <div className="md:col-span-2 space-y-1">
-              <label className="text-sm font-medium text-krtext">Chart Image</label>
-              <FileUploader
-                value={uploadForm.chartImg}
-                onChange={val => setUploadForm({...uploadForm, chartImg: val})}
-                accept="image/*"
-              />
-            </div>
-            <div className="md:col-span-2 space-y-1">
-              <label className="text-sm font-medium text-krtext">PNL Image</label>
-              <FileUploader
-                value={uploadForm.pnlImg}
-                onChange={val => setUploadForm({...uploadForm, pnlImg: val})}
-                accept="image/*"
-              />
-            </div>
-            <div className="md:col-span-2 space-y-1">
-              <label className="text-sm font-medium text-krtext">Reason for Entry</label>
-              <textarea
-                className="w-full px-3 py-2 border border-krborder rounded-md bg-transparent text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold min-h-[80px]"
-                value={uploadForm.reasonIn}
-                onChange={e => setUploadForm({...uploadForm, reasonIn: e.target.value})}
-                placeholder="Why did you enter this trade?"
-              />
-            </div>
-            <div className="md:col-span-2 space-y-1">
-              <label className="text-sm font-medium text-krtext">Reason for Exit</label>
-              <textarea
-                className="w-full px-3 py-2 border border-krborder rounded-md bg-transparent text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold min-h-[80px]"
-                value={uploadForm.reasonOut}
-                onChange={e => setUploadForm({...uploadForm, reasonOut: e.target.value})}
-                placeholder="Why did you exit this trade?"
-              />
-            </div>
-          </div>
-          <button
-            onClick={uploadChart}
-            className="mt-4 px-6 py-2 bg-krgold hover:bg-kryellow text-krblack rounded-lg font-semibold transition-colors"
-          >
-            Upload Snapshot
-          </button>
-        </div>
-      )}
-
       {/* Snapshots Grid */}
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredItems.length === 0 && (
           <div className="col-span-full text-center text-gray-400 py-12">
-            {hasActiveFilters ? `No ${activeTab.toLowerCase()} snapshots match the selected filters.` : `No ${activeTab.toLowerCase()} snapshots available. Upload your first snapshot to get started!`}
+            {hasActiveFilters ? `No ${activeTab.toLowerCase()} snapshots match the selected filters.` : `No ${activeTab.toLowerCase()} snapshots available.`}
           </div>
         )}
         {filteredItems.map((it:any)=> {
           const isProfit = it.exitPrice > it.entryPrice
           const pnlAmount = it.pnlAmount || (it.exitPrice - it.entryPrice)
           const pnlPercent = it.pnlPercent || (((it.exitPrice - it.entryPrice) / it.entryPrice) * 100)
-          const displayImage = activeTab === 'Chart' ? it.chartImg : it.pnlImg
+          const displayImage = activeTab === 'Charts' ? it.chartImg : it.pnlImg
           
           return (
             <div 
@@ -315,7 +179,7 @@ export default function Charts(){
                 {(it.objective || it.setup || it.position) && (
                   <div className="text-xs text-gray-400 space-y-1 bg-krblack/30 rounded-lg p-2">
                     {it.objective && <div><strong className="text-krtext">Objective:</strong> {it.objective}</div>}
-                    {it.setup && <div><strong className="text-krtext">Setup:</strong> {it.setup}</div>}
+                    {it.setup && <div><strong className="text-krtext">Strategy:</strong> {it.setup}</div>}
                     {it.position && <div><strong className="text-krtext">Position:</strong> {it.position}</div>}
                     {it.type && <div><strong className="text-krtext">Type:</strong> {it.type} {it.type === 'Futures' && it.leverage ? `${it.leverage}x` : ''}</div>}
                   </div>
@@ -373,7 +237,7 @@ export default function Charts(){
                   <div className="text-krtext">{viewingTrade.objective}</div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-1">Setup</label>
+                  <label className="block text-sm font-medium text-gray-400 mb-1">Strategy</label>
                   <div className="text-krtext">{viewingTrade.setup}</div>
                 </div>
               </div>

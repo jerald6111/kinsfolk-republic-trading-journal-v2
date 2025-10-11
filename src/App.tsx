@@ -6,6 +6,7 @@ import Journal from './pages/Journal'
 import Playbook from './pages/Playbook'
 import Charts from './pages/Charts'
 import Wallet from './pages/Wallet'
+import News from './pages/News'
 import DataSettings from './pages/DataSettings'
 import Navbar from './components/Navbar'
 import { CurrencyProvider } from './context/CurrencyContext'
@@ -19,6 +20,7 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/vision" element={<VisionBoard />} />
+            <Route path="/news" element={<News />} />
             <Route path="/journal" element={<Journal />} />
             <Route path="/playbook" element={<Playbook />} />
             <Route path="/charts" element={<Charts />} />

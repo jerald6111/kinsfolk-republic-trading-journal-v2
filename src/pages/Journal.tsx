@@ -174,7 +174,7 @@ export default function Journal() {
               </div>
             </div>
 
-            {/* Objective and Setup */}
+            {/* Objective and Strategy */}
             <div className="grid grid-cols-2 gap-4">
               <Select
                 label="Objective"
@@ -184,7 +184,7 @@ export default function Journal() {
               />
 
               <Select
-                label="Setup"
+                label="Strategy"
                 value={form.setup || ''}
                 onChange={setup => setForm({...form, setup})}
                 options={strategies.map(s => ({ value: s, label: s }))}
@@ -406,7 +406,7 @@ export default function Journal() {
                   <div className="text-krtext">{viewingTrade.objective}</div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-1">Setup</label>
+                  <label className="block text-sm font-medium text-gray-400 mb-1">Strategy</label>
                   <div className="text-krtext">{viewingTrade.setup}</div>
                 </div>
               </div>
