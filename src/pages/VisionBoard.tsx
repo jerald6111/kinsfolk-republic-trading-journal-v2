@@ -67,6 +67,8 @@ export default function VisionBoard(){
   const [completionReflection, setCompletionReflection] = useState('')
   const [completionImages, setCompletionImages] = useState<string[]>([])
   const [uploadingImageIndex, setUploadingImageIndex] = useState<number | null>(null)
+  const [deletingAchievement, setDeletingAchievement] = useState<any>(null)
+  const [deleteConfirmStep, setDeleteConfirmStep] = useState(0) // 0 = not deleting, 1 = first confirm, 2 = second confirm
 
   const add = () => {
     if (editingGoal) {
@@ -137,6 +139,29 @@ export default function VisionBoard(){
       setItems(next)
       saveData({ vision: next })
     }
+  }
+
+  const handleDeleteAchievement = (achievement: any, e: React.MouseEvent) => {
+    e.stopPropagation() // Prevent opening the view modal
+    setDeletingAchievement(achievement)
+    setDeleteConfirmStep(1)
+  }
+
+  const confirmDeleteAchievement = () => {
+    if (deleteConfirmStep === 1) {
+      setDeleteConfirmStep(2)
+    } else if (deleteConfirmStep === 2 && deletingAchievement) {
+      const next = items.filter((it: any) => it.id !== deletingAchievement.id)
+      setItems(next)
+      saveData({ vision: next })
+      setDeletingAchievement(null)
+      setDeleteConfirmStep(0)
+    }
+  }
+
+  const cancelDeleteAchievement = () => {
+    setDeletingAchievement(null)
+    setDeleteConfirmStep(0)
   }
 
   const editGoal = (goal: any) => {
@@ -262,6 +287,14 @@ export default function VisionBoard(){
                         ))}
                       </div>
                     )}
+                    <button
+                      onClick={(e) => handleDeleteAchievement(it, e)}
+                      className="mt-3 w-full px-2 py-1 bg-krdanger/20 text-krdanger rounded text-sm hover:bg-krdanger hover:text-white transition-colors flex items-center justify-center gap-1"
+                      title="Delete achievement"
+                    >
+                      <Trash2 size={14} />
+                      Delete
+                    </button>
                   </div>
                 ))}
               </div>
@@ -436,6 +469,76 @@ export default function VisionBoard(){
           >
             Continue
           </button>
+        </div>
+      </Modal>
+
+      {/* Delete Achievement Confirmation Modal */}
+      <Modal
+        isOpen={deleteConfirmStep > 0}
+        onClose={cancelDeleteAchievement}
+        title="⚠️ Delete Achievement"
+      >
+        <div className="p-6">
+          {deleteConfirmStep === 1 && (
+            <div className="text-center">
+              <div className="text-6xl mb-4">🗑️</div>
+              <h3 className="text-xl font-bold text-krtext mb-3">First Confirmation</h3>
+              <p className="text-krmuted mb-2">
+                Are you sure you want to delete this achievement?
+              </p>
+              <p className="text-krgold font-semibold mb-4">
+                {deletingAchievement?.title}
+              </p>
+              <p className="text-sm text-krmuted mb-6">
+                This will permanently remove this achievement from your records.
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={cancelDeleteAchievement}
+                  className="flex-1 px-6 py-2 bg-krcard border border-krborder text-krtext rounded-md font-semibold hover:bg-krborder transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmDeleteAchievement}
+                  className="flex-1 px-6 py-2 bg-yellow-600 text-white rounded-md font-semibold hover:bg-yellow-700 transition-colors"
+                >
+                  Continue
+                </button>
+              </div>
+            </div>
+          )}
+
+          {deleteConfirmStep === 2 && (
+            <div className="text-center">
+              <div className="text-6xl mb-4">⚠️</div>
+              <h3 className="text-xl font-bold text-krdanger mb-3">Final Confirmation</h3>
+              <p className="text-krtext font-semibold mb-2">
+                Are you absolutely certain?
+              </p>
+              <p className="text-krmuted mb-4">
+                Deleting <strong className="text-krgold">{deletingAchievement?.title}</strong> cannot be undone.
+              </p>
+              <p className="text-sm text-krdanger mb-6">
+                All associated photos and reflections will be permanently lost.
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={cancelDeleteAchievement}
+                  className="flex-1 px-6 py-2 bg-krcard border border-krborder text-krtext rounded-md font-semibold hover:bg-krborder transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmDeleteAchievement}
+                  className="flex-1 px-6 py-2 bg-krdanger text-white rounded-md font-semibold hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+                >
+                  <Trash2 size={18} />
+                  Delete Permanently
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </Modal>
     </div>
