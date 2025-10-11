@@ -80,10 +80,48 @@ export default function Wallet() {
   
   // Current balance = wallet balance + trading PnL (after fees)
   const balance = walletBalance + totalTradingPnl
+  
+  // Calculate stats
+  const totalDeposits = items.filter(t => t.type === 'deposit').reduce((s, t) => s + t.amount, 0)
+  const totalWithdrawals = items.filter(t => t.type === 'withdrawal').reduce((s, t) => s + t.amount, 0)
 
   return (
-    <div className="min-h-screen bg-krcard/30 backdrop-blur-sm text-krtext p-6">
-      <h1 className="text-2xl font-bold mb-6 text-krtext">Wallet</h1>
+    <div className="min-h-screen bg-gradient-to-br from-krblack via-krblack to-krcard/20 text-krtext p-4 md:p-6">
+      {/* Header */}
+      <div className="mb-6">
+        <div className="flex items-center gap-3 mb-4">
+          <span className="text-4xl">💰</span>
+          <div>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-krgold to-kryellow bg-clip-text text-transparent">Wallet</h1>
+            <p className="text-krmuted text-sm mt-1">Manage deposits, withdrawals, and track your balance</p>
+          </div>
+        </div>
+
+        {/* Balance Stats Cards */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4">
+            <p className="text-xs text-krmuted mb-1">Current Balance</p>
+            <p className={`text-2xl font-bold ${balance >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+              {formatAmount(balance)}
+            </p>
+          </div>
+          <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4">
+            <p className="text-xs text-krmuted mb-1">Total Deposits</p>
+            <p className="text-2xl font-bold text-blue-400">{formatAmount(totalDeposits)}</p>
+          </div>
+          <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4">
+            <p className="text-xs text-krmuted mb-1">Total Withdrawals</p>
+            <p className="text-2xl font-bold text-orange-400">{formatAmount(totalWithdrawals)}</p>
+          </div>
+          <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4">
+            <p className="text-xs text-krmuted mb-1">Trading P&L</p>
+            <p className={`text-2xl font-bold ${totalTradingPnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+              {formatAmount(totalTradingPnl)}
+            </p>
+          </div>
+        </div>
+      </div>
+
       <div className="grid md:grid-cols-3 gap-6 mb-6">
         {/* Form Section */}
         <div className="bg-krcard backdrop-blur-sm rounded-xl shadow-sm border border-krborder p-6">
