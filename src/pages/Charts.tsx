@@ -61,7 +61,12 @@ export default function Charts(){
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-krblack via-krblack to-krcard/20 text-krtext p-4 md:p-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-krblack to-gray-950 text-krtext p-4 md:p-6 relative overflow-hidden">
+      {/* Animated gradient accents */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-krgold/10 via-transparent to-transparent pointer-events-none"></div>
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-kryellow/5 via-transparent to-transparent pointer-events-none"></div>
+      
+      <div className="relative z-10">
       <div className="mb-6">
         <div className="flex items-center gap-3">
           <span className="text-4xl">{activeTab === 'Charts' ? '📊' : '💰'}</span>
@@ -304,6 +309,7 @@ export default function Charts(){
           </div>
         </Modal>
       )}
+      </div>
     </div>
   )
 }
