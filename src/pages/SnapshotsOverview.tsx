@@ -1,14 +1,16 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { loadData } from '../utils/storage'
 import { useCurrency } from '../context/CurrencyContext'
-import { Camera, TrendingUp, TrendingDown, BarChart3, ArrowRight, ImageIcon } from 'lucide-react'
+import { Camera, TrendingUp, TrendingDown, BarChart3, ArrowRight, ImageIcon, DollarSign, Calendar } from 'lucide-react'
+import Modal from '../components/Modal'
 
 export default function SnapshotsOverview() {
   const data = loadData()
   const { formatAmount } = useCurrency()
   const journal = data.journal || []
   const chartsData = journal.filter((j: any) => j.chartImg || j.pnlImg)
+  const [viewingTrade, setViewingTrade] = useState<any>(null)
   
   const totalSnapshots = chartsData.length
   const chartSnapshots = chartsData.filter((j: any) => j.chartImg).length
@@ -150,13 +152,17 @@ export default function SnapshotsOverview() {
               const displayImage = snapshot.chartImg || snapshot.pnlImg
               
               return (
-                <div key={snapshot.id} className="bg-krblack/40 rounded-lg overflow-hidden border border-krborder/30 hover:border-krgold/50 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200">
+                <div 
+                  key={snapshot.id} 
+                  onClick={() => setViewingTrade(snapshot)}
+                  className="bg-krblack/40 rounded-lg overflow-hidden border border-krborder/30 hover:border-krgold/50 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 cursor-pointer group"
+                >
                   {displayImage && (
-                    <div className="aspect-video bg-krblack/50 relative">
+                    <div className="aspect-video bg-krblack/50 relative overflow-hidden">
                       <img 
                         src={displayImage} 
                         alt={snapshot.ticker}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
                       />
                     </div>
                   )}
@@ -182,6 +188,128 @@ export default function SnapshotsOverview() {
           </div>
         )}
       </div>
+
+      {/* Trade Details Modal */}
+      {viewingTrade && (
+        <Modal isOpen={!!viewingTrade} onClose={() => setViewingTrade(null)} title="Snapshot Details" maxWidth="max-w-6xl">
+          <div className="space-y-6">
+            {/* Header */}
+            <div className="flex items-start justify-between">
+              <div>
+                <h2 className="text-2xl font-bold text-krtext">{viewingTrade.ticker}</h2>
+                <div className="flex items-center gap-2 text-sm text-krmuted mt-1">
+                  <Calendar size={14} />
+                  <span>{viewingTrade.date} {viewingTrade.time}</span>
+                </div>
+              </div>
+              <span className={`text-lg px-3 py-1.5 rounded-lg font-semibold ${(viewingTrade.pnlAmount || 0) > 0 ? 'bg-green-400/20 text-green-400' : 'bg-red-400/20 text-red-400'}`}>
+                {(viewingTrade.pnlAmount || 0) > 0 ? <TrendingUp className="inline-block w-5 h-5 mr-1" /> : <TrendingDown className="inline-block w-5 h-5 mr-1" />}
+                {(viewingTrade.pnlPercent || (((viewingTrade.exitPrice - viewingTrade.entryPrice) / viewingTrade.entryPrice) * 100)).toFixed(2)}%
+              </span>
+            </div>
+
+            {/* Images Grid */}
+            <div className={`grid gap-6 ${viewingTrade.chartImg && viewingTrade.pnlImg ? 'grid-cols-2' : 'grid-cols-1'}`}>
+              {viewingTrade.chartImg && (
+                <div>
+                  <label className="block text-sm font-medium text-krmuted mb-2">Chart Analysis</label>
+                  <img src={viewingTrade.chartImg} className="w-full rounded-lg border border-krborder" alt="Chart" />
+                </div>
+              )}
+              {viewingTrade.pnlImg && (
+                <div>
+                  <label className="block text-sm font-medium text-krmuted mb-2">PnL Screenshot</label>
+                  <img src={viewingTrade.pnlImg} className="w-full rounded-lg border border-krborder" alt="PnL" />
+                </div>
+              )}
+            </div>
+
+            {/* Trade Details */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div className="bg-krblack/40 rounded-lg p-3 border border-krborder/30">
+                <div className="text-xs text-krmuted mb-1">Entry</div>
+                <div className="text-krtext font-semibold flex items-center gap-1">
+                  <DollarSign size={14} />
+                  {formatAmount(viewingTrade.entryPrice)}
+                </div>
+              </div>
+              <div className="bg-krblack/40 rounded-lg p-3 border border-krborder/30">
+                <div className="text-xs text-krmuted mb-1">Exit</div>
+                <div className="text-krtext font-semibold flex items-center gap-1">
+                  <DollarSign size={14} />
+                  {formatAmount(viewingTrade.exitPrice)}
+                </div>
+              </div>
+              <div className="bg-krblack/40 rounded-lg p-3 border border-krborder/30">
+                <div className="text-xs text-krmuted mb-1">P&L</div>
+                <div className={`font-semibold ${(viewingTrade.pnlAmount || 0) > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                  {formatAmount(viewingTrade.pnlAmount || 0)}
+                </div>
+              </div>
+              <div className="bg-krblack/40 rounded-lg p-3 border border-krborder/30">
+                <div className="text-xs text-krmuted mb-1">Fee</div>
+                <div className="text-krtext font-semibold">
+                  {formatAmount(viewingTrade.fee || 0)}
+                </div>
+              </div>
+            </div>
+
+            {/* Trade Info */}
+            {(viewingTrade.objective || viewingTrade.setup || viewingTrade.position) && (
+              <div className="bg-krblack/40 rounded-lg p-4 border border-krborder/30 space-y-2 text-sm">
+                {viewingTrade.objective && (
+                  <div>
+                    <span className="text-krmuted">Objective:</span>
+                    <span className="text-krtext ml-2">{viewingTrade.objective}</span>
+                  </div>
+                )}
+                {viewingTrade.setup && (
+                  <div>
+                    <span className="text-krmuted">Strategy:</span>
+                    <span className="text-krtext ml-2">{viewingTrade.setup}</span>
+                  </div>
+                )}
+                {viewingTrade.position && (
+                  <div>
+                    <span className="text-krmuted">Position:</span>
+                    <span className="text-krtext ml-2">{viewingTrade.position}</span>
+                  </div>
+                )}
+                {viewingTrade.type && (
+                  <div>
+                    <span className="text-krmuted">Type:</span>
+                    <span className="text-krtext ml-2">
+                      {viewingTrade.type} {viewingTrade.type === 'Futures' && viewingTrade.leverage ? `${viewingTrade.leverage}x` : ''}
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Reasons */}
+            {(viewingTrade.reasonIn || viewingTrade.reasonOut) && (
+              <div className="space-y-3">
+                {viewingTrade.reasonIn && (
+                  <div>
+                    <label className="block text-sm font-medium text-krmuted mb-2">Reason for Entry</label>
+                    <div className="p-3 bg-krcard/50 rounded-lg border border-krborder text-krtext">
+                      {viewingTrade.reasonIn}
+                    </div>
+                  </div>
+                )}
+                {viewingTrade.reasonOut && (
+                  <div>
+                    <label className="block text-sm font-medium text-krmuted mb-2">Reason for Exit</label>
+                    <div className="p-3 bg-krcard/50 rounded-lg border border-krborder text-krtext">
+                      {viewingTrade.reasonOut}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </Modal>
+      )}
       </div>
       </div>
     </div>

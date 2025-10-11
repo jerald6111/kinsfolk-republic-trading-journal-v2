@@ -212,8 +212,9 @@ export default function Charts(){
 
       {/* Trade Details Modal */}
       {viewingTrade && (
-        <Modal isOpen={!!viewingTrade} onClose={() => setViewingTrade(null)} title="Trade Details" maxWidth="max-w-4xl">
-          <div className="max-w-4xl mx-auto">
+        <Modal isOpen={!!viewingTrade} onClose={() => setViewingTrade(null)} title="Trade Details" maxWidth="max-w-7xl">
+          <div className="space-y-6">
+            {/* Header */}
             <div className="flex items-start justify-between mb-4">
               <div>
                 <h2 className="text-2xl font-bold text-krtext">{viewingTrade.ticker}</h2>
@@ -225,21 +226,23 @@ export default function Charts(){
               </span>
             </div>
 
-            {/* Images */}
-            <div className="grid grid-cols-2 gap-4 mb-6">
-              {viewingTrade.chartImg && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">Chart Image</label>
-                  <img src={viewingTrade.chartImg} className="w-full rounded-lg border border-krborder" alt="Chart" />
-                </div>
-              )}
-              {viewingTrade.pnlImg && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">PnL Image</label>
+            {/* Charts View - Only show Chart Image (Horizontal) */}
+            {!isPnlView && viewingTrade.chartImg && (
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-400 mb-2">Chart Analysis</label>
+                <img src={viewingTrade.chartImg} className="w-full rounded-lg border border-krborder" alt="Chart" />
+              </div>
+            )}
+
+            {/* PNL View - Only show PNL Image (Vertical) */}
+            {isPnlView && viewingTrade.pnlImg && (
+              <div className="mb-6 flex justify-center">
+                <div className="max-w-2xl w-full">
+                  <label className="block text-sm font-medium text-gray-400 mb-2">PnL Screenshot</label>
                   <img src={viewingTrade.pnlImg} className="w-full rounded-lg border border-krborder" alt="PnL" />
                 </div>
-              )}
-            </div>
+              </div>
+            )}
 
             {/* Trade Details Grid */}
             <div className="grid grid-cols-2 gap-4 mb-6">
