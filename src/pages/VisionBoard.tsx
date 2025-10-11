@@ -183,8 +183,40 @@ export default function VisionBoard(){
   const completedGoals = items.filter((it: any) => it.status === 'completed')
 
   return (
-    <div className="min-h-screen bg-krcard/30 backdrop-blur-sm text-krtext p-6">
-      <h1 className="text-2xl font-bold mb-4 text-krtext">Vision Board</h1>
+    <div className="min-h-screen bg-gradient-to-br from-krblack via-krblack to-krcard/20 text-krtext p-4 md:p-6">
+      {/* Header with Stats */}
+      <div className="mb-6">
+        <div className="flex items-center gap-3 mb-4">
+          <span className="text-4xl">🎯</span>
+          <div>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-krgold to-kryellow bg-clip-text text-transparent">Vision Board</h1>
+            <p className="text-krmuted text-sm mt-1">Visualize your goals and track achievements</p>
+          </div>
+        </div>
+
+        {/* Quick Stats Cards */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4">
+            <p className="text-xs text-krmuted mb-1">Active Goals</p>
+            <p className="text-2xl font-bold text-blue-400">{activeGoals.length}</p>
+          </div>
+          <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4">
+            <p className="text-xs text-krmuted mb-1">Completed</p>
+            <p className="text-2xl font-bold text-green-400">{completedGoals.length}</p>
+          </div>
+          <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4">
+            <p className="text-xs text-krmuted mb-1">Total Goals</p>
+            <p className="text-2xl font-bold text-krgold">{items.length}</p>
+          </div>
+          <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4">
+            <p className="text-xs text-krmuted mb-1">Success Rate</p>
+            <p className="text-2xl font-bold text-purple-400">
+              {items.length > 0 ? `${((completedGoals.length / items.length) * 100).toFixed(0)}%` : '0%'}
+            </p>
+          </div>
+        </div>
+      </div>
+
       <div className="grid md:grid-cols-[350px,1fr] gap-4 mb-6">
         <div className="p-4 bg-krcard rounded-xl border border-krborder self-start">
           <h2 className="text-lg font-semibold mb-3 text-krtext">{editingGoal ? 'Edit Goal' : 'Add New Goal'}</h2>
