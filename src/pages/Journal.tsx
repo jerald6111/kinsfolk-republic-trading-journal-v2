@@ -132,10 +132,10 @@ export default function Journal() {
                 <select
                   value={form.type}
                   onChange={e => setForm({...form, type: e.target.value as TradeType})}
-                  className="w-full px-3 py-2 border border-krborder rounded-md bg-transparent text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
+                  className="w-full px-3 py-2 border border-krborder rounded-md bg-krcard text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
                 >
                   {TYPES.map(type => (
-                    <option key={type} value={type}>{type}</option>
+                    <option key={type} value={type} className="bg-krcard text-krtext">{type}</option>
                   ))}
                 </select>
               </div>
@@ -147,10 +147,10 @@ export default function Journal() {
                   <select
                     value={form.position}
                     onChange={e => setForm({...form, position: e.target.value as TradePosition})}
-                    className="w-full px-3 py-2 border border-krborder rounded-md bg-transparent text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
+                    className="w-full px-3 py-2 border border-krborder rounded-md bg-krcard text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
                   >
                     {POSITIONS.map(pos => (
-                      <option key={pos} value={pos}>{pos}</option>
+                      <option key={pos} value={pos} className="bg-krcard text-krtext">{pos}</option>
                     ))}
                   </select>
                 </div>
