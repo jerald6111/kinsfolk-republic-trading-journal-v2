@@ -24,7 +24,17 @@ export default function DataMarket() {
       colorTheme: 'dark',
       locale: 'en',
       isTransparent: true,
-      largeChartUrl: ''
+      largeChartUrl: '',
+      // Pre-configured filter for Binance, Bybit, and OKX perpetuals
+      symbols: [
+        { s: 'BINANCE:BTCUSDT.P' },
+        { s: 'BINANCE:ETHUSDT.P' },
+        { s: 'BYBIT:BTCUSDT.P' },
+        { s: 'BYBIT:ETHUSDT.P' },
+        { s: 'OKX:BTCUSDT.P' },
+        { s: 'OKX:ETHUSDT.P' }
+      ],
+      defaultExchange: 'BINANCE'
     })
 
     container.appendChild(script)
@@ -42,8 +52,8 @@ export default function DataMarket() {
         <div className="flex items-center gap-3">
           <Database className="text-krgold" size={32} />
           <div>
-            <h1 className="text-2xl font-bold">Crypto Data Market</h1>
-            <p className="text-gray-400 mt-1">Top 500 Cryptocurrencies - Real-time data and analytics</p>
+            <h1 className="text-2xl font-bold">Data Market</h1>
+            <p className="text-gray-400 mt-1">Powered by TradingView - Professional crypto market analysis tools</p>
           </div>
         </div>
       </div>
@@ -52,8 +62,8 @@ export default function DataMarket() {
       <div className="bg-krcard backdrop-blur-sm rounded-xl shadow-sm border border-krborder p-6">
         <div className="flex items-center gap-2 mb-4">
           <TrendingUp className="text-krgold" size={24} />
-          <h2 className="text-xl font-semibold">Cryptocurrency Screener</h2>
-          <span className="text-sm text-gray-400 ml-2">(Top 500 by Market Cap)</span>
+          <h2 className="text-xl font-semibold">Perpetual Futures Screener</h2>
+          <span className="text-sm text-gray-400 ml-2">(Binance • Bybit • OKX)</span>
         </div>
         <div className="tradingview-widget-container">
           <div ref={screenerRef} className="tradingview-widget-container__widget"></div>
