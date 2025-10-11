@@ -528,6 +528,18 @@ export default function TradeAnalytics() {
                                   <span className="text-krtext font-medium">{formatAmount(trade.exitPrice)}</span>
                                 </div>
                               )}
+                              {trade.type === 'Futures' && trade.marginCost > 0 && (
+                                <div>
+                                  <span className="text-gray-400">Margin: </span>
+                                  <span className="text-krtext font-medium">{formatAmount(trade.marginCost)}</span>
+                                </div>
+                              )}
+                              {trade.fee > 0 && (
+                                <div>
+                                  <span className="text-gray-400">Fee: </span>
+                                  <span className="text-krtext font-medium">{formatAmount(trade.fee)}</span>
+                                </div>
+                              )}
                               {trade.positionSize && (
                                 <div>
                                   <span className="text-gray-400">Position: </span>

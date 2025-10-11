@@ -18,6 +18,7 @@ export type JournalEntry = {
   exitTime: string;
   exitPrice: number;
   fee: number;
+  marginCost: number;
   pnlAmount: number;
   pnlPercent: number;
   chartImg: string;

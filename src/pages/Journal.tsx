@@ -34,6 +34,7 @@ export default function Journal() {
     exitTime: new Date().toLocaleTimeString('en-US', { hour12: false }).slice(0, 5),
     exitPrice: 0,
     fee: 0,
+    marginCost: 0,
     pnlAmount: 0,
     pnlPercent: 0,
     chartImg: '',
@@ -87,6 +88,7 @@ export default function Journal() {
       exitTime: new Date().toLocaleTimeString('en-US', { hour12: false }).slice(0, 5),
       exitPrice: 0,
       fee: 0,
+      marginCost: 0,
       pnlAmount: 0,
       pnlPercent: 0,
       chartImg: '',
@@ -199,6 +201,20 @@ export default function Journal() {
                 onChange={lev => setForm({...form, leverage: Number(lev)})}
                 options={LEVERAGE_OPTIONS.map(l => ({ value: l, label: `${l}x` }))}
               />
+            )}
+
+            {/* Margin Cost (only show for Futures) */}
+            {form.type === 'Futures' && (
+              <div className="space-y-1">
+                <label className="block text-sm font-medium text-krtext">Margin Cost</label>
+                <input
+                  type="number"
+                  className="w-full px-3 py-2 border border-krborder rounded-md bg-transparent text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
+                  value={form.marginCost || ''}
+                  onChange={e => setForm({...form, marginCost: Number(e.target.value)})}
+                  placeholder="Enter margin cost"
+                />
+              </div>
             )}
 
             {/* Exit Date & Time and Exit Price */}
@@ -422,6 +438,12 @@ export default function Journal() {
                   <div className="text-krtext">{formatAmount(viewingTrade.exitPrice)}</div>
                   <div className="text-xs text-gray-400">{viewingTrade.exitDate} {viewingTrade.exitTime}</div>
                 </div>
+                {viewingTrade.type === 'Futures' && viewingTrade.marginCost > 0 && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-400 mb-1">Margin Cost</label>
+                    <div className="text-krtext">{formatAmount(viewingTrade.marginCost)}</div>
+                  </div>
+                )}
                 <div>
                   <label className="block text-sm font-medium text-gray-400 mb-1">P&L</label>
                   <div className={`font-semibold ${viewingTrade.pnlAmount > 0 ? 'text-green-400' : 'text-red-400'}`}>
