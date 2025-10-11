@@ -156,29 +156,29 @@ export default function Journal() {
           <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4">
             <p className="text-xs text-krmuted mb-1">Win Rate</p>
             <p className="text-xl font-bold text-green-500">
-              {items.length > 0 ? `${((items.filter(t => t.pnlAmount > 0).length / items.length) * 100).toFixed(1)}%` : '0%'}
+              {items.length > 0 ? `${((items.filter(t => (t.pnlAmount - (t.fee || 0)) > 0).length / items.length) * 100).toFixed(1)}%` : '0%'}
             </p>
           </div>
           <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4">
             <p className="text-xs text-krmuted mb-1">Total P&L</p>
-            <p className={`text-xl font-bold ${items.reduce((sum, t) => sum + t.pnlAmount, 0) >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-              {currency.symbol}{Math.abs(items.reduce((sum, t) => sum + t.pnlAmount, 0)).toFixed(2)}
+            <p className={`text-xl font-bold ${items.reduce((sum, t) => sum + (t.pnlAmount - (t.fee || 0)), 0) >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+              {formatAmount(items.reduce((sum, t) => sum + (t.pnlAmount - (t.fee || 0)), 0))}
             </p>
           </div>
           <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4">
             <p className="text-xs text-krmuted mb-1">Avg Win</p>
             <p className="text-xl font-bold text-green-500">
-              {currency.symbol}{items.filter(t => t.pnlAmount > 0).length > 0 
-                ? (items.filter(t => t.pnlAmount > 0).reduce((sum, t) => sum + t.pnlAmount, 0) / items.filter(t => t.pnlAmount > 0).length).toFixed(2)
-                : '0.00'}
+              {items.filter(t => (t.pnlAmount - (t.fee || 0)) > 0).length > 0 
+                ? formatAmount(items.filter(t => (t.pnlAmount - (t.fee || 0)) > 0).reduce((sum, t) => sum + (t.pnlAmount - (t.fee || 0)), 0) / items.filter(t => (t.pnlAmount - (t.fee || 0)) > 0).length)
+                : formatAmount(0)}
             </p>
           </div>
           <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4">
             <p className="text-xs text-krmuted mb-1">Avg Loss</p>
             <p className="text-xl font-bold text-red-500">
-              {currency.symbol}{items.filter(t => t.pnlAmount < 0).length > 0 
-                ? Math.abs(items.filter(t => t.pnlAmount < 0).reduce((sum, t) => sum + t.pnlAmount, 0) / items.filter(t => t.pnlAmount < 0).length).toFixed(2)
-                : '0.00'}
+              {items.filter(t => (t.pnlAmount - (t.fee || 0)) < 0).length > 0 
+                ? formatAmount(Math.abs(items.filter(t => (t.pnlAmount - (t.fee || 0)) < 0).reduce((sum, t) => sum + (t.pnlAmount - (t.fee || 0)), 0) / items.filter(t => (t.pnlAmount - (t.fee || 0)) < 0).length))
+                : formatAmount(0)}
             </p>
           </div>
         </div>

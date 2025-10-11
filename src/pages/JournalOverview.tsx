@@ -1,15 +1,17 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { loadData } from '../utils/storage'
+import { useCurrency } from '../context/CurrencyContext'
 import { ArrowRight } from 'lucide-react'
 
 export default function JournalOverview() {
   const data = loadData()
+  const { formatAmount } = useCurrency()
   const journal = data.journal || []
   
   const totalTrades = journal.length
-  const wins = journal.filter(j => j.pnlAmount > 0).length
-  const losses = journal.filter(j => j.pnlAmount < 0).length
+  const wins = journal.filter(j => ((j.pnlAmount || 0) - (j.fee || 0)) > 0).length
+  const losses = journal.filter(j => ((j.pnlAmount || 0) - (j.fee || 0)) < 0).length
   const winRate = totalTrades ? Math.round((wins / totalTrades) * 100) : 0
   // Total PnL = sum of (pnlAmount - fee) for each trade
   const totalPnl = journal.reduce((s, j) => s + (j.pnlAmount || 0) - (j.fee || 0), 0)
@@ -52,7 +54,7 @@ export default function JournalOverview() {
           <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-5">
             <div className="text-krmuted text-sm mb-1">Total PnL</div>
             <div className={`text-3xl font-bold ${totalPnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-              ${totalPnl.toFixed(2)}
+              {formatAmount(totalPnl)}
             </div>
           </div>
           <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-5">
@@ -84,19 +86,19 @@ export default function JournalOverview() {
             <div className="bg-krblack/30 rounded-lg p-3">
               <div className="text-xs text-krmuted">Avg Win</div>
               <div className="text-base font-semibold text-green-400">
-                ${wins > 0 ? (journal.filter(j => j.pnlAmount > 0).reduce((s, j) => s + j.pnlAmount - (j.fee || 0), 0) / wins).toFixed(2) : '0.00'}
+                {wins > 0 ? formatAmount(journal.filter(j => ((j.pnlAmount || 0) - (j.fee || 0)) > 0).reduce((s, j) => s + (j.pnlAmount || 0) - (j.fee || 0), 0) / wins) : formatAmount(0)}
               </div>
             </div>
             <div className="bg-krblack/30 rounded-lg p-3">
               <div className="text-xs text-krmuted">Avg Loss</div>
               <div className="text-base font-semibold text-red-400">
-                ${losses > 0 ? (journal.filter(j => j.pnlAmount < 0).reduce((s, j) => s + j.pnlAmount - (j.fee || 0), 0) / losses).toFixed(2) : '0.00'}
+                {losses > 0 ? formatAmount(journal.filter(j => ((j.pnlAmount || 0) - (j.fee || 0)) < 0).reduce((s, j) => s + (j.pnlAmount || 0) - (j.fee || 0), 0) / losses) : formatAmount(0)}
               </div>
             </div>
             <div className="bg-krblack/30 rounded-lg p-3">
               <div className="text-xs text-krmuted">Risk/Reward</div>
               <div className="text-base font-semibold text-krgold">
-                {wins > 0 && losses > 0 ? (Math.abs(journal.filter(j => j.pnlAmount > 0).reduce((s, j) => s + j.pnlAmount - (j.fee || 0), 0) / wins) / Math.abs(journal.filter(j => j.pnlAmount < 0).reduce((s, j) => s + j.pnlAmount - (j.fee || 0), 0) / losses)).toFixed(2) : '0.00'}
+                {wins > 0 && losses > 0 ? (Math.abs(journal.filter(j => ((j.pnlAmount || 0) - (j.fee || 0)) > 0).reduce((s, j) => s + (j.pnlAmount || 0) - (j.fee || 0), 0) / wins) / Math.abs(journal.filter(j => ((j.pnlAmount || 0) - (j.fee || 0)) < 0).reduce((s, j) => s + (j.pnlAmount || 0) - (j.fee || 0), 0) / losses)).toFixed(2) : '0.00'}
               </div>
             </div>
           </div>

@@ -1,10 +1,12 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { loadData } from '../utils/storage'
+import { useCurrency } from '../context/CurrencyContext'
 import { Camera, TrendingUp, TrendingDown, BarChart3, ArrowRight, ImageIcon } from 'lucide-react'
 
 export default function SnapshotsOverview() {
   const data = loadData()
+  const { formatAmount } = useCurrency()
   const journal = data.journal || []
   const chartsData = journal.filter((j: any) => j.chartImg || j.pnlImg)
   
@@ -12,8 +14,9 @@ export default function SnapshotsOverview() {
   const chartSnapshots = chartsData.filter((j: any) => j.chartImg).length
   const pnlSnapshots = chartsData.filter((j: any) => j.pnlImg).length
   
-  const totalPnl = chartsData.reduce((s: number, j: any) => s + (j.pnlAmount || 0), 0)
-  const wins = chartsData.filter((j: any) => j.pnlAmount > 0).length
+  // Calculate PnL with fees subtracted
+  const totalPnl = chartsData.reduce((s: number, j: any) => s + ((j.pnlAmount || 0) - (j.fee || 0)), 0)
+  const wins = chartsData.filter((j: any) => ((j.pnlAmount || 0) - (j.fee || 0)) > 0).length
   const winRate = totalSnapshots ? Math.round((wins / totalSnapshots) * 100) : 0
 
   // Recent snapshots
@@ -52,7 +55,7 @@ export default function SnapshotsOverview() {
           <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4 hover:border-krgold/50 transition-all">
             <p className="text-xs text-krmuted mb-1">Total PnL</p>
             <p className={`text-2xl font-bold ${totalPnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-              ${totalPnl.toFixed(2)}
+              {formatAmount(totalPnl)}
             </p>
           </div>
           <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4 hover:border-krgold/50 transition-all">
