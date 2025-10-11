@@ -189,6 +189,7 @@ export default function VisionBoard(){
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-kryellow/5 via-transparent to-transparent pointer-events-none"></div>
       
       <div className="relative z-10 p-4 md:p-6">
+        <div className="max-w-7xl mx-auto">
       {/* Header */}
       <div className="mb-6">
         <div className="flex items-center gap-3 mb-4">
@@ -636,6 +637,7 @@ export default function VisionBoard(){
           )}
         </div>
       </Modal>
+      </div>
       </div>
     </div>
   )
