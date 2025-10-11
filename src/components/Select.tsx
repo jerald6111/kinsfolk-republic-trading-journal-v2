@@ -15,7 +15,7 @@ export default function Select({ value, onChange, options, label, className = ''
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className={`w-full px-3 py-2 border border-krborder rounded-md bg-krcard text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold ${className}`}
+        className={`w-full px-3 py-2 border border-krborder rounded-xl bg-krcard text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold ${className}`}
       >
         {options.map((opt) => (
           <option key={opt.value} value={opt.value} className="bg-krcard text-krtext">

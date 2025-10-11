@@ -147,7 +147,7 @@ export default function Journal() {
                 <select
                   value={form.type}
                   onChange={e => setForm({...form, type: e.target.value as TradeType})}
-                  className="w-full px-3 py-2 border border-krborder rounded-md bg-krcard text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
+                  className="w-full px-3 py-2 border border-krborder rounded-xl bg-krcard text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
                 >
                   {TYPES.map(type => (
                     <option key={type} value={type} className="bg-krcard text-krtext">{type}</option>
@@ -162,7 +162,7 @@ export default function Journal() {
                   <select
                     value={form.position}
                     onChange={e => setForm({...form, position: e.target.value as TradePosition})}
-                    className="w-full px-3 py-2 border border-krborder rounded-md bg-krcard text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
+                    className="w-full px-3 py-2 border border-krborder rounded-xl bg-krcard text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
                   >
                     {POSITIONS.map(pos => (
                       <option key={pos} value={pos} className="bg-krcard text-krtext">{pos}</option>
@@ -424,132 +424,153 @@ export default function Journal() {
               const netPnl = (viewingTrade.pnlAmount || 0) - (viewingTrade.fee || 0)
               return (
                 <>
-                  <div className="flex items-start justify-between mb-4">
+                  {/* Header */}
+                  <div className="flex items-start justify-between mb-6">
                     <div>
                       <h2 className="text-2xl font-bold text-krtext">{viewingTrade.ticker}</h2>
-                      <p className="text-sm text-gray-400">{viewingTrade.date} {viewingTrade.time}</p>
+                      <p className="text-sm text-gray-400 mt-1">
+                        {viewingTrade.date} {viewingTrade.time} → {viewingTrade.exitDate} {viewingTrade.exitTime}
+                      </p>
                     </div>
-                    <span className={`text-lg px-3 py-1.5 rounded font-semibold ${netPnl > 0 ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
-                      {netPnl > 0 ? <TrendingUp className="inline-block w-5 h-5 mr-1" /> : <TrendingDown className="inline-block w-5 h-5 mr-1" />}
-                      {viewingTrade.pnlPercent.toFixed(2)}%
-                    </span>
+                    <div className="text-right">
+                      <div className={`text-3xl font-bold ${netPnl > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                        {netPnl > 0 ? '+' : ''}{formatAmount(netPnl)}
+                      </div>
+                      <div className={`text-sm font-medium ${netPnl > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                        {netPnl > 0 ? <TrendingUp className="inline-block w-4 h-4" /> : <TrendingDown className="inline-block w-4 h-4" />}
+                        {viewingTrade.pnlPercent.toFixed(2)}%
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Trade Type & Position Cards */}
+                  <div className="grid grid-cols-4 gap-3 mb-6">
+                    <div className="bg-krblack/30 backdrop-blur-sm rounded-xl p-3 border border-krborder">
+                      <label className="block text-xs text-gray-400 mb-1">Type</label>
+                      <div className="text-krtext font-semibold">{viewingTrade.type}</div>
+                    </div>
+                    {viewingTrade.type === 'Futures' && (
+                      <>
+                        <div className="bg-krblack/30 backdrop-blur-sm rounded-xl p-3 border border-krborder">
+                          <label className="block text-xs text-gray-400 mb-1">Position</label>
+                          <div className="text-krtext font-semibold">{viewingTrade.position}</div>
+                        </div>
+                        <div className="bg-krblack/30 backdrop-blur-sm rounded-xl p-3 border border-krborder">
+                          <label className="block text-xs text-gray-400 mb-1">Leverage</label>
+                          <div className="text-krtext font-semibold">{viewingTrade.leverage}x</div>
+                        </div>
+                      </>
+                    )}
+                    <div className="bg-krblack/30 backdrop-blur-sm rounded-xl p-3 border border-krborder">
+                      <label className="block text-xs text-gray-400 mb-1">Objective</label>
+                      <div className="text-krtext font-semibold">{viewingTrade.objective}</div>
+                    </div>
+                    {viewingTrade.setup && (
+                      <div className="bg-krblack/30 backdrop-blur-sm rounded-xl p-3 border border-krborder col-span-2">
+                        <label className="block text-xs text-gray-400 mb-1">Strategy</label>
+                        <div className="text-krtext font-semibold">{viewingTrade.setup}</div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Price & P&L Information */}
+                  <div className="grid grid-cols-2 gap-4 mb-6">
+                    <div className="bg-krblack/30 backdrop-blur-sm rounded-xl p-4 border border-krborder">
+                      <label className="block text-sm text-gray-400 mb-2">Entry Price</label>
+                      <div className="text-2xl font-bold text-krtext">{formatAmount(viewingTrade.entryPrice)}</div>
+                      <div className="text-xs text-gray-400 mt-1">{viewingTrade.date} {viewingTrade.time}</div>
+                    </div>
+                    <div className="bg-krblack/30 backdrop-blur-sm rounded-xl p-4 border border-krborder">
+                      <label className="block text-sm text-gray-400 mb-2">Exit Price</label>
+                      <div className="text-2xl font-bold text-krtext">{formatAmount(viewingTrade.exitPrice)}</div>
+                      <div className="text-xs text-gray-400 mt-1">{viewingTrade.exitDate} {viewingTrade.exitTime}</div>
+                    </div>
+                  </div>
+
+                  {/* Financial Details */}
+                  <div className="grid grid-cols-2 gap-4 mb-6">
+                    {viewingTrade.marginCost > 0 && (
+                      <div className="bg-krblack/30 backdrop-blur-sm rounded-xl p-4 border border-krborder">
+                        <label className="block text-sm text-gray-400 mb-2">Margin Cost</label>
+                        <div className="text-xl font-semibold text-krtext">{formatAmount(viewingTrade.marginCost)}</div>
+                      </div>
+                    )}
+                    <div className="bg-krblack/30 backdrop-blur-sm rounded-xl p-4 border border-krborder">
+                      <label className="block text-sm text-gray-400 mb-2">Gross P&L</label>
+                      <div className={`text-xl font-semibold ${viewingTrade.pnlAmount > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                        {formatAmount(viewingTrade.pnlAmount)}
+                      </div>
+                    </div>
+                    <div className="bg-krblack/30 backdrop-blur-sm rounded-xl p-4 border border-krborder">
+                      <label className="block text-sm text-gray-400 mb-2">Fee</label>
+                      <div className="text-xl font-semibold text-red-400">{formatAmount(viewingTrade.fee || 0)}</div>
+                    </div>
+                    <div className="bg-krblack/30 backdrop-blur-sm rounded-xl p-4 border border-krborder">
+                      <label className="block text-sm text-gray-400 mb-2">Net P&L</label>
+                      <div className={`text-xl font-bold ${netPnl > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                        {formatAmount(netPnl)}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Images */}
+                  {(viewingTrade.chartImg || viewingTrade.pnlImg) && (
+                    <div className="grid grid-cols-2 gap-4 mb-6">
+                      {viewingTrade.chartImg && (
+                        <div className="bg-krblack/30 backdrop-blur-sm rounded-xl p-4 border border-krborder">
+                          <label className="block text-sm text-gray-400 mb-3">Chart Image</label>
+                          <img src={viewingTrade.chartImg} className="w-full rounded-lg border border-krborder" alt="Chart" />
+                        </div>
+                      )}
+                      {viewingTrade.pnlImg && (
+                        <div className="bg-krblack/30 backdrop-blur-sm rounded-xl p-4 border border-krborder">
+                          <label className="block text-sm text-gray-400 mb-3">PnL Image</label>
+                          <img src={viewingTrade.pnlImg} className="w-full rounded-lg border border-krborder" alt="PnL" />
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Reason */}
+                  {viewingTrade.reasonIn && (
+                    <div className="bg-krblack/30 backdrop-blur-sm rounded-xl p-4 border border-krborder mb-6">
+                      <label className="block text-sm text-gray-400 mb-3">Reason for Entry & Exit</label>
+                      <div className="text-krtext whitespace-pre-wrap leading-relaxed">
+                        {viewingTrade.reasonIn}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Action Buttons */}
+                  <div className="flex gap-3">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setForm({ ...viewingTrade });
+                        setViewingTrade(null);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      className="flex-1 px-4 py-2 text-blue-400 hover:bg-blue-500/10 border border-blue-500/30 rounded-lg transition-colors font-medium"
+                    >
+                      Edit Trade
+                    </button>
+                    <SendToDiscordButton trade={viewingTrade} />
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (confirm('Are you sure you want to delete this trade?')) {
+                          remove(viewingTrade.id);
+                          setViewingTrade(null);
+                        }
+                      }}
+                      className="px-4 py-2 text-red-400 hover:bg-red-500/10 border border-red-500/30 rounded-lg transition-colors font-medium"
+                    >
+                      Delete
+                    </button>
                   </div>
                 </>
               )
             })()}
-
-            {/* Images */}
-            <div className="grid grid-cols-2 gap-4 mb-6">
-              {viewingTrade.chartImg && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">Chart Image</label>
-                  <img src={viewingTrade.chartImg} className="w-full rounded-lg border border-krborder" alt="Chart" />
-                </div>
-              )}
-              {viewingTrade.pnlImg && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">PnL Image</label>
-                  <img src={viewingTrade.pnlImg} className="w-full rounded-lg border border-krborder" alt="PnL" />
-                </div>
-              )}
-            </div>
-
-            {/* Trade Details Grid */}
-            <div className="grid grid-cols-2 gap-4 mb-6">
-              <div className="space-y-3">
-                <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-1">Type</label>
-                  <div className="text-krtext">{viewingTrade.type} {viewingTrade.type === 'Futures' ? `${viewingTrade.leverage}x` : ''}</div>
-                </div>
-                {viewingTrade.type === 'Futures' && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-1">Position</label>
-                    <div className="text-krtext">{viewingTrade.position}</div>
-                  </div>
-                )}
-                <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-1">Objective</label>
-                  <div className="text-krtext">{viewingTrade.objective}</div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-1">Strategy</label>
-                  <div className="text-krtext">{viewingTrade.setup}</div>
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-1">Entry Price</label>
-                  <div className="text-krtext">{formatAmount(viewingTrade.entryPrice)}</div>
-                  <div className="text-xs text-gray-400">{viewingTrade.date} {viewingTrade.time}</div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-1">Exit Price</label>
-                  <div className="text-krtext">{formatAmount(viewingTrade.exitPrice)}</div>
-                  <div className="text-xs text-gray-400">{viewingTrade.exitDate} {viewingTrade.exitTime}</div>
-                </div>
-                {viewingTrade.marginCost > 0 && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-1">Margin Cost</label>
-                    <div className="text-krtext">{formatAmount(viewingTrade.marginCost)}</div>
-                  </div>
-                )}
-                <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-1">Gross P&L</label>
-                  <div className={`font-semibold ${viewingTrade.pnlAmount > 0 ? 'text-green-400' : 'text-red-400'}`}>
-                    {formatAmount(viewingTrade.pnlAmount)} ({viewingTrade.pnlPercent.toFixed(2)}%)
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-1">Fee</label>
-                  <div className="text-red-400">{formatAmount(viewingTrade.fee || 0)}</div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-1">Net P&L</label>
-                  <div className={`font-bold text-xl ${(viewingTrade.pnlAmount - (viewingTrade.fee || 0)) > 0 ? 'text-green-400' : 'text-red-400'}`}>
-                    {formatAmount((viewingTrade.pnlAmount || 0) - (viewingTrade.fee || 0))}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Reason */}
-            {viewingTrade.reasonIn && (
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-400 mb-2">Reason for Entry & Exit</label>
-                <div className="p-3 bg-krcard/50 rounded-lg border border-krborder text-krtext whitespace-pre-wrap">
-                  {viewingTrade.reasonIn}
-                </div>
-              </div>
-            )}
-
-            {/* Action Buttons */}
-            <div className="flex gap-3">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setForm({ ...viewingTrade });
-                  setViewingTrade(null);
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                }}
-                className="flex-1 px-4 py-2 text-blue-400 hover:bg-blue-500/10 border border-blue-500/30 rounded-md transition-colors"
-              >
-                Edit Trade
-              </button>
-              <SendToDiscordButton trade={viewingTrade} />
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (confirm('Are you sure you want to delete this trade?')) {
-                    remove(viewingTrade.id);
-                    setViewingTrade(null);
-                  }
-                }}
-                className="px-4 py-2 text-red-400 hover:bg-red-500/10 border border-red-500/30 rounded-md transition-colors"
-              >
-                Delete
-              </button>
-            </div>
           </div>
         </Modal>
       )}

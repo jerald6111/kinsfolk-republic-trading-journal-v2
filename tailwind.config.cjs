@@ -9,7 +9,7 @@ module.exports = {
         krgray: '#2B3139',
         krwhite: '#EAECEF',
         krbg: '#181A20',
-        krcard: 'rgba(30, 35, 41, 0.6)', // More transparent glass effect
+        krcard: 'rgba(30, 35, 41, 0.4)', // Even more transparent glass effect
         krborder: '#2B3139',
         krsuccess: '#0ECB81',
         krdanger: '#F6465D',

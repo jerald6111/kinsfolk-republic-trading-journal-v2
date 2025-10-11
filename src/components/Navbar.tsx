@@ -86,7 +86,7 @@ export default function Navbar(){
                   </Link>
                   {hoveredDropdown === n.to && (
                     <div className="absolute top-full left-0 pt-2 -mt-2 z-50">
-                      <div className="bg-krcard border border-krborder rounded-md shadow-lg min-w-[160px] overflow-hidden">
+                      <div className="bg-krcard border border-krborder rounded-xl shadow-lg min-w-[160px] overflow-hidden backdrop-blur-sm">
                         {n.dropdown.map(item => (
                           <Link
                             key={item.to}
