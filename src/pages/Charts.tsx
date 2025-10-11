@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import { loadData, saveData } from '../utils/storage'
 import Modal from '../components/Modal'
 import { TrendingUp, TrendingDown, Calendar, DollarSign, Percent, Filter, X } from 'lucide-react'
@@ -8,25 +8,26 @@ import { useCurrency } from '../context/CurrencyContext'
 export default function Charts(){
   const data = loadData()
   const { formatAmount } = useCurrency()
-  const [searchParams] = useSearchParams()
+  const location = useLocation()
   const journal = data.journal || []
-  const charts = journal.filter((j:any)=> j.chartImg || j.pnlImg)
+  
+  // Determine view type based on route
+  const isPnlView = location.pathname.includes('/pnl')
+  const activeTab = isPnlView ? 'PNL' : 'Charts'
+  
+  // Filter journal entries based on view type
+  const charts = journal.filter((j:any)=> isPnlView ? j.pnlImg : j.chartImg)
   const [items, setItems] = useState(charts)
-  const [activeTab, setActiveTab] = useState<'Charts' | 'PNL'>('Charts')
   const [viewingTrade, setViewingTrade] = useState<any>(null)
   const [filterTicker, setFilterTicker] = useState('')
   const [filterStartDate, setFilterStartDate] = useState('')
   const [filterEndDate, setFilterEndDate] = useState('')
 
-  // Set active tab based on URL parameter
+  // Update items when location changes
   useEffect(() => {
-    const tab = searchParams.get('tab')
-    if (tab === 'pnl') {
-      setActiveTab('PNL')
-    } else {
-      setActiveTab('Charts')
-    }
-  }, [searchParams])
+    const filteredCharts = journal.filter((j:any)=> isPnlView ? j.pnlImg : j.chartImg)
+    setItems(filteredCharts)
+  }, [location.pathname, journal.length])
 
   // Get unique tickers from all journal entries
   const uniqueTickers = useMemo(() => {
@@ -40,10 +41,9 @@ export default function Charts(){
       const matchesTicker = !filterTicker || item.ticker === filterTicker
       const matchesStartDate = !filterStartDate || item.date >= filterStartDate
       const matchesEndDate = !filterEndDate || item.date <= filterEndDate
-      const hasCorrectImage = activeTab === 'Charts' ? item.chartImg : item.pnlImg
-      return matchesTicker && matchesStartDate && matchesEndDate && hasCorrectImage
+      return matchesTicker && matchesStartDate && matchesEndDate
     })
-  }, [items, filterTicker, filterStartDate, filterEndDate, activeTab])
+  }, [items, filterTicker, filterStartDate, filterEndDate])
 
   const clearFilters = () => {
     setFilterTicker('')
@@ -56,7 +56,8 @@ export default function Charts(){
   const updateReason = (id:number, key:'reasonIn'|'reasonOut', val:string)=>{
     const j = journal.map((it:any)=> it.id===id ? { ...it, [key]: val } : it)
     saveData({ journal: j })
-    setItems(j.filter((it:any)=> it.chartImg || it.pnlImg))
+    const filteredCharts = j.filter((it:any)=> isPnlView ? it.pnlImg : it.chartImg)
+    setItems(filteredCharts)
   }
 
   return (
@@ -129,7 +130,7 @@ export default function Charts(){
           const isProfit = it.exitPrice > it.entryPrice
           const pnlAmount = it.pnlAmount || (it.exitPrice - it.entryPrice)
           const pnlPercent = it.pnlPercent || (((it.exitPrice - it.entryPrice) / it.entryPrice) * 100)
-          const displayImage = activeTab === 'Charts' ? it.chartImg : it.pnlImg
+          const displayImage = isPnlView ? it.pnlImg : it.chartImg
           
           return (
             <div 
