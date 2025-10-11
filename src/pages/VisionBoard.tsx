@@ -3,11 +3,13 @@ import FileUploader from '../components/FileUploader'
 import Modal from '../components/Modal'
 import { loadData, saveData } from '../utils/storage'
 import { Trash2, Edit2, CheckCircle2 } from 'lucide-react'
+import { useCurrency } from '../context/CurrencyContext'
 
 type GoalTimeline = 'Short Term (3-6 months)' | 'Mid Term (6-12 months)' | 'Long Term (1-3 years)'
 
 export default function VisionBoard(){
   const data = loadData()
+  const { formatAmount } = useCurrency()
   const [items, setItems] = useState(data.vision || [])
   const [title, setTitle] = useState('')
   const [desc, setDesc] = useState('')
@@ -115,7 +117,7 @@ export default function VisionBoard(){
                   <div className="font-bold text-krtext">{it.title}</div>
                   <div className="text-sm text-krmuted mt-1">{it.desc}</div>
                   <div className="text-sm mt-2 text-krtext">
-                    <div>Target: {it.target}</div>
+                    <div>Target: {formatAmount(parseFloat(it.target) || 0)}</div>
                     <div className="text-krgold">{it.timeline}</div>
                   </div>
                   <div className="flex gap-2 mt-3">
@@ -147,9 +149,9 @@ export default function VisionBoard(){
             </div>
           </div>
 
-          {/* Achievements (Completed Goals) */}
+          {/* Achievements (Completed Goals) - Moved to bottom */}
           {completedGoals.length > 0 && (
-            <div>
+            <div className="mt-8">
               <h2 className="text-xl font-semibold mb-4 text-krtext">🏆 Achievements</h2>
               <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {completedGoals.map((it:any)=> (
