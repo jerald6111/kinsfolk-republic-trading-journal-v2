@@ -69,12 +69,16 @@ export default function Journal() {
       amount = form.marginCost ? (form.marginCost * percent) / 100 : diff * (form.leverage || 1)
     }
     
+    // Subtract fees from PnL amount
+    const fee = form.fee || 0
+    amount = amount - fee
+    
     setForm({ ...form, pnlAmount: amount, pnlPercent: percent })
   }
 
   useEffect(() => {
     calculatePnL()
-  }, [form.entryPrice, form.exitPrice, form.leverage, form.position, form.type, form.marginCost])
+  }, [form.entryPrice, form.exitPrice, form.leverage, form.position, form.type, form.marginCost, form.fee])
 
   const save = () => {
     let next: JournalEntry[]
