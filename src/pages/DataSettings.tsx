@@ -41,6 +41,8 @@ export default function DataSettings(){
   const [sendingEmail, setSendingEmail] = useState(false)
   const [showEmail, setShowEmail] = useState(false)
   const [showPhishingCode, setShowPhishingCode] = useState(false)
+  const [isExporting, setIsExporting] = useState(false)
+  const [isImporting, setIsImporting] = useState(false)
 
   useEffect(() => {
     setWebhooks(getDiscordWebhooks())
@@ -56,17 +58,48 @@ export default function DataSettings(){
     if (savedAntiPhishing) setAntiPhishingCode(savedAntiPhishing)
   }, [])
 
-  const handleExport = () => {
-    exportData()
-    setShowExportModal(false)
+  const handleExport = async () => {
+    setIsExporting(true)
+    try {
+      // Small delay to show loading state
+      await new Promise(resolve => setTimeout(resolve, 300))
+      exportData()
+      // Show success message
+      await new Promise(resolve => setTimeout(resolve, 500))
+      alert('✅ Data exported successfully!')
+    } catch (error) {
+      console.error('Export error:', error)
+      alert('❌ Failed to export data. Please try again.')
+    } finally {
+      setIsExporting(false)
+      setShowExportModal(false)
+    }
   }
 
   const handleImport = async () => {
-    if (!selectedFile) return
-    await importData(selectedFile, { overwrite: importMode === 'overwrite' })
-    setShowImportModal(false)
-    setSelectedFile(null)
-    if (fileRef.current) fileRef.current.value = ''
+    if (!selectedFile) {
+      alert('⚠️ Please select a file to import')
+      return
+    }
+    
+    setIsImporting(true)
+    try {
+      await importData(selectedFile, { overwrite: importMode === 'overwrite' })
+      // Small delay to show completion
+      await new Promise(resolve => setTimeout(resolve, 500))
+      alert(`✅ Data imported successfully! Mode: ${importMode === 'overwrite' ? 'Overwrite' : 'Merge'}\n\n🔄 Refreshing page to load new data...`)
+      
+      // Refresh page to load imported data
+      window.location.reload()
+    } catch (error) {
+      console.error('Import error:', error)
+      alert('❌ Failed to import data. Please check the file format and try again.')
+      setIsImporting(false)
+    } finally {
+      setShowImportModal(false)
+      setSelectedFile(null)
+      if (fileRef.current) fileRef.current.value = ''
+    }
   }
 
   const handleDelete = () => {
@@ -591,84 +624,118 @@ export default function DataSettings(){
       {/* Export Modal */}
       <Modal
         isOpen={showExportModal}
-        onClose={() => setShowExportModal(false)}
+        onClose={() => !isExporting && setShowExportModal(false)}
         title="Export Data"
       >
         <div className="space-y-4">
-          <p className="text-gray-600">
-            This will download all your data as a JSON file. You can use this file to backup or transfer your data.
-          </p>
-          <div className="flex justify-end gap-3">
-            <button
-              onClick={() => setShowExportModal(false)}
-              className="px-4 py-2 border rounded-md hover:bg-gray-50"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleExport}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-            >
-              Export
-            </button>
-          </div>
+          {isExporting ? (
+            <div className="text-center py-8">
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent mb-4"></div>
+              <p className="text-lg font-medium text-krtext">Exporting your data...</p>
+              <p className="text-sm text-krmuted mt-2">Please wait while we prepare your backup file</p>
+            </div>
+          ) : (
+            <>
+              <p className="text-gray-600">
+                This will download all your data as a JSON file. You can use this file to backup or transfer your data.
+              </p>
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => setShowExportModal(false)}
+                  className="px-4 py-2 border rounded-md hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleExport}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                >
+                  Export
+                </button>
+              </div>
+            </>
+          )}
         </div>
       </Modal>
 
       {/* Import Modal */}
       <Modal
         isOpen={showImportModal}
-        onClose={() => setShowImportModal(false)}
+        onClose={() => !isImporting && setShowImportModal(false)}
         title="Import Data"
       >
         <div className="space-y-4">
-          <p className="text-gray-600">
-            Select a JSON file to import. Choose whether to merge with existing data or overwrite everything.
-          </p>
-          <div>
-            <input
-              ref={fileRef}
-              type="file"
-              accept="application/json"
-              onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
-              className="mb-4"
-            />
-          </div>
-          <div className="flex gap-4 mb-4">
-            <label className="flex items-center">
-              <input
-                type="radio"
-                checked={importMode === 'merge'}
-                onChange={() => setImportMode('merge')}
-                className="mr-2"
-              />
-              Merge with existing data
-            </label>
-            <label className="flex items-center">
-              <input
-                type="radio"
-                checked={importMode === 'overwrite'}
-                onChange={() => setImportMode('overwrite')}
-                className="mr-2"
-              />
-              Overwrite all data
-            </label>
-          </div>
-          <div className="flex justify-end gap-3">
-            <button
-              onClick={() => setShowImportModal(false)}
-              className="px-4 py-2 border rounded-md hover:bg-gray-50"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleImport}
-              disabled={!selectedFile}
-              className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50"
-            >
-              Import
-            </button>
-          </div>
+          {isImporting ? (
+            <div className="text-center py-8">
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-green-600 border-t-transparent mb-4"></div>
+              <p className="text-lg font-medium text-krtext">Importing your data...</p>
+              <p className="text-sm text-krmuted mt-2">Please wait, this may take a moment</p>
+              <p className="text-xs text-krmuted mt-4">
+                Mode: <strong>{importMode === 'overwrite' ? 'Overwrite All Data' : 'Merge with Existing Data'}</strong>
+              </p>
+            </div>
+          ) : (
+            <>
+              <p className="text-gray-600">
+                Select a JSON file to import. Choose whether to merge with existing data or overwrite everything.
+              </p>
+              <div>
+                <input
+                  ref={fileRef}
+                  type="file"
+                  accept="application/json"
+                  onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
+                  className="mb-4"
+                />
+                {selectedFile && (
+                  <p className="text-sm text-green-600 mt-2">
+                    ✓ Selected: {selectedFile.name}
+                  </p>
+                )}
+              </div>
+              <div className="flex gap-4 mb-4">
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    checked={importMode === 'merge'}
+                    onChange={() => setImportMode('merge')}
+                    className="mr-2"
+                  />
+                  Merge with existing data
+                </label>
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    checked={importMode === 'overwrite'}
+                    onChange={() => setImportMode('overwrite')}
+                    className="mr-2"
+                  />
+                  Overwrite all data
+                </label>
+              </div>
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-sm text-yellow-800">
+                <strong>⚠️ {importMode === 'overwrite' ? 'Warning' : 'Note'}:</strong>{' '}
+                {importMode === 'overwrite' 
+                  ? 'This will replace ALL your current data with the imported file. Make sure you have a backup!'
+                  : 'New data will be combined with your existing data. Duplicates may occur.'}
+              </div>
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => setShowImportModal(false)}
+                  className="px-4 py-2 border rounded-md hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleImport}
+                  disabled={!selectedFile}
+                  className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Import
+                </button>
+              </div>
+            </>
+          )}
         </div>
       </Modal>
 
