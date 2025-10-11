@@ -1,24 +1,36 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Calendar, Newspaper, TrendingUp, ExternalLink, Clock } from 'lucide-react'
+import { Calendar, TrendingUp, TrendingDown, Activity, Zap } from 'lucide-react'
 
-// News item type
+// Crypto market data type
+interface CryptoData {
+  id: string
+  symbol: string
+  name: string
+  current_price: number
+  price_change_percentage_24h: number
+  market_cap: number
+  image: string
+}
+
+// News item for ticker
 interface NewsItem {
   id: string
   title: string
-  description: string
-  url: string
   source: string
   publishedAt: string
-  category: 'crypto' | 'stocks' | 'forex'
 }
 
 export default function News() {
   const calendarRef = useRef<HTMLDivElement>(null)
+  const topGainersRef = useRef<HTMLDivElement>(null)
+  const topLosersRef = useRef<HTMLDivElement>(null)
+  const [topGainers, setTopGainers] = useState<CryptoData[]>([])
+  const [topLosers, setTopLosers] = useState<CryptoData[]>([])
   const [newsItems, setNewsItems] = useState<NewsItem[]>([])
   const [loading, setLoading] = useState(true)
 
+  // Economic Calendar Widget
   useEffect(() => {
-    // Economic Calendar Widget
     if (!calendarRef.current) return
 
     const container = calendarRef.current
@@ -32,9 +44,10 @@ export default function News() {
       colorTheme: 'dark',
       isTransparent: true,
       width: '100%',
-      height: '600',
+      height: '100%',
       locale: 'en',
-      importanceFilter: '0,1'
+      importanceFilter: '0,1',
+      countryFilter: 'us,eu,gb,jp,cn,au'
     })
 
     container.appendChild(script)
@@ -46,16 +59,99 @@ export default function News() {
     }
   }, [])
 
+  // Crypto Top Gainers Widget
   useEffect(() => {
-    // Fetch news from Cointelegraph RSS feed
+    if (!topGainersRef.current) return
+
+    const container = topGainersRef.current
+    container.innerHTML = ''
+
+    const script = document.createElement('script')
+    script.type = 'text/javascript'
+    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-hotlists.js'
+    script.async = true
+    script.innerHTML = JSON.stringify({
+      colorTheme: 'dark',
+      dateRange: '1D',
+      exchange: 'BINANCE',
+      showChart: false,
+      locale: 'en',
+      largeChartUrl: '',
+      isTransparent: true,
+      showSymbolLogo: true,
+      showFloatingTooltip: false,
+      width: '100%',
+      height: '100%',
+      plotLineColorGrowing: 'rgba(41, 98, 255, 1)',
+      plotLineColorFalling: 'rgba(41, 98, 255, 1)',
+      gridLineColor: 'rgba(42, 46, 57, 0)',
+      scaleFontColor: 'rgba(209, 212, 220, 1)',
+      belowLineFillColorGrowing: 'rgba(41, 98, 255, 0.12)',
+      belowLineFillColorFalling: 'rgba(41, 98, 255, 0.12)',
+      belowLineFillColorGrowingBottom: 'rgba(41, 98, 255, 0)',
+      belowLineFillColorFallingBottom: 'rgba(41, 98, 255, 0)',
+      symbolActiveColor: 'rgba(41, 98, 255, 0.12)'
+    })
+
+    container.appendChild(script)
+
+    return () => {
+      if (container) {
+        container.innerHTML = ''
+      }
+    }
+  }, [])
+
+  // Crypto Top Losers Widget
+  useEffect(() => {
+    if (!topLosersRef.current) return
+
+    const container = topLosersRef.current
+    container.innerHTML = ''
+
+    const script = document.createElement('script')
+    script.type = 'text/javascript'
+    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-hotlists.js'
+    script.async = true
+    script.innerHTML = JSON.stringify({
+      colorTheme: 'dark',
+      dateRange: '1D',
+      exchange: 'BINANCE',
+      showChart: false,
+      locale: 'en',
+      largeChartUrl: '',
+      isTransparent: true,
+      showSymbolLogo: true,
+      showFloatingTooltip: false,
+      width: '100%',
+      height: '100%',
+      plotLineColorGrowing: 'rgba(41, 98, 255, 1)',
+      plotLineColorFalling: 'rgba(41, 98, 255, 1)',
+      gridLineColor: 'rgba(42, 46, 57, 0)',
+      scaleFontColor: 'rgba(209, 212, 220, 1)',
+      belowLineFillColorGrowing: 'rgba(41, 98, 255, 0.12)',
+      belowLineFillColorFalling: 'rgba(41, 98, 255, 0.12)',
+      belowLineFillColorGrowingBottom: 'rgba(41, 98, 255, 0)',
+      belowLineFillColorFallingBottom: 'rgba(41, 98, 255, 0)',
+      symbolActiveColor: 'rgba(41, 98, 255, 0.12)'
+    })
+
+    container.appendChild(script)
+
+    return () => {
+      if (container) {
+        container.innerHTML = ''
+      }
+    }
+  }, [])
+
+  // Fetch news headlines for ticker
+  useEffect(() => {
     const fetchNews = async () => {
       setLoading(true)
       try {
-        // Cointelegraph RSS feed URL
         const RSS_URL = 'https://cointelegraph.com/rss'
-        
-        // Using RSS2JSON service to parse RSS feed (free service)
-        const API_URL = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(RSS_URL)}&api_key=YOUR_API_KEY&count=20`
+        const API_URL = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(RSS_URL)}&count=15`
         
         const response = await fetch(API_URL)
         const data = await response.json()
@@ -64,95 +160,27 @@ export default function News() {
           const formattedNews: NewsItem[] = data.items.map((item: any, index: number) => ({
             id: `ct-${index}`,
             title: item.title,
-            description: item.description?.replace(/<[^>]*>/g, '').substring(0, 200) + '...' || '',
-            url: item.link,
             source: 'Cointelegraph',
-            publishedAt: item.pubDate,
-            category: 'crypto' as const
+            publishedAt: item.pubDate
           }))
           
           setNewsItems(formattedNews)
         } else {
-          // Fallback to sample data if API fails
-          throw new Error('Failed to fetch from Cointelegraph')
+          throw new Error('Failed to fetch news')
         }
       } catch (error) {
-        console.error('Error fetching Cointelegraph news:', error)
+        console.error('Error fetching news:', error)
         
-        // Fallback sample news data
+        // Fallback sample news
         const sampleNews: NewsItem[] = [
-          {
-            id: '1',
-            title: 'Bitcoin Surges Past $45,000 as Institutional Adoption Grows',
-            description: 'Major financial institutions continue to embrace cryptocurrency, driving Bitcoin to new highs amid increased market confidence and regulatory clarity.',
-            url: 'https://cointelegraph.com',
-            source: 'Cointelegraph',
-            publishedAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
-            category: 'crypto'
-          },
-          {
-            id: '2',
-            title: 'Ethereum Layer-2 Solutions See Record Trading Volume',
-            description: 'Scaling solutions like Arbitrum and Optimism process billions in transactions, marking a significant milestone for Ethereum ecosystem.',
-            url: 'https://cointelegraph.com',
-            source: 'Cointelegraph',
-            publishedAt: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
-            category: 'crypto'
-          },
-          {
-            id: '3',
-            title: 'Major Exchange Announces New Staking Rewards Program',
-            description: 'Leading cryptocurrency exchange unveils enhanced staking options with competitive APY rates for multiple digital assets.',
-            url: 'https://cointelegraph.com',
-            source: 'Cointelegraph',
-            publishedAt: new Date(Date.now() - 1000 * 60 * 90).toISOString(),
-            category: 'crypto'
-          },
-          {
-            id: '4',
-            title: 'DeFi Protocol Introduces Revolutionary Lending Mechanism',
-            description: 'New decentralized finance platform promises higher yields and lower fees through innovative smart contract architecture.',
-            url: 'https://cointelegraph.com',
-            source: 'Cointelegraph',
-            publishedAt: new Date(Date.now() - 1000 * 60 * 120).toISOString(),
-            category: 'crypto'
-          },
-          {
-            id: '5',
-            title: 'NFT Marketplace Reports All-Time High Trading Activity',
-            description: 'Digital collectibles market experiences surge in volume as blue-chip collections maintain strong floor prices.',
-            url: 'https://cointelegraph.com',
-            source: 'Cointelegraph',
-            publishedAt: new Date(Date.now() - 1000 * 60 * 150).toISOString(),
-            category: 'crypto'
-          },
-          {
-            id: '6',
-            title: 'Blockchain Gaming Platform Secures Major Investment',
-            description: 'Web3 gaming project raises significant funding from venture capital firms, signaling continued interest in GameFi sector.',
-            url: 'https://cointelegraph.com',
-            source: 'Cointelegraph',
-            publishedAt: new Date(Date.now() - 1000 * 60 * 180).toISOString(),
-            category: 'crypto'
-          },
-          {
-            id: '7',
-            title: 'Central Bank Digital Currency Pilot Program Expands',
-            description: 'Government-backed digital currency initiative enters new phase with broader merchant and consumer participation.',
-            url: 'https://cointelegraph.com',
-            source: 'Cointelegraph',
-            publishedAt: new Date(Date.now() - 1000 * 60 * 210).toISOString(),
-            category: 'crypto'
-          },
-          {
-            id: '8',
-            title: 'Crypto Regulation Framework Gains Bipartisan Support',
-            description: 'Legislative proposal for comprehensive digital asset oversight receives positive reception from policymakers.',
-            url: 'https://cointelegraph.com',
-            source: 'Cointelegraph',
-            publishedAt: new Date(Date.now() - 1000 * 60 * 240).toISOString(),
-            category: 'crypto'
-          }
+          { id: '1', title: 'Bitcoin Surges Past $45,000 as Institutional Adoption Grows', source: 'Cointelegraph', publishedAt: new Date().toISOString() },
+          { id: '2', title: 'Ethereum Layer-2 Solutions See Record Trading Volume', source: 'Cointelegraph', publishedAt: new Date().toISOString() },
+          { id: '3', title: 'Major Exchange Announces New Staking Rewards Program', source: 'Cointelegraph', publishedAt: new Date().toISOString() },
+          { id: '4', title: 'DeFi Protocol Introduces Revolutionary Lending Mechanism', source: 'Cointelegraph', publishedAt: new Date().toISOString() },
+          { id: '5', title: 'NFT Marketplace Reports All-Time High Trading Activity', source: 'Cointelegraph', publishedAt: new Date().toISOString() },
+          { id: '6', title: 'Blockchain Gaming Platform Secures Major Investment', source: 'Cointelegraph', publishedAt: new Date().toISOString() },
+          { id: '7', title: 'Central Bank Digital Currency Pilot Program Expands', source: 'Cointelegraph', publishedAt: new Date().toISOString() },
+          { id: '8', title: 'Crypto Regulation Framework Gains Bipartisan Support', source: 'Cointelegraph', publishedAt: new Date().toISOString() }
         ]
         
         setNewsItems(sampleNews)
@@ -162,124 +190,123 @@ export default function News() {
     }
 
     fetchNews()
-    
-    // Refresh news every 5 minutes
-    const interval = setInterval(fetchNews, 5 * 60 * 1000)
+    const interval = setInterval(fetchNews, 5 * 60 * 1000) // Refresh every 5 minutes
     
     return () => clearInterval(interval)
   }, [])
 
-  const formatTimeAgo = (dateString: string) => {
-    const now = new Date()
-    const date = new Date(dateString)
-    const seconds = Math.floor((now.getTime() - date.getTime()) / 1000)
-    
-    if (seconds < 60) return `${seconds}s ago`
-    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`
-    if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`
-    return `${Math.floor(seconds / 86400)}d ago`
-  }
-
-  const getCategoryColor = (category: string) => {
-    switch (category) {
-      case 'crypto': return 'bg-purple-500/20 text-purple-400 border-purple-500/30'
-      case 'stocks': return 'bg-blue-500/20 text-blue-400 border-blue-500/30'
-      case 'forex': return 'bg-green-500/20 text-green-400 border-green-500/30'
-      default: return 'bg-gray-500/20 text-gray-400 border-gray-500/30'
-    }
-  }
-
   return (
-    <div className="min-h-screen bg-krcard/30 backdrop-blur-sm text-krtext p-6">
+    <div className="min-h-screen bg-gradient-to-br from-krblack via-krblack to-krcard/20 text-krtext p-4 md:p-6">
+      {/* Header */}
       <div className="mb-6">
         <div className="flex items-center gap-3 mb-2">
-          <Newspaper className="text-krgold" size={32} />
-          <h1 className="text-2xl font-bold">Crypto Market News</h1>
+          <Activity className="text-krgold" size={36} />
+          <div>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-krgold to-kryellow bg-clip-text text-transparent">Market Intelligence</h1>
+            <p className="text-krmuted text-sm mt-1">Real-time economic events, crypto trends, and breaking news</p>
+          </div>
         </div>
-        <p className="text-gray-400">Latest cryptocurrency news and updates from Cointelegraph</p>
       </div>
 
-      {/* News Feed Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-        {/* News Articles - 2/3 width */}
-        <div className="lg:col-span-2">
-          <div className="bg-krcard backdrop-blur-sm rounded-xl shadow-sm border border-krborder p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <TrendingUp className="text-krgold" size={24} />
-                <h2 className="text-xl font-semibold">Latest from Cointelegraph</h2>
-              </div>
-              
-              {/* Refresh indicator */}
-              <div className="text-xs text-gray-500">
-                Auto-refresh every 5 minutes
+      {/* News Ticker */}
+      <div className="mb-6 bg-krcard/80 backdrop-blur-md rounded-xl border border-krborder/50 p-3 overflow-hidden">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <Zap className="text-krgold animate-pulse" size={20} />
+            <span className="text-xs font-bold text-krgold uppercase">Breaking</span>
+          </div>
+          <div className="flex-1 overflow-hidden">
+            <div className="news-ticker-wrapper">
+              <div className="news-ticker">
+                {newsItems.map((item, idx) => (
+                  <span key={item.id} className="news-ticker-item">
+                    <span className="text-krtext font-medium">{item.title}</span>
+                    <span className="text-krmuted mx-4">•</span>
+                  </span>
+                ))}
+                {/* Duplicate for seamless loop */}
+                {newsItems.map((item, idx) => (
+                  <span key={`${item.id}-dup`} className="news-ticker-item">
+                    <span className="text-krtext font-medium">{item.title}</span>
+                    <span className="text-krmuted mx-4">•</span>
+                  </span>
+                ))}
               </div>
             </div>
+          </div>
+        </div>
+      </div>
 
-            {/* News Items */}
-            <div className="space-y-4 max-h-[800px] overflow-y-auto pr-2">
-              {loading ? (
-                <div className="text-center py-12 text-gray-400">Loading news from Cointelegraph...</div>
-              ) : newsItems.length === 0 ? (
-                <div className="text-center py-12 text-gray-400">No news available</div>
-              ) : (
-                newsItems.map(item => (
-                  <a
-                    key={item.id}
-                    href={item.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block bg-krblack/30 rounded-lg p-4 border border-krborder hover:border-krgold/50 transition-all group"
-                  >
-                    <div className="flex items-start justify-between gap-3 mb-2">
-                      <h3 className="text-lg font-semibold text-krtext group-hover:text-krgold transition-colors flex-1">
-                        {item.title}
-                      </h3>
-                      <ExternalLink size={16} className="text-gray-400 group-hover:text-krgold transition-colors flex-shrink-0 mt-1" />
-                    </div>
-                    
-                    <p className="text-gray-400 text-sm mb-3 line-clamp-2">
-                      {item.description}
-                    </p>
-                    
-                    <div className="flex items-center gap-3 flex-wrap">
-                      <span className={`px-2 py-1 rounded text-xs font-medium border ${getCategoryColor(item.category)}`}>
-                        {item.category.toUpperCase()}
-                      </span>
-                      <span className="text-xs text-gray-500">{item.source}</span>
-                      <div className="flex items-center gap-1 text-xs text-gray-500">
-                        <Clock size={12} />
-                        {formatTimeAgo(item.publishedAt)}
-                      </div>
-                    </div>
-                  </a>
-                ))
-              )}
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        {/* Economic Calendar - Left Column */}
+        <div className="xl:col-span-1">
+          <div className="bg-krcard/90 backdrop-blur-md rounded-2xl shadow-2xl border border-krborder/50 p-6 h-full">
+            <div className="flex items-center gap-2 mb-4">
+              <Calendar className="text-krgold" size={28} />
+              <div>
+                <h2 className="text-2xl font-bold text-krtext">Economic Calendar</h2>
+                <p className="text-xs text-krmuted">Key financial events</p>
+              </div>
             </div>
+            <div className="tradingview-widget-container h-[calc(100%-80px)]">
+              <div ref={calendarRef} className="tradingview-widget-container__widget h-full"></div>
+            </div>
+          </div>
+        </div>
 
-            {/* API Integration Note */}
-            <div className="mt-4 p-3 bg-krgold/10 border border-krgold/30 rounded-lg">
-              <p className="text-sm text-gray-400">
-                <strong className="text-krgold">News Source:</strong> Powered by <a href="https://cointelegraph.com" target="_blank" rel="noopener noreferrer" className="text-krgold hover:underline">Cointelegraph</a> RSS feed via RSS2JSON API.
-                Updates automatically every 5 minutes.
+        {/* Crypto Widgets - Right Columns */}
+        <div className="xl:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Top Gainers */}
+          <div className="bg-krcard/90 backdrop-blur-md rounded-2xl shadow-2xl border border-green-500/20 p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="p-2 bg-green-500/20 rounded-lg">
+                <TrendingUp className="text-green-400" size={24} />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-krtext">Top Gainers</h2>
+                <p className="text-xs text-krmuted">24h performance leaders</p>
+              </div>
+            </div>
+            <div className="tradingview-widget-container h-[500px]">
+              <div ref={topGainersRef} className="tradingview-widget-container__widget h-full"></div>
+            </div>
+            <div className="mt-4 pt-4 border-t border-krborder/30">
+              <p className="text-xs text-krmuted text-center">
+                <span className="text-green-400 font-semibold">🚀 Trending Up</span> • Data from Binance
+              </p>
+            </div>
+          </div>
+
+          {/* Top Losers */}
+          <div className="bg-krcard/90 backdrop-blur-md rounded-2xl shadow-2xl border border-red-500/20 p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="p-2 bg-red-500/20 rounded-lg">
+                <TrendingDown className="text-red-400" size={24} />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-krtext">Top Losers</h2>
+                <p className="text-xs text-krmuted">24h performance decliners</p>
+              </div>
+            </div>
+            <div className="tradingview-widget-container h-[500px]">
+              <div ref={topLosersRef} className="tradingview-widget-container__widget h-full"></div>
+            </div>
+            <div className="mt-4 pt-4 border-t border-krborder/30">
+              <p className="text-xs text-krmuted text-center">
+                <span className="text-red-400 font-semibold">📉 Trending Down</span> • Data from Binance
               </p>
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Economic Calendar - 1/3 width */}
-        <div className="lg:col-span-1">
-          <div className="bg-krcard backdrop-blur-sm rounded-xl shadow-sm border border-krborder p-6 sticky top-6">
-            <div className="flex items-center gap-2 mb-4">
-              <Calendar className="text-krgold" size={24} />
-              <h2 className="text-xl font-semibold">Economic Calendar</h2>
-            </div>
-            <p className="text-sm text-gray-400 mb-4">Medium to High Impact Events</p>
-            <div className="tradingview-widget-container">
-              <div ref={calendarRef} className="tradingview-widget-container__widget"></div>
-            </div>
-          </div>
-        </div>
+      {/* Info Footer */}
+      <div className="mt-6 bg-krgold/10 backdrop-blur-sm rounded-xl border border-krgold/30 p-4">
+        <p className="text-sm text-center text-krmuted">
+          <span className="text-krgold font-semibold">Data Sources:</span> Economic calendar and crypto market data powered by <a href="https://www.tradingview.com" target="_blank" rel="noopener noreferrer" className="text-krgold hover:underline">TradingView</a> • 
+          News ticker from <a href="https://cointelegraph.com" target="_blank" rel="noopener noreferrer" className="text-krgold hover:underline ml-1">Cointelegraph</a> • Updates every 5 minutes
+        </p>
       </div>
     </div>
   )

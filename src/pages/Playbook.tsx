@@ -97,14 +97,74 @@ export default function Playbook(){
   }
 
   return (
-    <div className="min-h-screen bg-krcard/30 backdrop-blur-sm text-krtext p-6">
-      <h1 className="text-2xl font-bold mb-6">Playbook</h1>
+    <div className="min-h-screen bg-gradient-to-br from-krblack via-krblack to-krcard/20 text-krtext p-4 md:p-6">
+      {/* Header with Introduction */}
+      <div className="mb-6">
+        <div className="flex items-center gap-3 mb-4">
+          <span className="text-4xl">📖</span>
+          <div>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-krgold to-kryellow bg-clip-text text-transparent">Trading Playbook</h1>
+            <p className="text-krmuted text-sm mt-1">Your personal collection of proven trading strategies</p>
+          </div>
+        </div>
+
+        {/* Introduction Card */}
+        <div className="bg-gradient-to-br from-krgold/10 via-krgold/5 to-transparent backdrop-blur-sm rounded-2xl border border-krgold/30 p-6 mb-6">
+          <div className="flex items-start gap-4">
+            <div className="p-3 bg-krgold/20 rounded-xl">
+              <span className="text-3xl">💡</span>
+            </div>
+            <div className="flex-1">
+              <h2 className="text-xl font-bold text-krtext mb-3 flex items-center gap-2">
+                What is a Trading Playbook?
+              </h2>
+              <div className="space-y-2 text-krmuted text-sm">
+                <p>
+                  A trading playbook is your <span className="text-krgold font-semibold">strategic blueprint</span> for consistent success in the markets. 
+                  Think of it as your personal collection of battle-tested setups, entry/exit rules, and market scenarios that work for you.
+                </p>
+                <div className="grid md:grid-cols-3 gap-4 mt-4">
+                  <div className="bg-krcard/50 backdrop-blur-sm rounded-xl p-4 border border-krborder/30">
+                    <div className="text-2xl mb-2">🎯</div>
+                    <h3 className="text-krtext font-semibold mb-1">Define Your Edge</h3>
+                    <p className="text-xs">Document patterns and setups that consistently give you an advantage in the market</p>
+                  </div>
+                  <div className="bg-krcard/50 backdrop-blur-sm rounded-xl p-4 border border-krborder/30">
+                    <div className="text-2xl mb-2">📊</div>
+                    <h3 className="text-krtext font-semibold mb-1">Reduce Emotions</h3>
+                    <p className="text-xs">Pre-defined strategies help you stay disciplined and avoid impulsive decisions</p>
+                  </div>
+                  <div className="bg-krcard/50 backdrop-blur-sm rounded-xl p-4 border border-krborder/30">
+                    <div className="text-2xl mb-2">🔄</div>
+                    <h3 className="text-krtext font-semibold mb-1">Continuous Improvement</h3>
+                    <p className="text-xs">Review and refine your strategies based on real trading results over time</p>
+                  </div>
+                </div>
+                <div className="mt-4 pt-4 border-t border-krborder/30">
+                  <p className="text-xs">
+                    <span className="text-krgold font-semibold">Pro Tip:</span> Each strategy should include clear entry criteria, exit rules, risk management parameters, 
+                    and visual examples. Update your playbook regularly as you learn what works best for your trading style.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       
       <div className="grid md:grid-cols-3 gap-6 mb-6">
         {/* Form Section */}
-        <div className="bg-krcard backdrop-blur-sm rounded-xl shadow-sm border border-krborder p-6">
-          <h2 className="text-lg font-semibold mb-4">
-            {editingId ? 'Edit Strategy' : 'Add New Strategy'}
+        <div className="bg-krcard/90 backdrop-blur-md rounded-2xl shadow-2xl border border-krborder/50 p-6">
+          <h2 className="text-xl font-bold mb-4 text-krtext flex items-center gap-2">
+            {editingId ? (
+              <>
+                <span className="text-blue-400">✏️</span> Edit Strategy
+              </>
+            ) : (
+              <>
+                <span className="text-krgold">➕</span> New Strategy
+              </>
+            )}
           </h2>
           
           <input 
@@ -158,14 +218,21 @@ export default function Playbook(){
 
         {/* Strategies Grid */}
         <div className="md:col-span-2">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-xl font-bold text-krtext flex items-center gap-2">
+              <span className="text-krgold">📚</span> My Strategies ({items.length})
+            </h2>
+          </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {items.length === 0 && (
-              <div className="col-span-full text-center text-gray-400 py-12">
-                No strategies yet. Add your first strategy to get started!
+              <div className="col-span-full text-center py-20">
+                <div className="text-6xl mb-4">📖</div>
+                <p className="text-krmuted">No strategies yet</p>
+                <p className="text-xs text-krmuted/60 mt-2">Create your first trading strategy!</p>
               </div>
             )}
             {items.map((it) => (
-              <div key={it.id} className="bg-krcard backdrop-blur-sm rounded-xl border border-krborder overflow-hidden hover:border-krgold/50 transition-colors group">
+              <div key={it.id} className="bg-krcard/90 backdrop-blur-md rounded-xl border border-krborder/50 overflow-hidden hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 group">
                 {/* Image Grid - Show up to 4 images */}
                 {it.images.length > 0 && (
                   <div className={`grid ${it.images.length === 1 ? 'grid-cols-1' : 'grid-cols-2'} gap-1 bg-krblack/50`}>

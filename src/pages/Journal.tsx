@@ -16,7 +16,7 @@ const LEVERAGE_OPTIONS = Array.from({ length: 150 }, (_, i) => i + 1)
 
 export default function Journal() {
   const data = loadData()
-  const { formatAmount } = useCurrency()
+  const { formatAmount, currency } = useCurrency()
   const [items, setItems] = useState<JournalEntry[]>(data.journal || [])
   const [strategies, setStrategies] = useState<string[]>([])
   const [viewingTrade, setViewingTrade] = useState<JournalEntry | null>(null)
@@ -131,14 +131,99 @@ export default function Journal() {
   }
 
   return (
-    <div className="min-h-screen bg-krcard/30 backdrop-blur-sm text-krtext p-6">
-      <h1 className="text-2xl font-bold mb-6 text-krtext">Journal</h1>
+    <div className="min-h-screen bg-gradient-to-br from-krblack via-krblack to-krcard/20 text-krtext p-4 md:p-6">
+      {/* Header Section with Stats */}
+      <div className="mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-krgold to-kryellow bg-clip-text text-transparent">Trading Journal</h1>
+            <p className="text-krmuted text-sm mt-1">Track and analyze your trading performance</p>
+          </div>
+          <div className="bg-krcard/50 backdrop-blur-sm rounded-xl border border-krborder px-4 py-2">
+            <p className="text-xs text-krmuted">Total Trades</p>
+            <p className="text-2xl font-bold text-krgold">{items.length}</p>
+          </div>
+        </div>
+
+        {/* Quick Stats Cards */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+          <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4">
+            <p className="text-xs text-krmuted mb-1">Win Rate</p>
+            <p className="text-xl font-bold text-green-500">
+              {items.length > 0 ? `${((items.filter(t => t.pnlAmount > 0).length / items.length) * 100).toFixed(1)}%` : '0%'}
+            </p>
+          </div>
+          <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4">
+            <p className="text-xs text-krmuted mb-1">Total P&L</p>
+            <p className={`text-xl font-bold ${items.reduce((sum, t) => sum + t.pnlAmount, 0) >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+              {currency.symbol}{Math.abs(items.reduce((sum, t) => sum + t.pnlAmount, 0)).toFixed(2)}
+            </p>
+          </div>
+          <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4">
+            <p className="text-xs text-krmuted mb-1">Avg Win</p>
+            <p className="text-xl font-bold text-green-500">
+              {currency.symbol}{items.filter(t => t.pnlAmount > 0).length > 0 
+                ? (items.filter(t => t.pnlAmount > 0).reduce((sum, t) => sum + t.pnlAmount, 0) / items.filter(t => t.pnlAmount > 0).length).toFixed(2)
+                : '0.00'}
+            </p>
+          </div>
+          <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4">
+            <p className="text-xs text-krmuted mb-1">Avg Loss</p>
+            <p className="text-xl font-bold text-red-500">
+              {currency.symbol}{items.filter(t => t.pnlAmount < 0).length > 0 
+                ? Math.abs(items.filter(t => t.pnlAmount < 0).reduce((sum, t) => sum + t.pnlAmount, 0) / items.filter(t => t.pnlAmount < 0).length).toFixed(2)
+                : '0.00'}
+            </p>
+          </div>
+        </div>
+      </div>
       
-      {/* Main Layout - Form and Trade History side by side on large screens, stacked on smaller */}
-      <div className="grid grid-cols-1 2xl:grid-cols-[1fr,400px] gap-6">
+      {/* Main Layout - Form and Trade History */}
+      <div className="grid grid-cols-1 2xl:grid-cols-[1fr,450px] gap-6">
         {/* Form Section */}
-        <div className="bg-krcard backdrop-blur-sm rounded-xl shadow-sm border border-krborder p-6">
-          <h2 className="text-xl font-semibold mb-4 text-krtext">{form.id ? 'Edit Trade' : 'Add New Trade'}</h2>
+        <div className="bg-krcard/90 backdrop-blur-md rounded-2xl shadow-2xl border border-krborder/50 p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-krtext flex items-center gap-2">
+              {form.id ? (
+                <>
+                  <span className="text-blue-400">✏️</span> Edit Trade
+                </>
+              ) : (
+                <>
+                  <span className="text-krgold">➕</span> New Trade
+                </>
+              )}
+            </h2>
+            {form.id && (
+              <button
+                onClick={() => setForm({
+                  date: new Date().toISOString().split('T')[0],
+                  time: new Date().toLocaleTimeString('en-US', { hour12: false }).slice(0, 5),
+                  ticker: '',
+                  objective: 'Scalping',
+                  setup: '',
+                  type: 'Spot',
+                  position: 'Long',
+                  leverage: 1,
+                  entryPrice: 0,
+                  exitDate: new Date().toISOString().split('T')[0],
+                  exitTime: new Date().toLocaleTimeString('en-US', { hour12: false }).slice(0, 5),
+                  exitPrice: 0,
+                  fee: 0,
+                  marginCost: 0,
+                  pnlAmount: 0,
+                  pnlPercent: 0,
+                  chartImg: '',
+                  pnlImg: '',
+                  reasonIn: '',
+                  reasonOut: ''
+                })}
+                className="text-sm text-krmuted hover:text-krtext transition-colors"
+              >
+                Cancel Edit
+              </button>
+            )}
+          </div>
           <div className="space-y-4">
             {/* Ticker */}
             <div className="space-y-1">
@@ -380,45 +465,57 @@ export default function Journal() {
         </div>
 
         {/* Trade History - Right Side */}
-        <div className="bg-krcard backdrop-blur-sm rounded-xl shadow-sm border border-krborder p-6">
-          <h2 className="text-xl font-semibold mb-4 text-krtext">Trade History</h2>
-          <div className="space-y-4 max-h-[calc(100vh-12rem)] overflow-y-auto pr-2">
+        <div className="bg-krcard/90 backdrop-blur-md rounded-2xl shadow-2xl border border-krborder/50 p-6 flex flex-col">
+          <h2 className="text-2xl font-bold mb-4 text-krtext flex items-center gap-2">
+            <span className="text-krgold">📊</span> Recent Trades
+          </h2>
+          <div className="space-y-3 overflow-y-auto pr-2 flex-1 max-h-[calc(100vh-16rem)] custom-scrollbar">
             {items.length === 0 && (
-              <div className="text-center text-gray-400 py-12">
-                No trades yet. Add your first trade to get started!
+              <div className="text-center py-20">
+                <div className="text-6xl mb-4">📈</div>
+                <p className="text-krmuted">No trades yet</p>
+                <p className="text-xs text-krmuted/60 mt-2">Add your first trade to start tracking!</p>
               </div>
             )}
-            {items.map((it) => {
+            {items.slice().reverse().map((it) => {
               const netPnl = (it.pnlAmount || 0) - (it.fee || 0)
               const isProfit = netPnl > 0
               return (
                 <div 
                   key={it.id} 
                   onClick={() => setViewingTrade(it)}
-                  className="bg-krblack/30 rounded-xl shadow-sm border border-krborder p-4 cursor-pointer hover:border-krgold/50 transition-colors"
+                  className="bg-krblack/40 backdrop-blur-sm rounded-xl border border-krborder/30 p-4 cursor-pointer hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 group"
                 >
                   {/* Trade Header */}
                   <div className="flex items-start justify-between gap-2 mb-3">
                     <div className="flex-1 min-w-0">
-                      <div className="font-bold text-lg text-krtext">{it.ticker}</div>
-                      <div className="text-sm text-gray-400">{it.date} {it.time}</div>
+                      <div className="font-bold text-lg text-krtext group-hover:text-krgold transition-colors">{it.ticker}</div>
+                      <div className="text-xs text-krmuted flex items-center gap-2">
+                        <span>{it.date}</span>
+                        <span className="text-krborder">•</span>
+                        <span>{it.time}</span>
+                      </div>
                     </div>
-                    <span className={`text-sm px-2 py-1 rounded whitespace-nowrap font-semibold ${isProfit ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
-                      {isProfit ? <TrendingUp className="inline-block w-4 h-4 mr-1" /> : <TrendingDown className="inline-block w-4 h-4 mr-1" />}
+                    <span className={`text-xs px-3 py-1.5 rounded-lg whitespace-nowrap font-bold ${isProfit ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'}`}>
+                      {isProfit ? <TrendingUp className="inline-block w-3 h-3 mr-1" /> : <TrendingDown className="inline-block w-3 h-3 mr-1" />}
                       {it.pnlPercent.toFixed(2)}%
                     </span>
                   </div>
 
-                  {/* Trade Details - Summary Only */}
-                  <div className="text-xs text-gray-400 space-y-1">
-                    <div className="grid grid-cols-2 gap-x-2">
-                      <div><strong className="text-krtext">Type:</strong> {it.type} {it.type === 'Futures' ? `${it.leverage}x` : ''}</div>
-                      <div><strong className="text-krtext">Position:</strong> {it.position}</div>
+                  {/* Trade Details */}
+                  <div className="text-xs space-y-2">
+                    <div className="flex items-center justify-between text-krmuted">
+                      <span className="flex items-center gap-1.5">
+                        <span className={`w-1.5 h-1.5 rounded-full ${it.position === 'Long' ? 'bg-green-400' : 'bg-red-400'}`}></span>
+                        {it.type} {it.type === 'Futures' ? `${it.leverage}x` : ''} • {it.position}
+                      </span>
                     </div>
-                    <div>
-                      <strong className="text-krtext">Entry:</strong> {formatAmount(it.entryPrice)} → <strong className="text-krtext">Exit:</strong> {formatAmount(it.exitPrice)}
+                    <div className="flex items-center justify-between pt-2 border-t border-krborder/20">
+                      <span className="text-krmuted">Net P&L</span>
+                      <span className={`font-bold text-sm ${isProfit ? 'text-green-400' : 'text-red-400'}`}>
+                        {formatAmount(netPnl)}
+                      </span>
                     </div>
-                    <div><strong className="text-krtext">Net P&L:</strong> {formatAmount(netPnl)} ({it.pnlPercent.toFixed(2)}%)</div>
                   </div>
                 </div>
               )
