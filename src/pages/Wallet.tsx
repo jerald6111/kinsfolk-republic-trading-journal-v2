@@ -198,51 +198,51 @@ export default function Wallet() {
 
         {/* Transactions List */}
         <div className="md:col-span-2">
-          <div className="bg-krcard backdrop-blur-sm rounded-xl shadow-sm border border-krborder p-6 mb-6">
-            <div className="text-lg text-krtext">
-              Current Balance: <span className="font-bold text-krgold text-2xl">{formatAmount(balance)}</span>
-            </div>
-          </div>
+          <h2 className="text-2xl font-bold mb-4 text-krtext flex items-center gap-2">
+            <span className="text-krgold">📜</span> Transaction History ({items.length})
+          </h2>
           
-          <div className="space-y-3">
+          <div className="space-y-3 max-h-[calc(100vh-16rem)] overflow-y-auto pr-2 custom-scrollbar">
             {items.length === 0 && (
-              <div className="text-center text-gray-400 py-8">
-                No transactions yet. Add your first transaction to get started!
+              <div className="text-center py-20">
+                <div className="text-6xl mb-4">💰</div>
+                <p className="text-krmuted">No transactions yet</p>
+                <p className="text-xs text-krmuted/60 mt-2">Add your first transaction!</p>
               </div>
             )}
-            {items.map((it)=> (
-              <div key={it.id} className="bg-krcard backdrop-blur-sm rounded-xl shadow-sm border border-krborder p-4 hover:border-krgold/50 transition-colors">
+            {items.slice().reverse().map((it)=> (
+              <div key={it.id} className="bg-krcard/90 backdrop-blur-md rounded-xl border border-krborder/50 p-4 hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 group">
                 <div className="flex justify-between items-start gap-4">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
-                      <div className="font-medium text-krtext">{it.date}</div>
-                      <span className={`px-2 py-0.5 rounded text-xs font-medium ${it.type === 'deposit' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
-                        {it.type === 'deposit' ? 'Deposit' : 'Withdrawal'}
+                      <div className="font-semibold text-krtext group-hover:text-krgold transition-colors">{it.date}</div>
+                      <span className={`px-3 py-1 rounded-lg text-xs font-bold border ${it.type === 'deposit' ? 'bg-green-500/20 text-green-400 border-green-500/30' : 'bg-red-500/20 text-red-400 border-red-500/30'}`}>
+                        {it.type === 'deposit' ? '💵 Deposit' : '💸 Withdrawal'}
                       </span>
                     </div>
                     {it.notes && (
-                      <div className="text-sm text-gray-400">
-                        <strong className="text-krtext">Notes:</strong> {it.notes}
+                      <div className="text-sm text-krmuted mt-1">
+                        {it.notes}
                       </div>
                     )}
                   </div>
                   
                   <div className="flex items-start gap-3">
-                    <div className={`text-xl font-bold ${it.type === 'deposit' ? 'text-green-400' : 'text-red-400'}`}>
+                    <div className={`text-2xl font-bold ${it.type === 'deposit' ? 'text-green-400' : 'text-red-400'}`}>
                       {it.type === 'deposit' ? '+' : '-'}{formatAmount(Number(it.amount))}
                     </div>
                     
                     <div className="flex flex-col gap-2">
                       <button
                         onClick={() => editTransaction(it)}
-                        className="px-2 py-1.5 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 text-blue-400 rounded-md transition-colors"
+                        className="px-3 py-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/30 text-blue-400 rounded-lg transition-all font-semibold"
                         title="Edit Transaction"
                       >
                         <Edit2 size={14} />
                       </button>
                       <button
                         onClick={() => deleteTransaction(it.id)}
-                        className="px-2 py-1.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 rounded-md transition-colors"
+                        className="px-3 py-2 bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 text-red-400 rounded-lg transition-all font-semibold"
                         title="Delete Transaction"
                       >
                         <Trash2 size={14} />
