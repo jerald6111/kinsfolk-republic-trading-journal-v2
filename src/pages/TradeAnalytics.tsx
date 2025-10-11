@@ -182,7 +182,8 @@ export default function TradeAnalytics() {
     const first = curr.getDate() - curr.getDay() // First day is Sunday
     const weekDates = []
     for (let i = 0; i < 7; i++) {
-      const day = new Date(curr.setDate(first + i))
+      const day = new Date(curr)
+      day.setDate(first + i)
       weekDates.push(day)
     }
     return weekDates
@@ -830,47 +831,7 @@ export default function TradeAnalytics() {
         </div>
       </div>
 
-      {/* ========== SECTION 6: PNL CALENDAR ========== */}
-      <div className="mb-8">
-        <h2 className="text-xl font-semibold mb-4 text-krtext flex items-center gap-2">
-          <Calendar size={24} className="text-krgold" />
-          PNL Calendar
-        </h2>
-      {/* PNL Calendar */}
-      <div className="bg-krcard backdrop-blur-sm rounded-xl border border-krborder p-6 mb-8">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <Calendar className="text-krgold" size={24} />
-            <h2 className="text-xl font-semibold">PNL Calendar</h2>
-          </div>
-          <div className="flex gap-2 bg-krblack/30 rounded-lg p-1">
-            <button
-              onClick={() => setCalendarView('monthly')}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                calendarView === 'monthly'
-                  ? 'bg-krgold text-krblack'
-                  : 'text-gray-400 hover:text-krtext'
-              }`}
-            >
-              Monthly
-            </button>
-            <button
-              onClick={() => setCalendarView('weekly')}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                calendarView === 'weekly'
-                  ? 'bg-krgold text-krblack'
-                  : 'text-gray-400 hover:text-krtext'
-              }`}
-            >
-              Weekly
-            </button>
-          </div>
-        </div>
-        {calendarView === 'monthly' ? renderMonthlyCalendar() : renderWeeklyCalendar()}
-      </div>
-      </div>
-
-      {/* ========== SECTION 7: EQUITY CURVE ========== */}
+      {/* ========== SECTION 6: EQUITY CURVE ========== */}
       <div className="mb-8">
         <h2 className="text-xl font-semibold mb-4 text-krtext flex items-center gap-2">
           <TrendingUp size={24} className="text-krgold" />
@@ -1039,6 +1000,46 @@ export default function TradeAnalytics() {
             </div>
           )}
         </div>
+      </div>
+      </div>
+
+      {/* ========== SECTION 7: PNL CALENDAR ========== */}
+      <div className="mb-8">
+        <h2 className="text-xl font-semibold mb-4 text-krtext flex items-center gap-2">
+          <Calendar size={24} className="text-krgold" />
+          PNL Calendar
+        </h2>
+      {/* PNL Calendar */}
+      <div className="bg-krcard backdrop-blur-sm rounded-xl border border-krborder p-6 mb-8">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <Calendar className="text-krgold" size={24} />
+            <h2 className="text-xl font-semibold">PNL Calendar</h2>
+          </div>
+          <div className="flex gap-2 bg-krblack/30 rounded-lg p-1">
+            <button
+              onClick={() => setCalendarView('monthly')}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                calendarView === 'monthly'
+                  ? 'bg-krgold text-krblack'
+                  : 'text-gray-400 hover:text-krtext'
+              }`}
+            >
+              Monthly
+            </button>
+            <button
+              onClick={() => setCalendarView('weekly')}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                calendarView === 'weekly'
+                  ? 'bg-krgold text-krblack'
+                  : 'text-gray-400 hover:text-krtext'
+              }`}
+            >
+              Weekly
+            </button>
+          </div>
+        </div>
+        {calendarView === 'monthly' ? renderMonthlyCalendar() : renderWeeklyCalendar()}
       </div>
       </div>
 
