@@ -14,6 +14,9 @@ export default function TradeAnalytics() {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
   const [showModal, setShowModal] = useState(false)
   const [showDurationInfo, setShowDurationInfo] = useState(false)
+  const [exposureFilter, setExposureFilter] = useState<'All' | 'Spot' | 'Futures'>('All')
+  const [selectedTicker, setSelectedTicker] = useState<string | null>(null)
+  const [showTickerModal, setShowTickerModal] = useState(false)
   
   const totalTrades = journal.length
   const wins = journal.filter(j => j.pnlAmount > 0).length
@@ -99,7 +102,7 @@ export default function TradeAnalytics() {
 
   // Setup Performance Breakdown
   const setupPerformance = journal.reduce((acc: any, trade: any) => {
-    const setup = trade.setup || 'Unknown'
+    const setup = trade.setup && trade.setup.trim() !== '' ? trade.setup : 'Unknown'
     if (!acc[setup]) {
       acc[setup] = { trades: 0, wins: 0, losses: 0, totalPnl: 0 }
     }
@@ -145,9 +148,11 @@ export default function TradeAnalytics() {
   // Group trades by ticker
   const tickerPerformance = journal.reduce((acc: any, trade) => {
     if (!acc[trade.ticker]) {
-      acc[trade.ticker] = { trades: 0, pnl: 0, wins: 0, losses: 0 }
+      acc[trade.ticker] = { trades: 0, pnl: 0, wins: 0, losses: 0, spotTrades: 0, futuresTrades: 0 }
     }
     acc[trade.ticker].trades++
+    if (trade.type === 'Spot') acc[trade.ticker].spotTrades++
+    if (trade.type === 'Futures') acc[trade.ticker].futuresTrades++
     // Subtract fee from pnl for ticker performance
     acc[trade.ticker].pnl += (trade.pnlAmount || 0) - (trade.fee || 0)
     if (trade.pnlAmount > 0) acc[trade.ticker].wins++
@@ -187,7 +192,9 @@ export default function TradeAnalytics() {
     const dateStr = date.toISOString().split('T')[0]
     const dayTrades = journal.filter((j: any) => {
       // Use exitDate for PnL calculation - trades appear when closed, not opened
-      const tradeDate = j.exitDate ? new Date(j.exitDate).toISOString().split('T')[0] : new Date(j.date).toISOString().split('T')[0]
+      // Handle both date formats (YYYY-MM-DD)
+      const exitDateStr = j.exitDate || j.date
+      const tradeDate = new Date(exitDateStr + 'T00:00:00').toISOString().split('T')[0]
       return tradeDate === dateStr
     })
     // Subtract fees from PnL for each trade
@@ -735,67 +742,109 @@ export default function TradeAnalytics() {
         </div>
       </div>
 
-      {/* Exposure by Pair/Coin */}
-      <div className="bg-krcard backdrop-blur-sm rounded-xl border border-krborder p-6 mb-8">
-        <h2 className="text-xl font-semibold mb-4">Exposure by Pair</h2>
-        <div className="space-y-2">
-          {Object.entries(tickerPerformance)
-            .sort(([, a]: any, [, b]: any) => b.trades - a.trades)
-            .slice(0, 10)
-            .map(([ticker, stats]: any, index) => {
-              const maxTrades = Object.values(tickerPerformance).reduce((max: number, s: any) => Math.max(max, s.trades), 0)
-              const percentage = (stats.trades / totalTrades) * 100
-              return (
-                <div key={ticker} className="bg-krblack/30 rounded-lg p-3">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="font-semibold">{ticker}</span>
-                    <div className="text-sm">
-                      <span className="text-gray-400">{stats.trades} trades </span>
-                      <span className="text-gray-500">({percentage.toFixed(1)}%)</span>
-                    </div>
-                  </div>
-                  <div className="relative h-2 bg-krblack rounded-full overflow-hidden">
-                    <div
-                      className="absolute top-0 left-0 h-full bg-gradient-to-r from-krgold to-kryellow"
-                      style={{ width: `${percentage}%` }}
-                    />
-                  </div>
-                </div>
-              )
-            })}
-        </div>
-      </div>
-
-      {/* Top Performers */}
-      <div className="bg-krcard backdrop-blur-sm rounded-xl border border-krborder p-6 mb-8">
-        <h2 className="text-xl font-semibold mb-4">Top 5 Performing Pairs</h2>
-        {topPerformers.length === 0 ? (
-          <div className="text-center py-8 text-gray-400">No trading data available</div>
-        ) : (
-          <div className="space-y-3">
-            {topPerformers.map(([ticker, stats]: any, index) => (
-              <div key={ticker} className="bg-krblack/30 rounded-lg p-4 flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="text-2xl font-bold text-gray-500">#{index + 1}</div>
-                  <div>
-                    <div className="font-semibold text-lg">{ticker}</div>
-                    <div className="text-sm text-gray-400">
-                      {stats.trades} trades • {stats.wins}W / {stats.losses}L
-                    </div>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className={`text-xl font-bold ${stats.pnl >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                    {formatAmount(stats.pnl)}
-                  </div>
-                  <div className="text-sm text-gray-400">
-                    {stats.trades > 0 ? ((stats.wins / stats.trades) * 100).toFixed(0) : 0}% win rate
-                  </div>
-                </div>
-              </div>
-            ))}
+      {/* Exposure by Pair and Top 5 Performing Pairs - Side by Side */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        {/* Exposure by Pair/Coin */}
+        <div className="bg-krcard backdrop-blur-sm rounded-xl border border-krborder p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold">Exposure by Pair</h2>
+            <div className="flex gap-1 bg-krblack/30 rounded-lg p-1">
+              {(['All', 'Spot', 'Futures'] as const).map((filter) => (
+                <button
+                  key={filter}
+                  onClick={() => setExposureFilter(filter)}
+                  className={`px-3 py-1 text-xs rounded-md transition-colors ${
+                    exposureFilter === filter
+                      ? 'bg-krgold text-krblack font-semibold'
+                      : 'text-gray-400 hover:text-krtext'
+                  }`}
+                >
+                  {filter}
+                </button>
+              ))}
+            </div>
           </div>
-        )}
+          <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2">
+            {(() => {
+              // Filter tickers based on exposure filter
+              const filteredTickers = Object.entries(tickerPerformance).filter(([ticker, stats]: any) => {
+                if (exposureFilter === 'Spot') return stats.spotTrades > 0
+                if (exposureFilter === 'Futures') return stats.futuresTrades > 0
+                return true
+              })
+              
+              const sortedTickers = filteredTickers.sort(([, a]: any, [, b]: any) => b.trades - a.trades)
+              const totalFilteredTrades = exposureFilter === 'All' 
+                ? totalTrades 
+                : journal.filter((j: any) => j.type === exposureFilter).length
+              
+              return sortedTickers.map(([ticker, stats]: any) => {
+                const percentage = totalFilteredTrades > 0 ? (stats.trades / totalFilteredTrades) * 100 : 0
+                return (
+                  <div key={ticker} className="bg-krblack/30 rounded-lg p-3 hover:bg-krblack/50 transition-colors cursor-pointer"
+                    onClick={() => {
+                      setSelectedTicker(ticker)
+                      setShowTickerModal(true)
+                    }}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="font-semibold">{ticker}</span>
+                      <div className="text-sm">
+                        <span className="text-gray-400">{stats.trades} trades </span>
+                        <span className="text-gray-500">({percentage.toFixed(1)}%)</span>
+                      </div>
+                    </div>
+                    <div className="relative h-2 bg-krblack rounded-full overflow-hidden">
+                      <div
+                        className="absolute top-0 left-0 h-full bg-gradient-to-r from-krgold to-kryellow"
+                        style={{ width: `${percentage}%` }}
+                      />
+                    </div>
+                  </div>
+                )
+              })
+            })()}
+          </div>
+        </div>
+
+        {/* Top Performers */}
+        <div className="bg-krcard backdrop-blur-sm rounded-xl border border-krborder p-6">
+          <h2 className="text-xl font-semibold mb-4">Top 5 Performing Pairs</h2>
+          {topPerformers.length === 0 ? (
+            <div className="text-center py-8 text-gray-400">No trading data available</div>
+          ) : (
+            <div className="space-y-3">
+              {topPerformers.map(([ticker, stats]: any, index) => (
+                <div 
+                  key={ticker} 
+                  className="bg-krblack/30 rounded-lg p-4 flex items-center justify-between hover:bg-krblack/50 transition-colors cursor-pointer"
+                  onClick={() => {
+                    setSelectedTicker(ticker)
+                    setShowTickerModal(true)
+                  }}
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="text-2xl font-bold text-gray-500">#{index + 1}</div>
+                    <div>
+                      <div className="font-semibold text-lg">{ticker}</div>
+                      <div className="text-sm text-gray-400">
+                        {stats.trades} trades • {stats.wins}W / {stats.losses}L
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className={`text-xl font-bold ${stats.pnl >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                      {formatAmount(stats.pnl)}
+                    </div>
+                    <div className="text-sm text-gray-400">
+                      {stats.trades > 0 ? ((stats.wins / stats.trades) * 100).toFixed(0) : 0}% win rate
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* PNL Calendar */}
@@ -994,70 +1043,6 @@ export default function TradeAnalytics() {
             </div>
           )}
         </div>
-        
-        {/* Win/Loss Distribution */}
-        <div className="bg-krcard backdrop-blur-sm rounded-xl border border-krborder p-6">
-          <h2 className="text-lg font-semibold mb-4">Win/Loss Distribution</h2>
-          {journal.length === 0 ? (
-            <div className="bg-krblack/30 rounded-lg p-8 text-center text-gray-400">
-              No trading data available
-            </div>
-          ) : (
-            <div className="h-64">
-              {(() => {
-                // Calculate distribution by PnL ranges
-                const ranges = [
-                  { label: '<-$100', min: -Infinity, max: -100, count: 0 },
-                  { label: '-$100--$50', min: -100, max: -50, count: 0 },
-                  { label: '-$50--$10', min: -50, max: -10, count: 0 },
-                  { label: '-$10-$0', min: -10, max: 0, count: 0 },
-                  { label: '$0-$10', min: 0, max: 10, count: 0 },
-                  { label: '$10-$50', min: 10, max: 50, count: 0 },
-                  { label: '$50-$100', min: 50, max: 100, count: 0 },
-                  { label: '>$100', min: 100, max: Infinity, count: 0 },
-                ]
-                
-                journal.forEach((trade: any) => {
-                  const netPnl = (trade.pnlAmount || 0) - (trade.fee || 0)
-                  const range = ranges.find(r => netPnl >= r.min && netPnl < r.max)
-                  if (range) range.count++
-                })
-                
-                const maxCount = Math.max(...ranges.map(r => r.count), 1)
-                
-                return (
-                  <div className="h-full flex flex-col">
-                    <div className="flex-1 flex items-end justify-around gap-1 bg-krblack/30 rounded-lg p-4">
-                      {ranges.map((range, idx) => {
-                        const height = (range.count / maxCount) * 100
-                        const isLoss = range.max <= 0
-                        return (
-                          <div key={idx} className="flex-1 flex flex-col items-center gap-1">
-                            <div className="text-xs text-gray-400">{range.count}</div>
-                            <div
-                              className={`w-full rounded-t transition-all hover:opacity-80 ${
-                                isLoss ? 'bg-red-500/70' : 'bg-green-500/70'
-                              }`}
-                              style={{ height: `${height}%`, minHeight: range.count > 0 ? '4px' : '0' }}
-                              title={`${range.label}: ${range.count} trades`}
-                            />
-                          </div>
-                        )
-                      })}
-                    </div>
-                    <div className="flex justify-around mt-2 text-xs text-gray-500">
-                      {ranges.map((range, idx) => (
-                        <div key={idx} className="flex-1 text-center truncate px-1" title={range.label}>
-                          {range.label}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )
-              })()}
-            </div>
-          )}
-        </div>
       </div>
 
       {/* Trade Details Modal */}
@@ -1175,6 +1160,169 @@ export default function TradeAnalytics() {
                                 <div>
                                   <span className="text-gray-400">R:R: </span>
                                   <span className="text-krtext font-medium">{trade.riskReward}</span>
+                                </div>
+                              )}
+                            </div>
+                            
+                            {/* Notes */}
+                            {(trade.reasonIn || trade.reasonOut) && (
+                              <div className="mt-3 pt-3 border-t border-krborder/50">
+                                {trade.reasonIn && (
+                                  <div className="mb-2">
+                                    <div className="text-xs text-gray-500 mb-1">Entry Reason:</div>
+                                    <div className="text-sm text-gray-300">{trade.reasonIn}</div>
+                                  </div>
+                                )}
+                                {trade.reasonOut && (
+                                  <div>
+                                    <div className="text-xs text-gray-500 mb-1">Exit Reason:</div>
+                                    <div className="text-sm text-gray-300">{trade.reasonOut}</div>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+
+                            {/* Images */}
+                            {(trade.chartImg || trade.pnlImg) && (
+                              <div className="mt-3 flex gap-2">
+                                {trade.chartImg && (
+                                  <div className="flex-1">
+                                    <img src={trade.chartImg} alt="Chart" className="w-full rounded-lg border border-krborder" />
+                                  </div>
+                                )}
+                                {trade.pnlImg && (
+                                  <div className="flex-1">
+                                    <img src={trade.pnlImg} alt="PNL" className="w-full rounded-lg border border-krborder" />
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </>
+                )
+              })()}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Ticker Details Modal */}
+      {showTickerModal && selectedTicker && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowTickerModal(false)}>
+          <div className="bg-krcard border border-krborder rounded-xl max-w-4xl w-full max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="sticky top-0 bg-krcard border-b border-krborder p-6 flex items-center justify-between">
+              <div>
+                <h2 className="text-2xl font-bold text-krtext">{selectedTicker}</h2>
+                <p className="text-gray-400 text-sm mt-1">All Trades</p>
+              </div>
+              <button
+                onClick={() => setShowTickerModal(false)}
+                className="p-2 hover:bg-krgold/20 rounded-lg transition-colors"
+              >
+                <X size={24} className="text-gray-400 hover:text-krtext" />
+              </button>
+            </div>
+            
+            <div className="p-6">
+              {(() => {
+                const tickerTrades = journal.filter((j: any) => j.ticker === selectedTicker)
+                const tickerStats = tickerPerformance[selectedTicker]
+                const tickerWins = tickerTrades.filter((t: any) => (t.pnlAmount || 0) - (t.fee || 0) > 0).length
+                const tickerLosses = tickerTrades.filter((t: any) => (t.pnlAmount || 0) - (t.fee || 0) < 0).length
+                
+                return (
+                  <>
+                    {/* Ticker Summary */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                      <div className="bg-krblack/30 rounded-lg p-4 text-center">
+                        <div className="text-sm text-gray-400 mb-1">Total PnL</div>
+                        <div className={`text-2xl font-bold ${tickerStats.pnl >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                          {formatAmount(tickerStats.pnl)}
+                        </div>
+                      </div>
+                      <div className="bg-krblack/30 rounded-lg p-4 text-center">
+                        <div className="text-sm text-gray-400 mb-1">Total Trades</div>
+                        <div className="text-2xl font-bold text-krtext">{tickerStats.trades}</div>
+                      </div>
+                      <div className="bg-krblack/30 rounded-lg p-4 text-center">
+                        <div className="text-sm text-gray-400 mb-1">Win Rate</div>
+                        <div className={`text-2xl font-bold ${tickerWins / tickerStats.trades >= 0.5 ? 'text-green-500' : 'text-red-500'}`}>
+                          {((tickerWins / tickerStats.trades) * 100).toFixed(0)}%
+                        </div>
+                      </div>
+                      <div className="bg-krblack/30 rounded-lg p-4 text-center">
+                        <div className="text-sm text-gray-400 mb-1">Avg PnL</div>
+                        <div className={`text-2xl font-bold ${tickerStats.pnl / tickerStats.trades >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                          {formatAmount(tickerStats.pnl / tickerStats.trades)}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Trade List */}
+                    <div className="space-y-3">
+                      <h3 className="text-lg font-semibold mb-3">All Trades ({tickerStats.trades})</h3>
+                      {tickerTrades.map((trade: any) => {
+                        const netPnl = (trade.pnlAmount || 0) - (trade.fee || 0)
+                        return (
+                          <div key={trade.id} className="bg-krblack/30 rounded-lg p-4 border border-krborder hover:border-krgold/50 transition-colors">
+                            <div className="flex items-start justify-between mb-3">
+                              <div>
+                                <div className="flex items-center gap-2">
+                                  <h4 className="text-lg font-semibold text-krtext">{trade.ticker}</h4>
+                                  {netPnl >= 0 ? (
+                                    <TrendingUp className="text-green-500" size={20} />
+                                  ) : (
+                                    <TrendingDown className="text-red-500" size={20} />
+                                  )}
+                                  <span className="text-sm text-gray-400">
+                                    {trade.type} {trade.position}
+                                    {trade.leverage && trade.leverage > 1 ? ` ${trade.leverage}x` : ''}
+                                  </span>
+                                </div>
+                                <div className="text-sm text-gray-400 mt-1">
+                                  {trade.setup || 'No strategy'} • {trade.objective || 'N/A'}
+                                </div>
+                                <div className="text-xs text-gray-500 mt-1">
+                                  {trade.date} {trade.time} → {trade.exitDate || trade.date} {trade.exitTime || trade.time}
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <div className={`text-xl font-bold ${netPnl >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                                  {netPnl >= 0 ? '+' : ''}{formatAmount(netPnl)}
+                                </div>
+                                <div className="text-xs text-gray-400 mt-1">
+                                  {trade.pnlPercent ? `${trade.pnlPercent.toFixed(2)}%` : 'N/A'}
+                                </div>
+                              </div>
+                            </div>
+                            
+                            {/* Trade Details Grid */}
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                              {trade.entryPrice && (
+                                <div>
+                                  <span className="text-gray-400">Entry: </span>
+                                  <span className="text-krtext font-medium">{trade.entryPrice}</span>
+                                </div>
+                              )}
+                              {trade.exitPrice && (
+                                <div>
+                                  <span className="text-gray-400">Exit: </span>
+                                  <span className="text-krtext font-medium">{trade.exitPrice}</span>
+                                </div>
+                              )}
+                              {trade.marginCost > 0 && (
+                                <div>
+                                  <span className="text-gray-400">Margin: </span>
+                                  <span className="text-krtext font-medium">{formatAmount(trade.marginCost)}</span>
+                                </div>
+                              )}
+                              {trade.fee > 0 && (
+                                <div>
+                                  <span className="text-gray-400">Fee: </span>
+                                  <span className="text-krtext font-medium">{formatAmount(trade.fee)}</span>
                                 </div>
                               )}
                             </div>

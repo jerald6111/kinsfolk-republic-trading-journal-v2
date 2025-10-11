@@ -219,7 +219,7 @@ export default function Journal() {
                 label="Strategy"
                 value={form.setup || ''}
                 onChange={setup => setForm({...form, setup})}
-                options={strategies.map(s => ({ value: s, label: s }))}
+                options={[{ value: '', label: '' }, ...strategies.map(s => ({ value: s, label: s }))]}
               />
             </div>
 
