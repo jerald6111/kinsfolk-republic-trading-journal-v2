@@ -124,16 +124,24 @@ export default function Wallet() {
 
       <div className="grid md:grid-cols-3 gap-6 mb-6">
         {/* Form Section */}
-        <div className="bg-krcard backdrop-blur-sm rounded-xl shadow-sm border border-krborder p-6">
-          <h2 className="text-lg font-semibold mb-4">
-            {editingId ? 'Edit Transaction' : 'Add Transaction'}
+        <div className="bg-krcard/90 backdrop-blur-md rounded-2xl shadow-2xl border border-krborder/50 p-6">
+          <h2 className="text-2xl font-bold mb-4 text-krtext flex items-center gap-2">
+            {editingId ? (
+              <>
+                <span className="text-blue-400">✏️</span> Edit Transaction
+              </>
+            ) : (
+              <>
+                <span className="text-krgold">➕</span> New Transaction
+              </>
+            )}
           </h2>
           <div className="space-y-4">
             <div className="space-y-1">
               <div className="text-sm font-medium text-krtext">Date</div>
               <input 
                 type="date" 
-                className="w-full px-3 py-2 border border-krborder rounded-md bg-transparent text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold" 
+                className="w-full px-3 py-3 border border-krborder rounded-xl bg-krblack/30 text-krtext focus:border-krgold focus:ring-2 focus:ring-krgold/20 transition-all" 
                 value={form.date} 
                 onChange={e=>setForm({...form, date: e.target.value})} 
               />
@@ -143,17 +151,17 @@ export default function Wallet() {
               <select 
                 value={form.type} 
                 onChange={e=>setForm({...form, type: e.target.value})} 
-                className="w-full px-3 py-2 border border-krborder rounded-md bg-transparent text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
+                className="w-full px-3 py-3 border border-krborder rounded-xl bg-krblack/30 text-krtext focus:border-krgold focus:ring-2 focus:ring-krgold/20 transition-all"
               >
-                <option value="deposit">Deposit</option>
-                <option value="withdrawal">Withdrawal</option>
+                <option value="deposit">💵 Deposit</option>
+                <option value="withdrawal">💸 Withdrawal</option>
               </select>
             </div>
             <div className="space-y-1">
               <div className="text-sm font-medium text-krtext">Amount</div>
               <input 
                 type="number" 
-                className="w-full px-3 py-2 border border-krborder rounded-md bg-transparent text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold" 
+                className="w-full px-3 py-3 border border-krborder rounded-xl bg-krblack/30 text-krtext focus:border-krgold focus:ring-2 focus:ring-krgold/20 transition-all" 
                 placeholder="Enter amount" 
                 value={form.amount} 
                 onChange={e=>setForm({...form, amount: e.target.value})} 
@@ -162,7 +170,7 @@ export default function Wallet() {
             <div className="space-y-1">
               <div className="text-sm font-medium text-krtext">Notes</div>
               <textarea 
-                className="w-full px-3 py-2 border border-krborder rounded-md bg-transparent text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold" 
+                className="w-full px-3 py-3 border border-krborder rounded-xl bg-krblack/30 text-krtext focus:border-krgold focus:ring-2 focus:ring-krgold/20 transition-all" 
                 placeholder="Add notes" 
                 value={form.notes} 
                 onChange={e=>setForm({...form, notes: e.target.value})} 
@@ -172,14 +180,14 @@ export default function Wallet() {
             <div className="flex gap-2">
               <button 
                 onClick={save}
-                className="flex-1 px-4 py-2 bg-krgold hover:bg-kryellow text-krblack rounded-md font-semibold transition-colors"
+                className="flex-1 px-4 py-3 bg-krgold hover:bg-kryellow text-krblack rounded-xl font-bold transition-colors shadow-lg shadow-krgold/20"
               >
                 {editingId ? 'Update Transaction' : 'Save Transaction'}
               </button>
               {editingId && (
                 <button 
                   onClick={cancelEdit}
-                  className="px-4 py-2 bg-krcard hover:bg-krgray/20 border border-krborder text-krtext rounded-xl transition-colors backdrop-blur-sm"
+                  className="px-4 py-3 bg-krblack/50 text-krtext rounded-xl font-medium hover:bg-krblack/70 border border-krborder transition-colors"
                 >
                   Cancel
                 </button>
