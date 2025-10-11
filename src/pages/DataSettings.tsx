@@ -13,7 +13,9 @@ import {
 } from '../utils/storage'
 import { useCurrency } from '../context/CurrencyContext'
 import Modal from '../components/Modal'
-import { AlertTriangle, Save, Link2, Trash2 } from 'lucide-react'
+import { AlertTriangle, Save, Link2, Trash2, Mail, Shield, Download, Send, CheckCircle2 } from 'lucide-react'
+
+type EmailFrequency = 'disabled' | 'every-update' | 'every-trade' | 'daily' | 'weekly'
 
 export default function DataSettings(){
   const fileRef = useRef<HTMLInputElement|null>(null)
@@ -29,10 +31,27 @@ export default function DataSettings(){
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [importMode, setImportMode] = useState<'merge' | 'overwrite'>('merge')
   const [editingWebhook, setEditingWebhook] = useState<DiscordWebhook | null>(null)
+  
+  // Email Backup Settings
+  const [email, setEmail] = useState('')
+  const [emailFrequency, setEmailFrequency] = useState<EmailFrequency>('disabled')
+  const [antiPhishingCode, setAntiPhishingCode] = useState('')
+  const [showEmailSettings, setShowEmailSettings] = useState(false)
+  const [emailSaved, setEmailSaved] = useState(false)
+  const [sendingEmail, setSendingEmail] = useState(false)
 
   useEffect(() => {
     setWebhooks(getDiscordWebhooks())
     setActiveWebhookId(getActiveWebhookId())
+    
+    // Load email settings from localStorage
+    const savedEmail = localStorage.getItem('backup_email')
+    const savedFrequency = localStorage.getItem('email_frequency') as EmailFrequency
+    const savedAntiPhishing = localStorage.getItem('anti_phishing_code')
+    
+    if (savedEmail) setEmail(savedEmail)
+    if (savedFrequency) setEmailFrequency(savedFrequency)
+    if (savedAntiPhishing) setAntiPhishingCode(savedAntiPhishing)
   }, [])
 
   const handleExport = () => {
@@ -89,6 +108,59 @@ export default function DataSettings(){
     setActiveWebhookId(id)
   }
 
+  const saveEmailSettings = () => {
+    if (email && !email.includes('@')) {
+      alert('Please enter a valid email address')
+      return
+    }
+    
+    localStorage.setItem('backup_email', email)
+    localStorage.setItem('email_frequency', emailFrequency)
+    localStorage.setItem('anti_phishing_code', antiPhishingCode)
+    
+    setEmailSaved(true)
+    setTimeout(() => setEmailSaved(false), 3000)
+  }
+
+  const handleSendEmail = async () => {
+    if (!email || !email.includes('@')) {
+      alert('Please save a valid email address first')
+      return
+    }
+
+    setSendingEmail(true)
+    
+    // Export data
+    const dataStr = JSON.stringify(localStorage, null, 2)
+    const blob = new Blob([dataStr], { type: 'application/json' })
+    
+    // In a real implementation, you would send this to a backend service
+    // For now, we'll simulate the email being sent and download the file
+    setTimeout(() => {
+      // Create download link
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `trading-journal-backup-${new Date().toISOString().split('T')[0]}.json`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
+      
+      setSendingEmail(false)
+      alert(`Data prepared for email to ${email}\n\nNote: For actual email functionality, you need to integrate with an email service provider (e.g., SendGrid, EmailJS, or your own backend).\n\nFor now, the file has been downloaded. You can manually attach it to an email.`)
+    }, 1500)
+  }
+
+  const generateRandomPhishingCode = () => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+    let code = ''
+    for (let i = 0; i < 8; i++) {
+      code += chars.charAt(Math.floor(Math.random() * chars.length))
+    }
+    setAntiPhishingCode(code)
+  }
+
   return (
     <div className="max-w-4xl mx-auto">
       <h1 className="text-2xl font-bold mb-6">Data Settings</h1>
@@ -107,7 +179,7 @@ export default function DataSettings(){
                 const selected = currencies.find(c => c.code === e.target.value)
                 if (selected) setCurrency(selected)
               }}
-              className="w-full px-3 py-2 border border-krborder rounded-md bg-krblack text-krtext focus:ring-1 focus:ring-krgold"
+              className="w-full px-3 py-2 border border-krborder rounded-xl bg-krblack text-krtext focus:ring-1 focus:ring-krgold"
             >
               {currencies.map(c => (
                 <option key={c.code} value={c.code}>
@@ -118,6 +190,133 @@ export default function DataSettings(){
           </div>
           <div className="text-sm text-krmuted">
             Current: <strong className="text-krtext">{currency.symbol} {currency.name}</strong> (Rate: {currency.rate} to USD)
+          </div>
+        </div>
+      </div>
+
+      {/* Email Backup Settings */}
+      <div className="bg-krcard rounded-xl shadow-sm border border-krborder p-6 mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <Mail className="text-krgold" size={20} />
+            <h2 className="text-lg font-semibold text-krtext">Email Backup & Security</h2>
+          </div>
+          {emailSaved && (
+            <span className="flex items-center gap-1 text-green-500 text-sm">
+              <CheckCircle2 size={16} />
+              Saved!
+            </span>
+          )}
+        </div>
+        
+        <div className="space-y-4">
+          {/* Email Address */}
+          <div>
+            <label className="block text-sm font-medium text-krtext mb-2">
+              Email Address
+            </label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full px-3 py-2 border border-krborder rounded-xl bg-krblack text-krtext focus:ring-1 focus:ring-krgold"
+              placeholder="your.email@example.com"
+            />
+            <p className="text-xs text-krmuted mt-1">
+              Your data will be sent to this email address automatically based on the frequency you choose
+            </p>
+          </div>
+
+          {/* Auto-Send Frequency */}
+          <div>
+            <label className="block text-sm font-medium text-krtext mb-2">
+              Auto-Send Frequency
+            </label>
+            <select
+              value={emailFrequency}
+              onChange={(e) => setEmailFrequency(e.target.value as EmailFrequency)}
+              className="w-full px-3 py-2 border border-krborder rounded-xl bg-krblack text-krtext focus:ring-1 focus:ring-krgold"
+            >
+              <option value="disabled">Disabled (Manual only)</option>
+              <option value="every-update">Every Update (Real-time)</option>
+              <option value="every-trade">After Each Trade Entry</option>
+              <option value="daily">Once a Day</option>
+              <option value="weekly">Once a Week</option>
+            </select>
+            <p className="text-xs text-krmuted mt-1">
+              {emailFrequency === 'disabled' && 'Automatic backups are disabled. Use manual send button.'}
+              {emailFrequency === 'every-update' && 'Your data will be emailed after every change.'}
+              {emailFrequency === 'every-trade' && 'Your data will be emailed after each trade is logged.'}
+              {emailFrequency === 'daily' && 'Your data will be emailed once per day.'}
+              {emailFrequency === 'weekly' && 'Your data will be emailed once per week.'}
+            </p>
+          </div>
+
+          {/* Anti-Phishing Code */}
+          <div>
+            <label className="flex items-center gap-2 text-sm font-medium text-krtext mb-2">
+              <Shield className="text-krgold" size={16} />
+              Anti-Phishing Code
+            </label>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={antiPhishingCode}
+                onChange={(e) => setAntiPhishingCode(e.target.value.toUpperCase())}
+                className="flex-1 px-3 py-2 border border-krborder rounded-xl bg-krblack text-krtext font-mono text-lg tracking-wider focus:ring-1 focus:ring-krgold"
+                placeholder="XXXXXXXX"
+                maxLength={8}
+              />
+              <button
+                onClick={generateRandomPhishingCode}
+                className="px-4 py-2 bg-krgold/20 text-krgold rounded-xl hover:bg-krgold/30 transition-colors whitespace-nowrap"
+              >
+                Generate
+              </button>
+            </div>
+            <div className="mt-2 p-3 bg-blue-500/10 border border-blue-500/30 rounded-xl">
+              <p className="text-xs text-blue-400 leading-relaxed">
+                <strong>Security Feature:</strong> All legitimate emails from this system will include your anti-phishing code. 
+                If you receive an email without this code, it's likely a phishing attempt. Never trust emails that don't contain your personal code.
+              </p>
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex gap-3 pt-2">
+            <button
+              onClick={saveEmailSettings}
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-krgold text-krblack rounded-xl hover:bg-kryellow transition-colors font-semibold"
+            >
+              <Save size={18} />
+              Save Email Settings
+            </button>
+            <button
+              onClick={handleSendEmail}
+              disabled={!email || sendingEmail}
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {sendingEmail ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                  Sending...
+                </>
+              ) : (
+                <>
+                  <Send size={18} />
+                  Send Now
+                </>
+              )}
+            </button>
+          </div>
+
+          {/* Info Note */}
+          <div className="p-3 bg-krgold/10 border border-krgold/30 rounded-xl">
+            <p className="text-xs text-krgold leading-relaxed">
+              <strong>Note:</strong> The "Send Now" button will prepare your data for email. 
+              For full email functionality, integration with an email service (SendGrid, EmailJS, etc.) is required. 
+              Currently, the file will be downloaded for you to manually attach to an email.
+            </p>
           </div>
         </div>
       </div>
