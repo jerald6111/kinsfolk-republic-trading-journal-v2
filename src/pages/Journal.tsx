@@ -125,7 +125,7 @@ export default function Journal() {
               />
             </div>
 
-            {/* Type and Position */}
+            {/* Type and Position/Margin Cost */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">
                 <label className="block text-sm font-medium text-krtext">Type</label>
@@ -140,18 +140,33 @@ export default function Journal() {
                 </select>
               </div>
               
-              <div className="space-y-1">
-                <label className="block text-sm font-medium text-krtext">Position</label>
-                <select
-                  value={form.position}
-                  onChange={e => setForm({...form, position: e.target.value as TradePosition})}
-                  className="w-full px-3 py-2 border border-krborder rounded-md bg-transparent text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
-                >
-                  {POSITIONS.map(pos => (
-                    <option key={pos} value={pos}>{pos}</option>
-                  ))}
-                </select>
-              </div>
+              {/* Position (only for Futures) */}
+              {form.type === 'Futures' ? (
+                <div className="space-y-1">
+                  <label className="block text-sm font-medium text-krtext">Position</label>
+                  <select
+                    value={form.position}
+                    onChange={e => setForm({...form, position: e.target.value as TradePosition})}
+                    className="w-full px-3 py-2 border border-krborder rounded-md bg-transparent text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
+                  >
+                    {POSITIONS.map(pos => (
+                      <option key={pos} value={pos}>{pos}</option>
+                    ))}
+                  </select>
+                </div>
+              ) : (
+                /* Margin Cost (for Spot) */
+                <div className="space-y-1">
+                  <label className="block text-sm font-medium text-krtext">Margin Cost</label>
+                  <input
+                    type="number"
+                    className="w-full px-3 py-2 border border-krborder rounded-md bg-transparent text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
+                    value={form.marginCost || ''}
+                    onChange={e => setForm({...form, marginCost: Number(e.target.value)})}
+                    placeholder="Enter margin cost"
+                  />
+                </div>
+              )}
             </div>
 
             {/* Entry Date and Entry Price */}
@@ -193,27 +208,25 @@ export default function Journal() {
               />
             </div>
 
-            {/* Leverage (only show for Futures) */}
+            {/* Leverage and Margin Cost (only show for Futures) */}
             {form.type === 'Futures' && (
-              <Select
-                label="Leverage"
-                value={form.leverage || 1}
-                onChange={lev => setForm({...form, leverage: Number(lev)})}
-                options={LEVERAGE_OPTIONS.map(l => ({ value: l, label: `${l}x` }))}
-              />
-            )}
-
-            {/* Margin Cost (only show for Futures) */}
-            {form.type === 'Futures' && (
-              <div className="space-y-1">
-                <label className="block text-sm font-medium text-krtext">Margin Cost</label>
-                <input
-                  type="number"
-                  className="w-full px-3 py-2 border border-krborder rounded-md bg-transparent text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
-                  value={form.marginCost || ''}
-                  onChange={e => setForm({...form, marginCost: Number(e.target.value)})}
-                  placeholder="Enter margin cost"
+              <div className="grid grid-cols-2 gap-4">
+                <Select
+                  label="Leverage"
+                  value={form.leverage || 1}
+                  onChange={lev => setForm({...form, leverage: Number(lev)})}
+                  options={LEVERAGE_OPTIONS.map(l => ({ value: l, label: `${l}x` }))}
                 />
+                <div className="space-y-1">
+                  <label className="block text-sm font-medium text-krtext">Margin Cost</label>
+                  <input
+                    type="number"
+                    className="w-full px-3 py-2 border border-krborder rounded-md bg-transparent text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
+                    value={form.marginCost || ''}
+                    onChange={e => setForm({...form, marginCost: Number(e.target.value)})}
+                    placeholder="Enter margin cost"
+                  />
+                </div>
               </div>
             )}
 
@@ -413,10 +426,12 @@ export default function Journal() {
                   <label className="block text-sm font-medium text-gray-400 mb-1">Type</label>
                   <div className="text-krtext">{viewingTrade.type} {viewingTrade.type === 'Futures' ? `${viewingTrade.leverage}x` : ''}</div>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-1">Position</label>
-                  <div className="text-krtext">{viewingTrade.position}</div>
-                </div>
+                {viewingTrade.type === 'Futures' && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-400 mb-1">Position</label>
+                    <div className="text-krtext">{viewingTrade.position}</div>
+                  </div>
+                )}
                 <div>
                   <label className="block text-sm font-medium text-gray-400 mb-1">Objective</label>
                   <div className="text-krtext">{viewingTrade.objective}</div>
@@ -438,7 +453,7 @@ export default function Journal() {
                   <div className="text-krtext">{formatAmount(viewingTrade.exitPrice)}</div>
                   <div className="text-xs text-gray-400">{viewingTrade.exitDate} {viewingTrade.exitTime}</div>
                 </div>
-                {viewingTrade.type === 'Futures' && viewingTrade.marginCost > 0 && (
+                {viewingTrade.marginCost > 0 && (
                   <div>
                     <label className="block text-sm font-medium text-gray-400 mb-1">Margin Cost</label>
                     <div className="text-krtext">{formatAmount(viewingTrade.marginCost)}</div>
