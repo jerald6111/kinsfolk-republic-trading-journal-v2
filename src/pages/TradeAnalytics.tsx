@@ -951,6 +951,43 @@ export default function TradeAnalytics() {
                         </svg>
                       </div>
                     </div>
+                    
+                    {/* Drawdown Statistics */}
+                    {(() => {
+                      // Calculate drawdown
+                      let peak = walletBalance
+                      let maxDrawdown = 0
+                      let currentDrawdown = 0
+                      
+                      points.forEach(point => {
+                        if (point.cumulative > peak) {
+                          peak = point.cumulative
+                        }
+                        currentDrawdown = peak > 0 ? ((peak - point.cumulative) / peak) * 100 : 0
+                        if (currentDrawdown > maxDrawdown) {
+                          maxDrawdown = currentDrawdown
+                        }
+                      })
+                      
+                      // Current drawdown
+                      const currentPeak = Math.max(...points.map(p => p.cumulative), walletBalance)
+                      const currentDD = currentPeak > 0 ? ((currentPeak - currentBalance) / currentPeak) * 100 : 0
+                      
+                      return (
+                        <div className="grid grid-cols-2 gap-2 mt-3">
+                          <div className="bg-krblack/30 rounded-lg p-2">
+                            <div className="text-xs text-gray-400">Max Drawdown</div>
+                            <div className="text-sm font-bold text-red-400">-{maxDrawdown.toFixed(2)}%</div>
+                          </div>
+                          <div className="bg-krblack/30 rounded-lg p-2">
+                            <div className="text-xs text-gray-400">Current Drawdown</div>
+                            <div className={`text-sm font-bold ${currentDD > 0 ? 'text-red-400' : 'text-green-400'}`}>
+                              {currentDD > 0 ? `-${currentDD.toFixed(2)}%` : '0.00%'}
+                            </div>
+                          </div>
+                        </div>
+                      )
+                    })()}
                   </>
                 )
               })()}
