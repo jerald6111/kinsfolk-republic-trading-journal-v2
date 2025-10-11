@@ -14,6 +14,7 @@ import DataMarket from './pages/DataMarket'
 import DataSettings from './pages/DataSettings'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
+import FloatingSupportButton from './components/FloatingSupportButton'
 import { CurrencyProvider } from './context/CurrencyContext'
 
 export default function App() {
@@ -48,6 +49,7 @@ export default function App() {
           </div>
         )}
         <Footer />
+        <FloatingSupportButton />
       </div>
     </CurrencyProvider>
   )
