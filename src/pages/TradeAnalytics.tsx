@@ -641,6 +641,131 @@ export default function TradeAnalytics() {
         </div>
       )}
 
+      {/* Risk Management Metrics */}
+      <div className="bg-krcard backdrop-blur-sm rounded-xl border border-krborder p-6 mb-8">
+        <div className="flex items-center gap-3 mb-4">
+          <Shield className="text-krgold" size={24} />
+          <h2 className="text-xl font-semibold">Risk Management</h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          {/* Average Risk per Trade */}
+          <div className="bg-krblack/30 rounded-lg p-4">
+            <div className="text-sm text-gray-400 mb-2">Avg Risk per Trade</div>
+            <div className="text-xl font-bold text-krtext">
+              {journal.length > 0
+                ? formatAmount(journal.reduce((s: number, j: any) => s + (j.marginCost || 0), 0) / journal.length)
+                : '$0.00'}
+            </div>
+            <div className="text-xs text-gray-500 mt-1">
+              {totalDeposits > 0 && journal.length > 0
+                ? `${((journal.reduce((s: number, j: any) => s + (j.marginCost || 0), 0) / journal.length / totalDeposits) * 100).toFixed(2)}% of capital`
+                : 'No data'}
+            </div>
+          </div>
+
+          {/* Risk Consistency Score */}
+          <div className="bg-krblack/30 rounded-lg p-4">
+            <div className="text-sm text-gray-400 mb-2">Risk Consistency</div>
+            <div className="text-xl font-bold text-krtext">
+              {(() => {
+                const marginCosts = journal.map((j: any) => j.marginCost || 0).filter(m => m > 0)
+                if (marginCosts.length < 2) return 'N/A'
+                const avg = marginCosts.reduce((a, b) => a + b, 0) / marginCosts.length
+                const variance = marginCosts.reduce((sum, val) => sum + Math.pow(val - avg, 2), 0) / marginCosts.length
+                const stdDev = Math.sqrt(variance)
+                const cv = avg > 0 ? (stdDev / avg) * 100 : 0
+                const score = Math.max(0, 100 - cv)
+                return `${score.toFixed(0)}%`
+              })()}
+            </div>
+            <div className="text-xs text-gray-500 mt-1">
+              {(() => {
+                const marginCosts = journal.map((j: any) => j.marginCost || 0).filter(m => m > 0)
+                if (marginCosts.length < 2) return 'Need more trades'
+                const avg = marginCosts.reduce((a, b) => a + b, 0) / marginCosts.length
+                const variance = marginCosts.reduce((sum, val) => sum + Math.pow(val - avg, 2), 0) / marginCosts.length
+                const stdDev = Math.sqrt(variance)
+                const cv = avg > 0 ? (stdDev / avg) * 100 : 0
+                const score = Math.max(0, 100 - cv)
+                return score >= 70 ? 'Consistent' : score >= 50 ? 'Moderate' : 'Inconsistent'
+              })()}
+            </div>
+          </div>
+
+          {/* Reward-to-Risk Ratio */}
+          <div className="bg-krblack/30 rounded-lg p-4">
+            <div className="text-sm text-gray-400 mb-2">Reward-to-Risk</div>
+            <div className="text-xl font-bold text-krgold">
+              {(() => {
+                const avgRisk = journal.length > 0
+                  ? journal.reduce((s: number, j: any) => s + (j.marginCost || 0), 0) / journal.length
+                  : 0
+                const avgReward = totalTrades > 0 ? totalPnl / totalTrades : 0
+                const ratio = avgRisk > 0 ? Math.abs(avgReward / avgRisk) : 0
+                return ratio.toFixed(2)
+              })()}
+            </div>
+            <div className="text-xs text-gray-500 mt-1">
+              {(() => {
+                const avgRisk = journal.length > 0
+                  ? journal.reduce((s: number, j: any) => s + (j.marginCost || 0), 0) / journal.length
+                  : 0
+                const avgReward = totalTrades > 0 ? totalPnl / totalTrades : 0
+                const ratio = avgRisk > 0 ? Math.abs(avgReward / avgRisk) : 0
+                return ratio >= 2 ? 'Excellent' : ratio >= 1 ? 'Good' : 'Poor'
+              })()}
+            </div>
+          </div>
+
+          {/* Win/Loss Consistency */}
+          <div className="bg-krblack/30 rounded-lg p-4">
+            <div className="text-sm text-gray-400 mb-2">PnL Consistency</div>
+            <div className="text-xl font-bold text-krtext">
+              {(() => {
+                const pnls = journal.map((j: any) => (j.pnlAmount || 0) - (j.fee || 0))
+                if (pnls.length < 2) return 'N/A'
+                const avg = pnls.reduce((a, b) => a + b, 0) / pnls.length
+                const variance = pnls.reduce((sum, val) => sum + Math.pow(val - avg, 2), 0) / pnls.length
+                const stdDev = Math.sqrt(variance)
+                return formatAmount(stdDev)
+              })()}
+            </div>
+            <div className="text-xs text-gray-500 mt-1">Std deviation</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Exposure by Pair/Coin */}
+      <div className="bg-krcard backdrop-blur-sm rounded-xl border border-krborder p-6 mb-8">
+        <h2 className="text-xl font-semibold mb-4">Exposure by Pair</h2>
+        <div className="space-y-2">
+          {Object.entries(tickerPerformance)
+            .sort(([, a]: any, [, b]: any) => b.trades - a.trades)
+            .slice(0, 10)
+            .map(([ticker, stats]: any, index) => {
+              const maxTrades = Object.values(tickerPerformance).reduce((max: number, s: any) => Math.max(max, s.trades), 0)
+              const percentage = (stats.trades / totalTrades) * 100
+              return (
+                <div key={ticker} className="bg-krblack/30 rounded-lg p-3">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-semibold">{ticker}</span>
+                    <div className="text-sm">
+                      <span className="text-gray-400">{stats.trades} trades </span>
+                      <span className="text-gray-500">({percentage.toFixed(1)}%)</span>
+                    </div>
+                  </div>
+                  <div className="relative h-2 bg-krblack rounded-full overflow-hidden">
+                    <div
+                      className="absolute top-0 left-0 h-full bg-gradient-to-r from-krgold to-kryellow"
+                      style={{ width: `${percentage}%` }}
+                    />
+                  </div>
+                </div>
+              )
+            })}
+        </div>
+      </div>
+
       {/* Top Performers */}
       <div className="bg-krcard backdrop-blur-sm rounded-xl border border-krborder p-6 mb-8">
         <h2 className="text-xl font-semibold mb-4">Top 5 Performing Pairs</h2>
