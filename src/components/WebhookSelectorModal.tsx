@@ -11,9 +11,26 @@ type WebhookSelectorModalProps = {
 }
 
 export default function WebhookSelectorModal({ isOpen, onClose, onSelect }: WebhookSelectorModalProps) {
-  const webhooks = getDiscordWebhooks()
-  const activeWebhookId = getActiveWebhookId()
+  const [webhooks, setWebhooks] = useState<DiscordWebhook[]>([])
+  const [activeWebhookId, setActiveWebhookIdState] = useState('')
   const [selectedWebhookId, setSelectedWebhookId] = useState<string | null>(null)
+
+  // Load webhooks when modal opens
+  React.useEffect(() => {
+    if (isOpen) {
+      const loadedWebhooks = getDiscordWebhooks()
+      const loadedActiveId = getActiveWebhookId()
+      setWebhooks(loadedWebhooks)
+      setActiveWebhookIdState(loadedActiveId)
+      
+      // Set initial selection
+      if (loadedActiveId && loadedWebhooks.find(w => w.id === loadedActiveId)) {
+        setSelectedWebhookId(loadedActiveId)
+      } else if (loadedWebhooks.length > 0) {
+        setSelectedWebhookId(loadedWebhooks[0].id)
+      }
+    }
+  }, [isOpen])
 
   // Function to mask webhook URL - show only last 4 characters
   const maskWebhookUrl = (url: string) => {
@@ -28,16 +45,10 @@ export default function WebhookSelectorModal({ isOpen, onClose, onSelect }: Webh
     return 0
   })
 
-  // Auto-select the active webhook when modal opens (as default suggestion)
-  React.useEffect(() => {
-    if (isOpen) {
-      if (activeWebhookId && webhooks.find(w => w.id === activeWebhookId)) {
-        setSelectedWebhookId(activeWebhookId)
-      } else if (webhooks.length > 0) {
-        setSelectedWebhookId(webhooks[0].id)
-      }
-    }
-  }, [isOpen, webhooks, activeWebhookId])
+  const handleWebhookClick = (webhookId: string) => {
+    console.log('Webhook clicked:', webhookId)
+    setSelectedWebhookId(webhookId)
+  }
 
   const handleConfirm = () => {
     if (selectedWebhookId) {
@@ -79,7 +90,11 @@ export default function WebhookSelectorModal({ isOpen, onClose, onSelect }: Webh
           {sortedWebhooks.map((webhook: DiscordWebhook) => (
             <button
               key={webhook.id}
-              onClick={() => setSelectedWebhookId(webhook.id)}
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                handleWebhookClick(webhook.id)
+              }}
               type="button"
               className={`w-full p-4 text-left rounded-lg border transition-all cursor-pointer ${
                 selectedWebhookId === webhook.id
@@ -87,7 +102,7 @@ export default function WebhookSelectorModal({ isOpen, onClose, onSelect }: Webh
                   : 'border-krborder hover:border-krgold/50 hover:bg-krgold/5'
               }`}
             >
-              <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center justify-between gap-3 pointer-events-none">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <div className="font-medium text-krwhite">{webhook.name}</div>
