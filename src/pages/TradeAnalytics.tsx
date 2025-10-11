@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { loadData } from '../utils/storage'
-import { BarChart3, TrendingUp, TrendingDown, Activity, DollarSign, Percent, Target, Calendar, ChevronLeft, ChevronRight, X } from 'lucide-react'
+import { BarChart3, TrendingUp, TrendingDown, Activity, DollarSign, Percent, Target, Calendar, ChevronLeft, ChevronRight, X, Info, Clock, Flame, Shield } from 'lucide-react'
 import { useCurrency } from '../context/CurrencyContext'
 
 export default function TradeAnalytics() {
@@ -13,6 +13,7 @@ export default function TradeAnalytics() {
   const [currentDate, setCurrentDate] = useState(new Date())
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
   const [showModal, setShowModal] = useState(false)
+  const [showDurationInfo, setShowDurationInfo] = useState(false)
   
   const totalTrades = journal.length
   const wins = journal.filter(j => j.pnlAmount > 0).length
@@ -36,6 +37,110 @@ export default function TradeAnalytics() {
   const currentBalance = walletBalance + totalPnl
   // ROI = ((Current Balance - Total Deposits + Total Withdrawals) / Total Deposits) × 100
   const roi = totalDeposits > 0 ? ((currentBalance - totalDeposits + totalWithdrawals) / totalDeposits) * 100 : 0
+
+  // Calculate Average Trade Duration
+  const tradeDurations = journal.map((j: any) => {
+    const entryTime = new Date(`${j.date} ${j.time || '00:00:00'}`).getTime()
+    const exitTime = new Date(`${j.exitDate || j.date} ${j.exitTime || j.time || '00:00:00'}`).getTime()
+    return exitTime - entryTime
+  }).filter(d => d > 0)
+  const avgDuration = tradeDurations.length > 0 ? tradeDurations.reduce((a, b) => a + b, 0) / tradeDurations.length : 0
+  const avgDurationHours = avgDuration / (1000 * 60 * 60)
+  const avgDurationDays = avgDurationHours / 24
+
+  // Determine trader type based on average duration
+  const getTraderType = (hours: number) => {
+    if (hours < 1) return { type: 'Scalper', color: 'text-purple-400' }
+    if (hours < 24) return { type: 'Day Trader', color: 'text-blue-400' }
+    if (hours < 168) return { type: 'Swing Trader', color: 'text-green-400' }
+    return { type: 'Position Trader', color: 'text-orange-400' }
+  }
+  const traderType = getTraderType(avgDurationHours)
+
+  // Calculate Win/Loss Streaks
+  const calculateStreaks = () => {
+    let currentStreak = 0
+    let longestWinStreak = 0
+    let longestLossStreak = 0
+    let currentWinStreak = 0
+    let currentLossStreak = 0
+
+    // Sort trades by exit date/time
+    const sortedTrades = [...journal].sort((a, b) => {
+      const dateA = new Date(`${a.exitDate || a.date} ${a.exitTime || a.time}`).getTime()
+      const dateB = new Date(`${b.exitDate || b.date} ${b.exitTime || b.time}`).getTime()
+      return dateA - dateB
+    })
+
+    sortedTrades.forEach((trade: any) => {
+      const netPnl = (trade.pnlAmount || 0) - (trade.fee || 0)
+      
+      if (netPnl > 0) {
+        currentWinStreak++
+        currentLossStreak = 0
+        longestWinStreak = Math.max(longestWinStreak, currentWinStreak)
+      } else if (netPnl < 0) {
+        currentLossStreak++
+        currentWinStreak = 0
+        longestLossStreak = Math.max(longestLossStreak, currentLossStreak)
+      }
+    })
+
+    // Current streak
+    if (sortedTrades.length > 0) {
+      const lastTrade = sortedTrades[sortedTrades.length - 1]
+      const lastNetPnl = (lastTrade.pnlAmount || 0) - (lastTrade.fee || 0)
+      currentStreak = lastNetPnl > 0 ? currentWinStreak : lastNetPnl < 0 ? -currentLossStreak : 0
+    }
+
+    return { currentStreak, longestWinStreak, longestLossStreak }
+  }
+  const streaks = calculateStreaks()
+
+  // Setup Performance Breakdown
+  const setupPerformance = journal.reduce((acc: any, trade: any) => {
+    const setup = trade.setup || 'Unknown'
+    if (!acc[setup]) {
+      acc[setup] = { trades: 0, wins: 0, losses: 0, totalPnl: 0 }
+    }
+    acc[setup].trades++
+    const netPnl = (trade.pnlAmount || 0) - (trade.fee || 0)
+    acc[setup].totalPnl += netPnl
+    if (netPnl > 0) acc[setup].wins++
+    else if (netPnl < 0) acc[setup].losses++
+    return acc
+  }, {})
+
+  const topSetups = Object.entries(setupPerformance)
+    .map(([setup, stats]: any) => ({
+      setup,
+      ...stats,
+      winRate: stats.trades > 0 ? (stats.wins / stats.trades) * 100 : 0,
+      avgPnl: stats.trades > 0 ? stats.totalPnl / stats.trades : 0
+    }))
+    .sort((a, b) => b.totalPnl - a.totalPnl)
+    .slice(0, 5)
+
+  // Leverage Usage Analysis
+  const leverageData = journal
+    .filter((j: any) => j.type === 'Futures' && j.leverage)
+    .reduce((acc: any, trade: any) => {
+      const lev = trade.leverage
+      if (!acc[lev]) {
+        acc[lev] = { count: 0, totalPnl: 0, wins: 0, losses: 0 }
+      }
+      acc[lev].count++
+      const netPnl = (trade.pnlAmount || 0) - (trade.fee || 0)
+      acc[lev].totalPnl += netPnl
+      if (netPnl > 0) acc[lev].wins++
+      else if (netPnl < 0) acc[lev].losses++
+      return acc
+    }, {})
+
+  const avgLeverage = journal.filter((j: any) => j.type === 'Futures' && j.leverage).length > 0
+    ? journal.filter((j: any) => j.type === 'Futures' && j.leverage).reduce((s: number, j: any) => s + (j.leverage || 0), 0) /
+      journal.filter((j: any) => j.type === 'Futures' && j.leverage).length
+    : 0
 
   // Group trades by ticker
   const tickerPerformance = journal.reduce((acc: any, trade) => {
@@ -81,7 +186,8 @@ export default function TradeAnalytics() {
   const getPnlForDate = (date: Date) => {
     const dateStr = date.toISOString().split('T')[0]
     const dayTrades = journal.filter((j: any) => {
-      const tradeDate = new Date(j.date).toISOString().split('T')[0]
+      // Use exitDate for PnL calculation - trades appear when closed, not opened
+      const tradeDate = j.exitDate ? new Date(j.exitDate).toISOString().split('T')[0] : new Date(j.date).toISOString().split('T')[0]
       return tradeDate === dateStr
     })
     // Subtract fees from PnL for each trade
@@ -380,6 +486,161 @@ export default function TradeAnalytics() {
         </div>
       </div>
 
+      {/* New Analytics Metrics - Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        {/* Average Trade Duration */}
+        <div className="bg-krcard backdrop-blur-sm rounded-xl border border-krborder p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Clock className="text-blue-400" size={20} />
+            <h2 className="text-lg font-semibold">Avg Trade Duration</h2>
+            <button
+              onClick={() => setShowDurationInfo(!showDurationInfo)}
+              className="ml-auto p-1 hover:bg-krgold/20 rounded-full transition-colors"
+            >
+              <Info size={16} className="text-gray-400" />
+            </button>
+          </div>
+          <div className={`text-2xl font-bold ${traderType.color} mb-2`}>
+            {avgDurationDays >= 1
+              ? `${avgDurationDays.toFixed(1)}d`
+              : `${avgDurationHours.toFixed(1)}h`}
+          </div>
+          <div className="text-sm text-gray-400">{traderType.type}</div>
+          {showDurationInfo && (
+            <div className="mt-3 p-3 bg-krblack/30 rounded-lg text-xs space-y-1">
+              <div><strong className="text-purple-400">Scalper:</strong> &lt;1 hour</div>
+              <div><strong className="text-blue-400">Day Trader:</strong> &lt;24 hours</div>
+              <div><strong className="text-green-400">Swing Trader:</strong> 1-7 days</div>
+              <div><strong className="text-orange-400">Position Trader:</strong> &gt;7 days</div>
+            </div>
+          )}
+        </div>
+
+        {/* Current Streak */}
+        <div className="bg-krcard backdrop-blur-sm rounded-xl border border-krborder p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Flame className={streaks.currentStreak > 0 ? 'text-green-500' : 'text-red-500'} size={20} />
+            <h2 className="text-lg font-semibold">Current Streak</h2>
+          </div>
+          <div className={`text-2xl font-bold mb-2 ${streaks.currentStreak > 0 ? 'text-green-500' : streaks.currentStreak < 0 ? 'text-red-500' : 'text-gray-400'}`}>
+            {streaks.currentStreak > 0 ? `+${streaks.currentStreak}` : streaks.currentStreak}
+          </div>
+          <div className="text-sm text-gray-400">
+            {streaks.currentStreak > 0 ? 'Wins' : streaks.currentStreak < 0 ? 'Losses' : 'No streak'}
+          </div>
+        </div>
+
+        {/* Longest Win Streak */}
+        <div className="bg-krcard backdrop-blur-sm rounded-xl border border-krborder p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <TrendingUp className="text-green-500" size={20} />
+            <h2 className="text-lg font-semibold">Best Win Streak</h2>
+          </div>
+          <div className="text-2xl font-bold text-green-500 mb-2">
+            {streaks.longestWinStreak}
+          </div>
+          <div className="text-sm text-gray-400">Consecutive wins</div>
+        </div>
+
+        {/* Longest Loss Streak */}
+        <div className="bg-krcard backdrop-blur-sm rounded-xl border border-krborder p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <TrendingDown className="text-red-500" size={20} />
+            <h2 className="text-lg font-semibold">Worst Loss Streak</h2>
+          </div>
+          <div className="text-2xl font-bold text-red-500 mb-2">
+            {streaks.longestLossStreak}
+          </div>
+          <div className="text-sm text-gray-400">Consecutive losses</div>
+        </div>
+      </div>
+
+      {/* Setup Performance Breakdown */}
+      {topSetups.length > 0 && (
+        <div className="bg-krcard backdrop-blur-sm rounded-xl border border-krborder p-6 mb-8">
+          <h2 className="text-xl font-semibold mb-4">Setup Performance Breakdown</h2>
+          <div className="space-y-3">
+            {topSetups.map((setup: any, index) => (
+              <div key={index} className="bg-krblack/30 rounded-lg p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="font-semibold text-lg">{setup.setup}</div>
+                  <div className={`text-xl font-bold ${setup.totalPnl >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                    {formatAmount(setup.totalPnl)}
+                  </div>
+                </div>
+                <div className="grid grid-cols-4 gap-4 text-sm">
+                  <div>
+                    <div className="text-gray-400">Trades</div>
+                    <div className="font-medium">{setup.trades}</div>
+                  </div>
+                  <div>
+                    <div className="text-gray-400">Win Rate</div>
+                    <div className={`font-medium ${setup.winRate >= 50 ? 'text-green-400' : 'text-red-400'}`}>
+                      {setup.winRate.toFixed(1)}%
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-gray-400">Avg P&L</div>
+                    <div className={`font-medium ${setup.avgPnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                      {formatAmount(setup.avgPnl)}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-gray-400">W/L</div>
+                    <div className="font-medium">{setup.wins}/{setup.losses}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Leverage Usage Heatmap */}
+      {Object.keys(leverageData).length > 0 && (
+        <div className="bg-krcard backdrop-blur-sm rounded-xl border border-krborder p-6 mb-8">
+          <h2 className="text-xl font-semibold mb-4">Leverage Usage & PnL Correlation</h2>
+          <div className="mb-4 text-sm text-gray-400">
+            Average Leverage: <span className="text-krtext font-semibold">{avgLeverage.toFixed(1)}x</span>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+            {Object.entries(leverageData)
+              .sort(([a], [b]) => Number(a) - Number(b))
+              .map(([leverage, stats]: any) => {
+                const winRate = stats.count > 0 ? (stats.wins / stats.count) * 100 : 0
+                const avgPnl = stats.count > 0 ? stats.totalPnl / stats.count : 0
+                const intensity = Math.min(stats.count / 5, 1) // Max out at 5 trades for color intensity
+                
+                return (
+                  <div
+                    key={leverage}
+                    className="bg-krblack/30 rounded-lg p-3 border-2"
+                    style={{
+                      borderColor: avgPnl >= 0
+                        ? `rgba(34, 197, 94, ${0.2 + intensity * 0.6})`
+                        : `rgba(239, 68, 68, ${0.2 + intensity * 0.6})`,
+                      backgroundColor: avgPnl >= 0
+                        ? `rgba(34, 197, 94, ${0.05 + intensity * 0.15})`
+                        : `rgba(239, 68, 68, ${0.05 + intensity * 0.15})`
+                    }}
+                  >
+                    <div className="text-lg font-bold text-krtext mb-1">{leverage}x</div>
+                    <div className="text-xs space-y-1">
+                      <div className="text-gray-400">{stats.count} trades</div>
+                      <div className={winRate >= 50 ? 'text-green-400' : 'text-red-400'}>
+                        {winRate.toFixed(0)}% WR
+                      </div>
+                      <div className={avgPnl >= 0 ? 'text-green-400' : 'text-red-400'}>
+                        {formatAmount(avgPnl)} avg
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+          </div>
+        </div>
+      )}
+
       {/* Top Performers */}
       <div className="bg-krcard backdrop-blur-sm rounded-xl border border-krborder p-6 mb-8">
         <h2 className="text-xl font-semibold mb-4">Top 5 Performing Pairs</h2>
@@ -445,19 +706,195 @@ export default function TradeAnalytics() {
         {calendarView === 'monthly' ? renderMonthlyCalendar() : renderWeeklyCalendar()}
       </div>
 
-      {/* Placeholder for charts */}
-      <div className="grid md:grid-cols-2 gap-6">
+      {/* Visualization Charts */}
+      <div className="grid md:grid-cols-2 gap-6 mb-8">
+        {/* PnL Over Time - Equity Curve */}
         <div className="bg-krcard backdrop-blur-sm rounded-xl border border-krborder p-6">
-          <h2 className="text-lg font-semibold mb-4">PnL Over Time</h2>
-          <div className="bg-krblack/30 rounded-lg p-8 text-center text-gray-400">
-            Chart visualization coming soon
-          </div>
+          <h2 className="text-lg font-semibold mb-4">PnL Over Time (Equity Curve)</h2>
+          {journal.length === 0 ? (
+            <div className="bg-krblack/30 rounded-lg p-8 text-center text-gray-400">
+              No trading data available
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {/* Build cumulative PnL over time */}
+              {(() => {
+                // Sort trades by exit date/time
+                const sortedTrades = [...journal].sort((a, b) => {
+                  const dateA = new Date(`${a.exitDate || a.date} ${a.exitTime || a.time}`).getTime()
+                  const dateB = new Date(`${b.exitDate || b.date} ${b.exitTime || b.time}`).getTime()
+                  return dateA - dateB
+                })
+                
+                let cumulative = walletBalance
+                const points = sortedTrades.map((trade, idx) => {
+                  const netPnl = (trade.pnlAmount || 0) - (trade.fee || 0)
+                  cumulative += netPnl
+                  return { cumulative, trade, idx }
+                })
+                
+                const maxPnl = Math.max(...points.map(p => p.cumulative), walletBalance)
+                const minPnl = Math.min(...points.map(p => p.cumulative), walletBalance)
+                const range = maxPnl - minPnl || 1
+                
+                return (
+                  <>
+                    <div className="text-sm text-gray-400 mb-2">
+                      Starting Balance: {formatAmount(walletBalance)} → Current: {formatAmount(currentBalance)}
+                    </div>
+                    <div className="relative h-64 bg-krblack/30 rounded-lg p-4">
+                      {/* Y-axis labels */}
+                      <div className="absolute left-0 top-0 bottom-0 w-16 flex flex-col justify-between text-xs text-gray-500">
+                        <div>{formatAmount(maxPnl)}</div>
+                        <div>{formatAmount((maxPnl + minPnl) / 2)}</div>
+                        <div>{formatAmount(minPnl)}</div>
+                      </div>
+                      
+                      {/* Chart area */}
+                      <div className="ml-16 h-full relative">
+                        {/* Zero line */}
+                        {walletBalance >= minPnl && walletBalance <= maxPnl && (
+                          <div 
+                            className="absolute left-0 right-0 border-t border-gray-600 border-dashed"
+                            style={{ top: `${((maxPnl - walletBalance) / range) * 100}%` }}
+                          >
+                            <span className="text-xs text-gray-500 absolute -top-2 right-0">Start</span>
+                          </div>
+                        )}
+                        
+                        {/* Line chart */}
+                        <svg className="w-full h-full" preserveAspectRatio="none">
+                          {/* Draw line segments */}
+                          {points.map((point, i) => {
+                            if (i === 0) {
+                              // First segment from starting balance to first trade
+                              const x1 = 0
+                              const y1 = ((maxPnl - walletBalance) / range) * 100
+                              const x2 = (i + 1) / (points.length + 1) * 100
+                              const y2 = ((maxPnl - point.cumulative) / range) * 100
+                              const color = point.cumulative >= walletBalance ? '#22c55e' : '#ef4444'
+                              return (
+                                <line
+                                  key={i}
+                                  x1={`${x1}%`}
+                                  y1={`${y1}%`}
+                                  x2={`${x2}%`}
+                                  y2={`${y2}%`}
+                                  stroke={color}
+                                  strokeWidth="2"
+                                />
+                              )
+                            }
+                            const prev = points[i - 1]
+                            const x1 = i / (points.length + 1) * 100
+                            const y1 = ((maxPnl - prev.cumulative) / range) * 100
+                            const x2 = (i + 1) / (points.length + 1) * 100
+                            const y2 = ((maxPnl - point.cumulative) / range) * 100
+                            const color = point.cumulative >= prev.cumulative ? '#22c55e' : '#ef4444'
+                            return (
+                              <line
+                                key={i}
+                                x1={`${x1}%`}
+                                y1={`${y1}%`}
+                                x2={`${x2}%`}
+                                y2={`${y2}%`}
+                                stroke={color}
+                                strokeWidth="2"
+                              />
+                            )
+                          })}
+                          
+                          {/* Draw points */}
+                          {points.map((point, i) => {
+                            const x = (i + 1) / (points.length + 1) * 100
+                            const y = ((maxPnl - point.cumulative) / range) * 100
+                            const netPnl = (point.trade.pnlAmount || 0) - (point.trade.fee || 0)
+                            const color = netPnl >= 0 ? '#22c55e' : '#ef4444'
+                            return (
+                              <circle
+                                key={i}
+                                cx={`${x}%`}
+                                cy={`${y}%`}
+                                r="3"
+                                fill={color}
+                                className="hover:r-5 cursor-pointer transition-all"
+                              >
+                                <title>{point.trade.ticker}: {formatAmount(netPnl)}</title>
+                              </circle>
+                            )
+                          })}
+                        </svg>
+                      </div>
+                    </div>
+                  </>
+                )
+              })()}
+            </div>
+          )}
         </div>
+        
+        {/* Win/Loss Distribution */}
         <div className="bg-krcard backdrop-blur-sm rounded-xl border border-krborder p-6">
           <h2 className="text-lg font-semibold mb-4">Win/Loss Distribution</h2>
-          <div className="bg-krblack/30 rounded-lg p-8 text-center text-gray-400">
-            Chart visualization coming soon
-          </div>
+          {journal.length === 0 ? (
+            <div className="bg-krblack/30 rounded-lg p-8 text-center text-gray-400">
+              No trading data available
+            </div>
+          ) : (
+            <div className="h-64">
+              {(() => {
+                // Calculate distribution by PnL ranges
+                const ranges = [
+                  { label: '<-$100', min: -Infinity, max: -100, count: 0 },
+                  { label: '-$100--$50', min: -100, max: -50, count: 0 },
+                  { label: '-$50--$10', min: -50, max: -10, count: 0 },
+                  { label: '-$10-$0', min: -10, max: 0, count: 0 },
+                  { label: '$0-$10', min: 0, max: 10, count: 0 },
+                  { label: '$10-$50', min: 10, max: 50, count: 0 },
+                  { label: '$50-$100', min: 50, max: 100, count: 0 },
+                  { label: '>$100', min: 100, max: Infinity, count: 0 },
+                ]
+                
+                journal.forEach((trade: any) => {
+                  const netPnl = (trade.pnlAmount || 0) - (trade.fee || 0)
+                  const range = ranges.find(r => netPnl >= r.min && netPnl < r.max)
+                  if (range) range.count++
+                })
+                
+                const maxCount = Math.max(...ranges.map(r => r.count), 1)
+                
+                return (
+                  <div className="h-full flex flex-col">
+                    <div className="flex-1 flex items-end justify-around gap-1 bg-krblack/30 rounded-lg p-4">
+                      {ranges.map((range, idx) => {
+                        const height = (range.count / maxCount) * 100
+                        const isLoss = range.max <= 0
+                        return (
+                          <div key={idx} className="flex-1 flex flex-col items-center gap-1">
+                            <div className="text-xs text-gray-400">{range.count}</div>
+                            <div
+                              className={`w-full rounded-t transition-all hover:opacity-80 ${
+                                isLoss ? 'bg-red-500/70' : 'bg-green-500/70'
+                              }`}
+                              style={{ height: `${height}%`, minHeight: range.count > 0 ? '4px' : '0' }}
+                              title={`${range.label}: ${range.count} trades`}
+                            />
+                          </div>
+                        )
+                      })}
+                    </div>
+                    <div className="flex justify-around mt-2 text-xs text-gray-500">
+                      {ranges.map((range, idx) => (
+                        <div key={idx} className="flex-1 text-center truncate px-1" title={range.label}>
+                          {range.label}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )
+              })()}
+            </div>
+          )}
         </div>
       </div>
 
