@@ -81,13 +81,13 @@ export default function VisionBoard(){
           <input className="w-full mb-2 p-2 rounded bg-transparent text-krtext border border-krborder focus:border-krgold focus:ring-1 focus:ring-krgold" placeholder="Target amount" value={target} onChange={e=>setTarget(e.target.value)} />
           
           <select 
-            className="w-full mb-2 p-2 rounded bg-transparent text-krtext border border-krborder focus:border-krgold focus:ring-1 focus:ring-krgold" 
+            className="w-full mb-2 p-2 rounded-xl bg-krcard text-krtext border border-krborder focus:border-krgold focus:ring-1 focus:ring-krgold" 
             value={timeline} 
             onChange={e=>setTimeline(e.target.value as GoalTimeline)}
           >
-            <option value="Short Term (3-6 months)">Short Term (3-6 months)</option>
-            <option value="Mid Term (6-12 months)">Mid Term (6-12 months)</option>
-            <option value="Long Term (1-3 years)">Long Term (1-3 years)</option>
+            <option value="Short Term (3-6 months)" className="bg-krcard text-krtext">Short Term (3-6 months)</option>
+            <option value="Mid Term (6-12 months)" className="bg-krcard text-krtext">Mid Term (6-12 months)</option>
+            <option value="Long Term (1-3 years)" className="bg-krcard text-krtext">Long Term (1-3 years)</option>
           </select>
           
           <div className="mb-2">
