@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import FileUploader from '../components/FileUploader'
 import Modal from '../components/Modal'
-import { loadData, saveData } from '../utils/storage'
+import { loadData, saveData, triggerAutoEmailBackup } from '../utils/storage'
 import { Trash2, Edit2, CheckCircle2, X, Image as ImageIcon } from 'lucide-react'
 import { useCurrency } from '../context/CurrencyContext'
 
@@ -79,12 +79,14 @@ export default function VisionBoard(){
       )
       setItems(next)
       saveData({ vision: next })
+      triggerAutoEmailBackup('update')
       setEditingGoal(null)
     } else {
       const it = { id: Date.now(), title, desc, target, timeline, img, status: 'active' }
       const next = [it, ...items]
       setItems(next)
       saveData({ vision: next })
+      triggerAutoEmailBackup('add')
     }
     setTitle(''); setDesc(''); setTarget(''); setTimeline('Short Term (3-6 months)'); setImg('')
   }
@@ -113,6 +115,7 @@ export default function VisionBoard(){
     )
     setItems(next)
     saveData({ vision: next })
+    triggerAutoEmailBackup('update')
     setCompletedGoalTitle(completingGoal.title)
     setShowCompletionModal(false)
     setShowCongratsModal(true)
@@ -138,6 +141,7 @@ export default function VisionBoard(){
       const next = items.filter((it: any) => it.id !== id)
       setItems(next)
       saveData({ vision: next })
+      triggerAutoEmailBackup('delete')
     }
   }
 
@@ -154,6 +158,7 @@ export default function VisionBoard(){
       const next = items.filter((it: any) => it.id !== deletingAchievement.id)
       setItems(next)
       saveData({ vision: next })
+      triggerAutoEmailBackup('delete')
       setDeletingAchievement(null)
       setDeleteConfirmStep(0)
     }

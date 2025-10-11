@@ -197,3 +197,48 @@ export async function importData(file: File, { overwrite = false } = {}){
 export function deleteAllData(){
   localStorage.removeItem(KEY)
 }
+
+// Auto-send email backup functionality
+export async function triggerAutoEmailBackup(action: 'add' | 'delete' | 'update') {
+  const emailFrequency = localStorage.getItem('email_frequency')
+  const email = localStorage.getItem('backup_email')
+  const antiPhishingCode = localStorage.getItem('anti_phishing_code')
+  
+  // Don't send if disabled or no email configured
+  if (!emailFrequency || emailFrequency === 'disabled' || !email || !antiPhishingCode) {
+    return
+  }
+  
+  // Check if we should send based on frequency and action
+  let shouldSend = false
+  
+  if (emailFrequency === 'on-add' && action === 'add') {
+    shouldSend = true
+  } else if (emailFrequency === 'on-delete' && action === 'delete') {
+    shouldSend = true
+  } else if (emailFrequency === 'on-change' && (action === 'add' || action === 'delete' || action === 'update')) {
+    shouldSend = true
+  }
+  
+  if (!shouldSend) return
+  
+  try {
+    const dataStr = JSON.stringify(localStorage, null, 2)
+    const functionUrl = '/api/send-email'
+    
+    await fetch(functionUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email,
+        antiPhishingCode,
+        dataStr,
+        emailFrequency
+      })
+    })
+    
+    console.log('✅ Auto-backup email sent successfully')
+  } catch (error) {
+    console.error('❌ Auto-backup email failed:', error)
+  }
+}

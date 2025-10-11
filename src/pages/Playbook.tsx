@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import FileUploader from '../components/FileUploader'
-import { loadData, saveData } from '../utils/storage'
+import { loadData, saveData, triggerAutoEmailBackup } from '../utils/storage'
 import { marked } from 'marked'
 import Modal from '../components/Modal'
 import { Trash2, Edit2, Eye, X } from 'lucide-react'
@@ -45,6 +45,7 @@ export default function Playbook(){
       )
       setItems(next)
       saveData({ playbook: next })
+      triggerAutoEmailBackup('update')
       setEditingId(null)
     } else {
       // Add new strategy
@@ -52,6 +53,7 @@ export default function Playbook(){
       const next = [it, ...items]
       setItems(next)
       saveData({ playbook: next })
+      triggerAutoEmailBackup('add')
     }
     
     setTitle('')
@@ -74,6 +76,7 @@ export default function Playbook(){
     const next = items.filter(it => it.id !== id)
     setItems(next)
     saveData({ playbook: next })
+    triggerAutoEmailBackup('delete')
   }
 
   const cancelEdit = () => {

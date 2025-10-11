@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { loadData, saveData } from '../utils/storage'
+import { loadData, saveData, triggerAutoEmailBackup } from '../utils/storage'
 import { useCurrency } from '../context/CurrencyContext'
 import { Trash2, Edit2 } from 'lucide-react'
 
@@ -33,6 +33,7 @@ export default function Wallet() {
       )
       setItems(next)
       saveData({ wallet: next })
+      triggerAutoEmailBackup('update')
       setEditingId(null)
     } else {
       // Add new transaction
@@ -40,6 +41,7 @@ export default function Wallet() {
       const next = [it, ...items]
       setItems(next)
       saveData({ wallet: next })
+      triggerAutoEmailBackup('add')
     }
     
     setForm({ date: '', type: 'deposit', amount: '', notes: '' })
@@ -61,6 +63,7 @@ export default function Wallet() {
     const next = items.filter(it => it.id !== id)
     setItems(next)
     saveData({ wallet: next })
+    triggerAutoEmailBackup('delete')
   }
 
   const cancelEdit = () => {

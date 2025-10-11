@@ -13,9 +13,9 @@ import {
 } from '../utils/storage'
 import { useCurrency } from '../context/CurrencyContext'
 import Modal from '../components/Modal'
-import { AlertTriangle, Save, Link2, Trash2, Mail, Shield, Download, Send, CheckCircle2 } from 'lucide-react'
+import { AlertTriangle, Save, Link2, Trash2, Mail, Shield, Download, Send, CheckCircle2, Info } from 'lucide-react'
 
-type EmailFrequency = 'disabled' | 'every-update' | 'every-trade' | 'daily' | 'weekly'
+type EmailFrequency = 'disabled' | 'on-add' | 'on-delete' | 'on-change' | 'daily' | 'weekly'
 
 export default function DataSettings(){
   const fileRef = useRef<HTMLInputElement|null>(null)
@@ -231,13 +231,48 @@ export default function DataSettings(){
             <Mail className="text-krgold" size={20} />
             <h2 className="text-lg font-semibold text-krtext">Email Backup & Security</h2>
           </div>
-          {emailSaved && (
-            <span className="flex items-center gap-1 text-green-500 text-sm">
-              <CheckCircle2 size={16} />
-              Saved!
-            </span>
-          )}
+          <div className="flex items-center gap-3">
+            {emailSaved && (
+              <span className="flex items-center gap-1 text-green-500 text-sm">
+                <CheckCircle2 size={16} />
+                Saved!
+              </span>
+            )}
+            {/* How to Use Button - Moved to top right */}
+            <button
+              onClick={() => setShowHowToUse(!showHowToUse)}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-500/10 border border-blue-500/30 text-blue-400 rounded-lg hover:bg-blue-500/20 transition-colors"
+              title="How to use Email Backup"
+            >
+              <Info size={16} />
+              <span className="text-sm font-medium">How to use</span>
+            </button>
+          </div>
         </div>
+        
+        {/* How to Use Expandable Section */}
+        {showHowToUse && (
+          <div className="mb-4 p-4 bg-blue-500/10 border border-blue-500/30 rounded-xl">
+            <h3 className="text-sm font-semibold text-blue-400 mb-3">💡 How to use Email Backup:</h3>
+            <ol className="text-xs text-blue-300 space-y-2 list-decimal list-inside">
+              <li>Enter your email address below</li>
+              <li>Set your anti-phishing code (for security verification)</li>
+              <li>Choose auto-send frequency (or keep as manual)</li>
+              <li>Click "Save Email Settings"</li>
+              <li>Click "Send Now" - you'll receive an email with:
+                <ul className="ml-6 mt-1 space-y-1 list-disc">
+                  <li>Your anti-phishing code (verify it matches!)</li>
+                  <li>📎 <strong>Attached JSON backup file</strong> (ready to download)</li>
+                  <li>Optional: Copy JSON data from email for extra security</li>
+                </ul>
+              </li>
+            </ol>
+            <p className="mt-3 text-xs text-yellow-300">
+              <strong>💾 Note:</strong> The backup file is attached to the email, so you can download it directly. 
+              The "Export Data" button below lets you save a backup locally without sending an email.
+            </p>
+          </div>
+        )}
         
         <div className="space-y-4">
           {/* Email Address */}
@@ -268,15 +303,17 @@ export default function DataSettings(){
               className="w-full px-3 py-2 border border-krborder rounded-xl bg-krblack text-krtext focus:ring-1 focus:ring-krgold"
             >
               <option value="disabled">Disabled (Manual only)</option>
-              <option value="every-update">Every Update (Real-time)</option>
-              <option value="every-trade">After Each Trade Entry</option>
+              <option value="on-add">When Data is Added</option>
+              <option value="on-delete">When Data is Deleted</option>
+              <option value="on-change">On Any Change (Add/Delete/Update)</option>
               <option value="daily">Once a Day</option>
               <option value="weekly">Once a Week</option>
             </select>
             <p className="text-xs text-krmuted mt-1">
               {emailFrequency === 'disabled' && 'Automatic backups are disabled. Use manual send button.'}
-              {emailFrequency === 'every-update' && 'Your data will be emailed after every change.'}
-              {emailFrequency === 'every-trade' && 'Your data will be emailed after each trade is logged.'}
+              {emailFrequency === 'on-add' && 'Backup will be sent automatically when you add new data (trades, goals, etc).'}
+              {emailFrequency === 'on-delete' && 'Backup will be sent automatically when you delete data.'}
+              {emailFrequency === 'on-change' && 'Backup will be sent after any change (add, delete, or update).'}
               {emailFrequency === 'daily' && 'Your data will be emailed once per day.'}
               {emailFrequency === 'weekly' && 'Your data will be emailed once per week.'}
             </p>
@@ -291,8 +328,20 @@ export default function DataSettings(){
             <div className="flex gap-2">
               <input
                 type="text"
-                value={antiPhishingCode}
-                onChange={(e) => setAntiPhishingCode(e.target.value.toUpperCase())}
+                value={emailSaved && antiPhishingCode.length >= 2 
+                  ? '•'.repeat(antiPhishingCode.length - 2) + antiPhishingCode.slice(-2)
+                  : antiPhishingCode
+                }
+                onChange={(e) => {
+                  // Only allow changes if not saved/masked
+                  if (!emailSaved) {
+                    setAntiPhishingCode(e.target.value.toUpperCase())
+                  }
+                }}
+                onFocus={() => {
+                  // Show full code on focus
+                  setEmailSaved(false)
+                }}
                 className="flex-1 px-3 py-2 border border-krborder rounded-xl bg-krblack text-krtext font-mono text-lg tracking-wider focus:ring-1 focus:ring-krgold"
                 placeholder="XXXXXXXX"
                 maxLength={8}
@@ -338,41 +387,6 @@ export default function DataSettings(){
                 </>
               )}
             </button>
-          </div>
-
-          {/* How to Use Button */}
-          <div className="mt-4">
-            <button
-              onClick={() => setShowHowToUse(!showHowToUse)}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-krcard border border-krborder text-krtext rounded-xl hover:bg-krborder transition-colors"
-            >
-              <span className="text-lg">ℹ️</span>
-              <span className="text-lg">💡</span>
-              <span className="font-medium">How to use</span>
-            </button>
-            
-            {showHowToUse && (
-              <div className="mt-3 p-4 bg-blue-500/10 border border-blue-500/30 rounded-xl">
-                <h3 className="text-sm font-semibold text-blue-400 mb-3">💡 How to use Email Backup:</h3>
-                <ol className="text-xs text-blue-300 space-y-2 list-decimal list-inside">
-                  <li>Enter your email address above</li>
-                  <li>Set your anti-phishing code (for security verification)</li>
-                  <li>Choose auto-send frequency (or keep as manual)</li>
-                  <li>Click "Save Email Settings"</li>
-                  <li>Click "Send Now" - you'll receive an email with:
-                    <ul className="ml-6 mt-1 space-y-1 list-disc">
-                      <li>Your anti-phishing code (verify it matches!)</li>
-                      <li>📎 <strong>Attached JSON backup file</strong> (ready to download)</li>
-                      <li>Optional: Copy JSON data from email for extra security</li>
-                    </ul>
-                  </li>
-                </ol>
-                <p className="mt-3 text-xs text-yellow-300">
-                  <strong>💾 Note:</strong> The backup file is attached to the email, so you can download it directly. 
-                  The "Export Data" button below lets you save a backup locally without sending an email.
-                </p>
-              </div>
-            )}
           </div>
         </div>
       </div>

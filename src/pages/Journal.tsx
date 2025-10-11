@@ -4,7 +4,7 @@ import DateTimePicker from '../components/DateTimePicker'
 import Select from '../components/Select'
 import Modal from '../components/Modal'
 import SendToDiscordButton from '../components/SendToDiscordButton'
-import { loadData, saveData } from '../utils/storage'
+import { loadData, saveData, triggerAutoEmailBackup } from '../utils/storage'
 import { useCurrency } from '../context/CurrencyContext'
 import { JournalEntry, TradeObjective, TradeType, TradePosition } from '../types'
 import { TrendingUp, TrendingDown, Link, X } from 'lucide-react'
@@ -89,6 +89,14 @@ export default function Journal() {
     }
     setItems(next)
     saveData({ journal: next })
+    
+    // Trigger auto-email backup if enabled
+    if (!form.id) {
+      triggerAutoEmailBackup('add')
+    } else {
+      triggerAutoEmailBackup('update')
+    }
+    
     setForm({
       date: new Date().toISOString().split('T')[0],
       time: new Date().toLocaleTimeString('en-US', { hour12: false }).slice(0, 5),
@@ -117,6 +125,9 @@ export default function Journal() {
     const next = items.filter(i => i.id !== id)
     setItems(next)
     saveData({ journal: next })
+    
+    // Trigger auto-email backup for deletion
+    triggerAutoEmailBackup('delete')
   }
 
   return (
