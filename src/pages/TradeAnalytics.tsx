@@ -497,94 +497,94 @@ export default function TradeAnalytics() {
       </div>
 
       {/* ========== SECTION 2: TRADING BEHAVIOR & STREAKS ========== */}
-      <div className="mb-8">
-        <h2 className="text-xl font-semibold mb-4 text-krtext flex items-center gap-2">
-          <Flame size={24} className="text-krgold" />
-          Trading Behavior & Streaks
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="mb-6">
+        <div className="flex items-center gap-2 mb-4">
+          <span className="text-2xl">🔥</span>
+          <h2 className="text-xl font-semibold text-krtext">Trading Behavior & Streaks</h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
         {/* Average Trade Duration */}
-        <div className="bg-krcard backdrop-blur-sm rounded-xl border border-krborder p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <Clock className="text-blue-400" size={20} />
-            <h2 className="text-lg font-semibold">Avg Trade Duration</h2>
+        <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4 hover:border-krgold/50 transition-all">
+          <div className="flex items-center gap-2 mb-2">
+            <Clock className="text-blue-400" size={18} />
+            <h3 className="text-sm font-semibold text-krtext">Avg Duration</h3>
             <button
               onClick={() => setShowDurationInfo(!showDurationInfo)}
               className="ml-auto p-1 hover:bg-krgold/20 rounded-full transition-colors"
             >
-              <Info size={16} className="text-gray-400" />
+              <Info size={14} className="text-krmuted" />
             </button>
           </div>
-          <div className={`text-2xl font-bold ${traderType.color} mb-2`}>
+          <p className={`text-xl font-bold ${traderType.color} mb-1`}>
             {avgDurationDays >= 1
               ? `${avgDurationDays.toFixed(1)}d`
               : `${avgDurationHours.toFixed(1)}h`}
-          </div>
-          <div className="text-sm text-gray-400">{traderType.type}</div>
+          </p>
+          <p className="text-xs text-krmuted">{traderType.type}</p>
           {showDurationInfo && (
-            <div className="mt-3 p-3 bg-krblack/30 rounded-lg text-xs space-y-1">
-              <div><strong className="text-purple-400">Scalper:</strong> &lt;1 hour</div>
-              <div><strong className="text-blue-400">Day Trader:</strong> &lt;24 hours</div>
-              <div><strong className="text-green-400">Swing Trader:</strong> 1-7 days</div>
-              <div><strong className="text-orange-400">Position Trader:</strong> &gt;7 days</div>
+            <div className="mt-3 p-2 bg-krblack/50 rounded-lg text-xs space-y-1 border border-krborder/30">
+              <div><strong className="text-purple-400">Scalper:</strong> &lt;1h</div>
+              <div><strong className="text-blue-400">Day Trader:</strong> &lt;24h</div>
+              <div><strong className="text-green-400">Swing:</strong> 1-7d</div>
+              <div><strong className="text-orange-400">Position:</strong> &gt;7d</div>
             </div>
           )}
         </div>
 
         {/* Current Streak */}
-        <div className="bg-krcard backdrop-blur-sm rounded-xl border border-krborder p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <Flame className={streaks.currentStreak > 0 ? 'text-green-500' : 'text-red-500'} size={20} />
-            <h2 className="text-lg font-semibold">Current Streak</h2>
+        <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4 hover:border-krgold/50 transition-all">
+          <div className="flex items-center gap-2 mb-2">
+            <Flame className={streaks.currentStreak > 0 ? 'text-green-400' : 'text-red-400'} size={18} />
+            <h3 className="text-sm font-semibold text-krtext">Current Streak</h3>
           </div>
-          <div className={`text-2xl font-bold mb-2 ${streaks.currentStreak > 0 ? 'text-green-500' : streaks.currentStreak < 0 ? 'text-red-500' : 'text-gray-400'}`}>
+          <p className={`text-xl font-bold mb-1 ${streaks.currentStreak > 0 ? 'text-green-400' : streaks.currentStreak < 0 ? 'text-red-400' : 'text-krmuted'}`}>
             {streaks.currentStreak > 0 ? `+${streaks.currentStreak}` : streaks.currentStreak}
-          </div>
-          <div className="text-sm text-gray-400">
+          </p>
+          <p className="text-xs text-krmuted">
             {streaks.currentStreak > 0 ? 'Wins' : streaks.currentStreak < 0 ? 'Losses' : 'No streak'}
-          </div>
+          </p>
         </div>
 
         {/* Longest Win Streak */}
-        <div className="bg-krcard backdrop-blur-sm rounded-xl border border-krborder p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <TrendingUp className="text-green-500" size={20} />
-            <h2 className="text-lg font-semibold">Best Win Streak</h2>
+        <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4 hover:border-krgold/50 transition-all">
+          <div className="flex items-center gap-2 mb-2">
+            <TrendingUp className="text-green-400" size={18} />
+            <h3 className="text-sm font-semibold text-krtext">Best Win Streak</h3>
           </div>
-          <div className="text-2xl font-bold text-green-500 mb-2">
+          <p className="text-xl font-bold text-green-400 mb-1">
             {streaks.longestWinStreak}
-          </div>
-          <div className="text-sm text-gray-400">Consecutive wins</div>
+          </p>
+          <p className="text-xs text-krmuted">Consecutive wins</p>
         </div>
 
         {/* Longest Loss Streak */}
-        <div className="bg-krcard backdrop-blur-sm rounded-xl border border-krborder p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <TrendingDown className="text-red-500" size={20} />
-            <h2 className="text-lg font-semibold">Worst Loss Streak</h2>
+        <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4 hover:border-krgold/50 transition-all">
+          <div className="flex items-center gap-2 mb-2">
+            <TrendingDown className="text-red-400" size={18} />
+            <h3 className="text-sm font-semibold text-krtext">Worst Loss Streak</h3>
           </div>
-          <div className="text-2xl font-bold text-red-500 mb-2">
+          <p className="text-xl font-bold text-red-400 mb-1">
             {streaks.longestLossStreak}
-          </div>
-          <div className="text-sm text-gray-400">Consecutive losses</div>
+          </p>
+          <p className="text-xs text-krmuted">Consecutive losses</p>
         </div>
         </div>
       </div>
 
       {/* ========== SECTION 3: STRATEGY PERFORMANCE ========== */}
       {topSetups.length > 0 && (
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold mb-4 text-krtext flex items-center gap-2">
-            <Target size={24} className="text-krgold" />
-            Strategy Performance
-          </h2>
-          <div className="bg-krcard backdrop-blur-sm rounded-xl border border-krborder p-6">
+        <div className="mb-6">
+          <div className="flex items-center gap-2 mb-4">
+            <span className="text-2xl">🎯</span>
+            <h2 className="text-xl font-semibold text-krtext">Strategy Performance</h2>
+          </div>
+          <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-5">
           <div className="space-y-3">
             {topSetups.map((setup: any, index) => (
-              <div key={index} className="bg-krblack/30 rounded-lg p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="font-semibold text-lg">{setup.setup}</div>
-                  <div className={`text-xl font-bold ${setup.totalPnl >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+              <div key={index} className="bg-krblack/40 rounded-lg p-4 border border-krborder/30 hover:border-krgold/50 transition-all">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="font-semibold text-base text-krtext">{setup.setup}</div>
+                  <div className={`text-lg font-bold ${setup.totalPnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
                     {formatAmount(setup.totalPnl)}
                   </div>
                 </div>
@@ -618,13 +618,13 @@ export default function TradeAnalytics() {
       )}
 
       {/* ========== SECTION 4: RISK MANAGEMENT ========== */}
-      <div className="mb-8">
-        <h2 className="text-xl font-semibold mb-4 text-krtext flex items-center gap-2">
-          <Shield size={24} className="text-krgold" />
-          Risk Management
-        </h2>
-        <div className="bg-krcard backdrop-blur-sm rounded-xl border border-krborder p-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="mb-6">
+        <div className="flex items-center gap-2 mb-4">
+          <span className="text-2xl">🛡️</span>
+          <h2 className="text-xl font-semibold text-krtext">Risk Management</h2>
+        </div>
+        <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-5">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
           {/* Average Risk per Trade */}
           <div className="bg-krblack/30 rounded-lg p-4">
             <div className="text-sm text-gray-400 mb-2">Avg Risk per Trade</div>
@@ -714,11 +714,11 @@ export default function TradeAnalytics() {
       </div>
 
       {/* ========== SECTION 5: PAIR ANALYSIS ========== */}
-      <div className="mb-8">
-        <h2 className="text-xl font-semibold mb-4 text-krtext flex items-center gap-2">
-          <BarChart3 size={24} className="text-krgold" />
-          Pair & Market Analysis
-        </h2>
+      <div className="mb-6">
+        <div className="flex items-center gap-2 mb-4">
+          <span className="text-2xl">📈</span>
+          <h2 className="text-xl font-semibold text-krtext">Pair & Market Analysis</h2>
+        </div>
         {/* Exposure by Pair and Top 5 Performing Pairs - Side by Side */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         {/* Exposure by Pair/Coin */}
@@ -826,11 +826,11 @@ export default function TradeAnalytics() {
       </div>
 
       {/* ========== SECTION 6: EQUITY CURVE ========== */}
-      <div className="mb-8">
-        <h2 className="text-xl font-semibold mb-4 text-krtext flex items-center gap-2">
-          <TrendingUp size={24} className="text-krgold" />
-          Performance Over Time
-        </h2>
+      <div className="mb-6">
+        <div className="flex items-center gap-2 mb-4">
+          <span className="text-2xl">💹</span>
+          <h2 className="text-xl font-semibold text-krtext">Performance Over Time</h2>
+        </div>
       {/* Visualization Charts */}
       <div>
         {/* PnL Over Time - Equity Curve - Full Width */}
@@ -998,16 +998,15 @@ export default function TradeAnalytics() {
       </div>
 
       {/* ========== SECTION 7: PNL CALENDAR ========== */}
-      <div className="mb-8">
-        <h2 className="text-xl font-semibold mb-4 text-krtext flex items-center gap-2">
-          <Calendar size={24} className="text-krgold" />
-          PNL Calendar
-        </h2>
+      <div className="mb-6">
+        <div className="flex items-center gap-2 mb-4">
+          <span className="text-2xl">📅</span>
+          <h2 className="text-xl font-semibold text-krtext">PNL Calendar</h2>
+        </div>
       {/* PNL Calendar */}
-      <div className="bg-krcard backdrop-blur-sm rounded-xl border border-krborder p-6 mb-8">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <Calendar className="text-krgold" size={24} />
+      <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-5 mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
             <h2 className="text-xl font-semibold">PNL Calendar</h2>
           </div>
           <div className="flex gap-2 bg-krblack/30 rounded-lg p-1">
