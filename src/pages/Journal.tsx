@@ -345,25 +345,15 @@ export default function Journal() {
               </div>
             </div>
 
-            {/* Reason for Entry */}
+            {/* Reason for Entry & Exit */}
             <div className="space-y-1">
-              <label className="block text-sm font-medium text-krtext">Reason for Entry</label>
+              <label className="block text-sm font-medium text-krtext">Reason for Entry & Exit</label>
               <textarea
                 className="w-full px-3 py-2 border border-krborder rounded-md bg-transparent text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
-                rows={3}
+                rows={5}
                 value={form.reasonIn || ''}
-                onChange={e => setForm({...form, reasonIn: e.target.value})}
-              />
-            </div>
-
-            {/* Reason for Exit */}
-            <div className="space-y-1">
-              <label className="block text-sm font-medium text-krtext">Reason for Exit</label>
-              <textarea
-                className="w-full px-3 py-2 border border-krborder rounded-md bg-transparent text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
-                rows={3}
-                value={form.reasonOut || ''}
-                onChange={e => setForm({...form, reasonOut: e.target.value})}
+                onChange={e => setForm({...form, reasonIn: e.target.value, reasonOut: e.target.value})}
+                placeholder="Describe your reasoning for entering and exiting this trade..."
               />
             </div>
 
@@ -508,25 +498,13 @@ export default function Journal() {
               </div>
             </div>
 
-            {/* Reasons */}
-            {(viewingTrade.reasonIn || viewingTrade.reasonOut) && (
-              <div className="space-y-4 mb-6">
-                {viewingTrade.reasonIn && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-2">Reason for Entry</label>
-                    <div className="p-3 bg-krcard/50 rounded-lg border border-krborder text-krtext">
-                      {viewingTrade.reasonIn}
-                    </div>
-                  </div>
-                )}
-                {viewingTrade.reasonOut && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-2">Reason for Exit</label>
-                    <div className="p-3 bg-krcard/50 rounded-lg border border-krborder text-krtext">
-                      {viewingTrade.reasonOut}
-                    </div>
-                  </div>
-                )}
+            {/* Reason */}
+            {viewingTrade.reasonIn && (
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-400 mb-2">Reason for Entry & Exit</label>
+                <div className="p-3 bg-krcard/50 rounded-lg border border-krborder text-krtext whitespace-pre-wrap">
+                  {viewingTrade.reasonIn}
+                </div>
               </div>
             )}
 
