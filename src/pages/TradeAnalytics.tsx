@@ -944,7 +944,7 @@ export default function TradeAnalytics() {
                               // First segment from starting balance to first trade
                               const x1 = 0
                               const y1 = ((maxPnl - walletBalance) / range) * 100
-                              const x2 = (i + 1) / (points.length + 1) * 100
+                              const x2 = ((i + 1) / points.length) * 100
                               const y2 = ((maxPnl - point.cumulative) / range) * 100
                               const color = point.cumulative >= walletBalance ? '#22c55e' : '#ef4444'
                               return (
@@ -960,9 +960,9 @@ export default function TradeAnalytics() {
                               )
                             }
                             const prev = points[i - 1]
-                            const x1 = i / (points.length + 1) * 100
+                            const x1 = (i / points.length) * 100
                             const y1 = ((maxPnl - prev.cumulative) / range) * 100
-                            const x2 = (i + 1) / (points.length + 1) * 100
+                            const x2 = ((i + 1) / points.length) * 100
                             const y2 = ((maxPnl - point.cumulative) / range) * 100
                             const color = point.cumulative >= prev.cumulative ? '#22c55e' : '#ef4444'
                             return (
@@ -980,7 +980,7 @@ export default function TradeAnalytics() {
                           
                           {/* Draw points */}
                           {points.map((point, i) => {
-                            const x = (i + 1) / (points.length + 1) * 100
+                            const x = ((i + 1) / points.length) * 100
                             const y = ((maxPnl - point.cumulative) / range) * 100
                             const netPnl = (point.trade.pnlAmount || 0) - (point.trade.fee || 0)
                             const color = netPnl >= 0 ? '#22c55e' : '#ef4444'
