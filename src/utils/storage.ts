@@ -223,7 +223,10 @@ export async function triggerAutoEmailBackup(action: 'add' | 'delete' | 'update'
   if (!shouldSend) return
   
   try {
-    const dataStr = JSON.stringify(localStorage, null, 2)
+    // Export only app data (vision, journal, playbook, wallet)
+    // NOT the entire localStorage which includes settings
+    const appData = loadData()
+    const dataStr = JSON.stringify(appData, null, 2)
     const functionUrl = '/api/send-email'
     
     await fetch(functionUrl, {

@@ -106,10 +106,9 @@ module.exports = async (req, res) => {
       </html>
     `;
 
-    // Prepare attachment
+    // Prepare attachment - Using proper format for JSON file
     const filename = `trading-journal-backup-${new Date().toISOString().split('T')[0]}.json`;
-    const attachmentContent = Buffer.from(dataStr).toString('base64');
-
+    
     // Send email with attachment
     const { data, error } = await resend.emails.send({
       from: 'Kinsfolk Republic <kinsfolk.republic@resend.dev>',
@@ -119,7 +118,8 @@ module.exports = async (req, res) => {
       attachments: [
         {
           filename: filename,
-          content: attachmentContent
+          content: dataStr,
+          type: 'application/json'
         }
       ]
     });

@@ -9,6 +9,7 @@ import {
   deleteDiscordWebhook,
   getActiveWebhookId,
   setActiveWebhookId,
+  loadData,
   type DiscordWebhook 
 } from '../utils/storage'
 import { useCurrency } from '../context/CurrencyContext'
@@ -189,8 +190,10 @@ export default function DataSettings(){
     setSendingEmail(true)
     
     try {
-      // Export data
-      const dataStr = JSON.stringify(localStorage, null, 2)
+      // Export data - Use loadData() to get only app data (vision, journal, playbook, wallet)
+      // NOT the entire localStorage which includes settings
+      const appData = loadData()
+      const dataStr = JSON.stringify(appData, null, 2)
       
       // Call serverless function (works on Vercel/Netlify deployment)
       // Try Vercel first, then Netlify
@@ -223,7 +226,9 @@ export default function DataSettings(){
       setSendingEmail(false)
       
       // Fallback: download file if email fails
-      const dataStr = JSON.stringify(localStorage, null, 2)
+      // Use loadData() to export only app data, not entire localStorage
+      const appData = loadData()
+      const dataStr = JSON.stringify(appData, null, 2)
       const blob = new Blob([dataStr], { type: 'application/json' })
       const url = URL.createObjectURL(blob)
       const link = document.createElement('a')
