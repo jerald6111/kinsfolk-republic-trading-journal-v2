@@ -80,15 +80,16 @@ export default function WebhookSelectorModal({ isOpen, onClose, onSelect }: Webh
             <button
               key={webhook.id}
               onClick={() => setSelectedWebhookId(webhook.id)}
-              className={`w-full p-4 text-left rounded-lg border transition-colors ${
+              type="button"
+              className={`w-full p-4 text-left rounded-lg border transition-all cursor-pointer ${
                 selectedWebhookId === webhook.id
-                  ? 'border-krgold bg-krgold/10'
+                  ? 'border-krgold bg-krgold/10 shadow-md shadow-krgold/20'
                   : 'border-krborder hover:border-krgold/50 hover:bg-krgold/5'
               }`}
             >
-              <div className="flex items-center justify-between">
-                <div className="flex-1 min-w-0 pr-3">
-                  <div className="flex items-center gap-2">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
                     <div className="font-medium text-krwhite">{webhook.name}</div>
                     {webhook.id === activeWebhookId && (
                       <span className="px-2 py-0.5 bg-green-500/20 text-green-500 text-xs rounded-full whitespace-nowrap">
@@ -96,10 +97,10 @@ export default function WebhookSelectorModal({ isOpen, onClose, onSelect }: Webh
                       </span>
                     )}
                   </div>
-                  <div className="text-sm text-gray-500 truncate mt-1 font-mono">{maskWebhookUrl(webhook.url)}</div>
+                  <div className="text-sm text-gray-500 mt-1 font-mono break-all">{maskWebhookUrl(webhook.url)}</div>
                 </div>
                 {selectedWebhookId === webhook.id && (
-                  <div className="ml-3 w-6 h-6 bg-krgold rounded-full flex items-center justify-center flex-shrink-0">
+                  <div className="w-6 h-6 bg-krgold rounded-full flex items-center justify-center flex-shrink-0">
                     <Check size={16} className="text-krblack" />
                   </div>
                 )}
