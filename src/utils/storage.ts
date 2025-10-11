@@ -87,26 +87,72 @@ export async function sendToDiscord(data: any, webhookId?: string) {
   if (!url) return false
 
   try {
+    // Build title: TICKER | Position | Leverage
+    const leverage = data.type === 'Futures' ? `${data.leverage}x` : '';
+    const title = `${data.ticker} | ${data.position} ${leverage}`.trim();
+    
+    // Determine color based on PnL
+    const isProfitable = data.pnlAmount > 0;
+    const embedColor = isProfitable ? 0x00FF00 : 0xFF0000; // Green for profit, Red for loss
+    
+    // Format PnL with + or - sign
+    const pnlSign = isProfitable ? '+' : '';
+    const pnlDisplay = `${pnlSign}$${data.pnlAmount.toFixed(2)} (${pnlSign}${data.pnlPercent.toFixed(2)}%)`;
+    
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         embeds: [{
-          title: `Trade: ${data.ticker} ${data.position}`,
-          color: data.pnlAmount > 0 ? 0x00ff00 : 0xff0000,
+          title: title,
+          description: `**${data.type}** ${data.type === 'Futures' ? `• Leverage: ${data.leverage}x` : ''}`,
+          color: embedColor,
           fields: [
-            { name: 'Type', value: `${data.type} ${data.type === 'Futures' ? `${data.leverage}x` : ''}`, inline: true },
-            { name: 'Objective', value: data.objective, inline: true },
-            { name: 'Setup', value: data.setup || 'N/A', inline: true },
-            { name: 'Entry', value: `${data.date} ${data.time}`, inline: true },
-            { name: 'Entry Price', value: data.entryPrice.toString(), inline: true },
-            { name: 'Exit Price', value: data.exitPrice.toString(), inline: true },
-            { name: 'PnL', value: `${data.pnlAmount} (${data.pnlPercent.toFixed(2)}%)`, inline: true },
-            { name: 'Entry Reason', value: data.reasonIn || 'N/A' },
-            { name: 'Exit Reason', value: data.reasonOut || 'N/A' }
+            { 
+              name: '📊 Objective', 
+              value: data.objective, 
+              inline: true 
+            },
+            { 
+              name: '🎯 Setup', 
+              value: data.setup || 'N/A', 
+              inline: true 
+            },
+            { 
+              name: '💰 PnL', 
+              value: `**${pnlDisplay}**`, 
+              inline: true 
+            },
+            { 
+              name: '📈 Entry', 
+              value: `**Price:** $${data.entryPrice}\n**Date:** ${data.date} ${data.time}`, 
+              inline: true 
+            },
+            { 
+              name: '📉 Exit', 
+              value: `**Price:** $${data.exitPrice}\n**Date:** ${data.exitDate} ${data.exitTime}`, 
+              inline: true 
+            },
+            { 
+              name: '💵 Fee', 
+              value: data.fee ? `$${data.fee.toFixed(2)}` : '$0.00', 
+              inline: true 
+            },
+            ...(data.marginCost > 0 ? [{ 
+              name: '💸 Margin Cost', 
+              value: `$${data.marginCost.toFixed(2)}`, 
+              inline: true 
+            }] : []),
+            ...(data.reasonIn ? [{ 
+              name: '📝 Reason for Entry & Exit', 
+              value: data.reasonIn 
+            }] : [])
           ],
           image: data.chartImg ? { url: data.chartImg } : undefined,
           thumbnail: data.pnlImg ? { url: data.pnlImg } : undefined,
+          footer: {
+            text: 'Kinsfolk Republic Trading Journal'
+          },
           timestamp: new Date().toISOString()
         }]
       })
