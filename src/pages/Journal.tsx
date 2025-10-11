@@ -50,17 +50,31 @@ export default function Journal() {
 
   const calculatePnL = () => {
     if (!form.entryPrice || !form.exitPrice) return
-    const multiplier = form.position === 'Long' ? 1 : -1
-    const leverageMulti = form.type === 'Futures' ? (form.leverage || 1) : 1
-    const diff = (form.exitPrice - form.entryPrice) * multiplier * leverageMulti
-    const amount = diff * (form.leverage || 1)
-    const percent = (diff / form.entryPrice) * 100 * leverageMulti
+    
+    let amount = 0
+    let percent = 0
+    
+    if (form.type === 'Spot') {
+      // Spot trading: Simple price difference (always Long)
+      const diff = form.exitPrice - form.entryPrice
+      percent = (diff / form.entryPrice) * 100
+      // Amount = percent of margin cost
+      amount = form.marginCost ? (form.marginCost * percent) / 100 : diff
+    } else {
+      // Futures trading: With leverage and position
+      const multiplier = form.position === 'Long' ? 1 : -1
+      const diff = (form.exitPrice - form.entryPrice) * multiplier
+      percent = (diff / form.entryPrice) * 100 * (form.leverage || 1)
+      // Amount = percent of margin cost
+      amount = form.marginCost ? (form.marginCost * percent) / 100 : diff * (form.leverage || 1)
+    }
+    
     setForm({ ...form, pnlAmount: amount, pnlPercent: percent })
   }
 
   useEffect(() => {
     calculatePnL()
-  }, [form.entryPrice, form.exitPrice, form.leverage, form.position, form.type])
+  }, [form.entryPrice, form.exitPrice, form.leverage, form.position, form.type, form.marginCost])
 
   const save = () => {
     let next: JournalEntry[]
@@ -255,24 +269,46 @@ export default function Journal() {
             {/* Gain/Loss Amount, Gain/Loss %, and Fee */}
             <div className="grid grid-cols-3 gap-4">
               <div className="space-y-1">
-                <label className="block text-sm font-medium text-krtext">Gain/Loss Amount</label>
+                <label className="block text-sm font-medium text-krtext">
+                  Gain/Loss Amount
+                  <button
+                    type="button"
+                    onClick={calculatePnL}
+                    className="ml-2 text-xs text-krgold hover:text-kryellow"
+                    title="Auto-calculate from entry/exit prices"
+                  >
+                    (Auto)
+                  </button>
+                </label>
                 <input
                   type="number"
+                  step="0.01"
                   className="w-full px-3 py-2 border border-krborder rounded-md bg-transparent text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
-                  value={form.pnlAmount?.toFixed(2) || '0.00'}
-                  readOnly
-                  disabled
+                  value={form.pnlAmount || ''}
+                  onChange={e => setForm({...form, pnlAmount: Number(e.target.value)})}
+                  placeholder="Enter P&L amount"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="block text-sm font-medium text-krtext">Gain/Loss %</label>
+                <label className="block text-sm font-medium text-krtext">
+                  Gain/Loss %
+                  <button
+                    type="button"
+                    onClick={calculatePnL}
+                    className="ml-2 text-xs text-krgold hover:text-kryellow"
+                    title="Auto-calculate from entry/exit prices"
+                  >
+                    (Auto)
+                  </button>
+                </label>
                 <input
-                  type="text"
+                  type="number"
+                  step="0.01"
                   className="w-full px-3 py-2 border border-krborder rounded-md bg-transparent text-krtext focus:border-krgold focus:ring-1 focus:ring-krgold"
-                  value={`${form.pnlPercent?.toFixed(2) || '0.00'}%`}
-                  readOnly
-                  disabled
+                  value={form.pnlPercent || ''}
+                  onChange={e => setForm({...form, pnlPercent: Number(e.target.value)})}
+                  placeholder="Enter P&L %"
                 />
               </div>
 
