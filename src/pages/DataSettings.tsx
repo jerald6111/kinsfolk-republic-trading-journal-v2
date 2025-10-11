@@ -148,6 +148,12 @@ export default function DataSettings(){
     setActiveWebhookId(id)
   }
 
+  // Function to mask webhook URL - show only last 4 characters
+  const maskWebhookUrl = (url: string) => {
+    if (url.length <= 4) return url
+    return '•'.repeat(url.length - 4) + url.slice(-4)
+  }
+
   const saveEmailSettings = () => {
     if (email && !email.includes('@')) {
       alert('Please enter a valid email address')
@@ -626,7 +632,7 @@ export default function DataSettings(){
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                       <div className="flex-1 min-w-0">
                         <div className="font-medium text-krtext">{webhook.name}</div>
-                        <div className="text-sm text-krmuted break-all">{webhook.url}</div>
+                        <div className="text-sm text-krmuted break-all font-mono">{maskWebhookUrl(webhook.url)}</div>
                       </div>
                       <div className="flex items-center gap-2 flex-shrink-0">
                         {webhook.id === activeWebhookId ? (

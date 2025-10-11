@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import Modal from './Modal'
-import { getDiscordWebhooks } from '../utils/storage'
+import { getDiscordWebhooks, getActiveWebhookId } from '../utils/storage'
 import type { DiscordWebhook } from '../utils/storage'
 import { Check } from 'lucide-react'
 
@@ -12,26 +12,32 @@ type WebhookSelectorModalProps = {
 
 export default function WebhookSelectorModal({ isOpen, onClose, onSelect }: WebhookSelectorModalProps) {
   const webhooks = getDiscordWebhooks()
+  const activeWebhookId = getActiveWebhookId()
   const [selectedWebhookId, setSelectedWebhookId] = useState<string | null>(null)
+
+  // Function to mask webhook URL - show only last 4 characters
+  const maskWebhookUrl = (url: string) => {
+    if (url.length <= 4) return url
+    return '•'.repeat(url.length - 4) + url.slice(-4)
+  }
 
   // Sort webhooks to show active one first
   const sortedWebhooks = [...webhooks].sort((a, b) => {
-    if (a.active && !b.active) return -1
-    if (!a.active && b.active) return 1
+    if (a.id === activeWebhookId && b.id !== activeWebhookId) return -1
+    if (a.id !== activeWebhookId && b.id === activeWebhookId) return 1
     return 0
   })
 
-  // Auto-select the first active webhook when modal opens
+  // Auto-select the active webhook when modal opens (as default suggestion)
   React.useEffect(() => {
     if (isOpen) {
-      const activeWebhook = webhooks.find(w => w.active)
-      if (activeWebhook) {
-        setSelectedWebhookId(activeWebhook.id)
+      if (activeWebhookId && webhooks.find(w => w.id === activeWebhookId)) {
+        setSelectedWebhookId(activeWebhookId)
       } else if (webhooks.length > 0) {
         setSelectedWebhookId(webhooks[0].id)
       }
     }
-  }, [isOpen, webhooks])
+  }, [isOpen, webhooks, activeWebhookId])
 
   const handleConfirm = () => {
     if (selectedWebhookId) {
@@ -67,7 +73,7 @@ export default function WebhookSelectorModal({ isOpen, onClose, onSelect }: Webh
     >
       <div className="p-6">
         <p className="text-gray-400 text-sm mb-4">
-          Select a Discord webhook to send this trade to:
+          Select a Discord webhook to send this trade to. The default active channel is pre-selected, but you can choose any configured channel:
         </p>
         <div className="space-y-3 mb-6">
           {sortedWebhooks.map((webhook: DiscordWebhook) => (
@@ -84,16 +90,16 @@ export default function WebhookSelectorModal({ isOpen, onClose, onSelect }: Webh
                 <div className="flex-1 min-w-0 pr-3">
                   <div className="flex items-center gap-2">
                     <div className="font-medium text-krwhite">{webhook.name}</div>
-                    {webhook.active && (
+                    {webhook.id === activeWebhookId && (
                       <span className="px-2 py-0.5 bg-green-500/20 text-green-500 text-xs rounded-full whitespace-nowrap">
-                        Active
+                        Default
                       </span>
                     )}
                   </div>
-                  <div className="text-sm text-gray-500 truncate mt-1 break-all">{webhook.url}</div>
+                  <div className="text-sm text-gray-500 truncate mt-1 font-mono">{maskWebhookUrl(webhook.url)}</div>
                 </div>
                 {selectedWebhookId === webhook.id && (
-                  <div className="ml-3 w-6 h-6 bg-krgold rounded-full flex items-center justify-center">
+                  <div className="ml-3 w-6 h-6 bg-krgold rounded-full flex items-center justify-center flex-shrink-0">
                     <Check size={16} className="text-krblack" />
                   </div>
                 )}
