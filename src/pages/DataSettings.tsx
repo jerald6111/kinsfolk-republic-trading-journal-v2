@@ -259,44 +259,60 @@ export default function DataSettings(){
   const [showHowToUse, setShowHowToUse] = useState(false)
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">Data Settings</h1>
-      
-      {/* Currency Settings */}
-      <div className="bg-krcard rounded-xl shadow-sm border border-krborder p-6 mb-6">
-        <h2 className="text-lg font-semibold mb-4 text-krtext">Currency Settings</h2>
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-krtext mb-2">
-              Select Currency (used throughout the application)
-            </label>
-            <select
-              value={currency.code}
-              onChange={(e) => {
-                const selected = currencies.find(c => c.code === e.target.value)
-                if (selected) setCurrency(selected)
-              }}
-              className="w-full px-3 py-2 border border-krborder rounded-xl bg-krblack text-krtext focus:ring-1 focus:ring-krgold"
-            >
-              {currencies.map(c => (
-                <option key={c.code} value={c.code}>
-                  {c.symbol} - {c.name} ({c.code})
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="text-sm text-krmuted">
-            Current: <strong className="text-krtext">{currency.symbol} {currency.name}</strong> (Rate: {currency.rate} to USD)
+    <div className="min-h-screen bg-gradient-to-br from-krblack via-krblack to-krcard/20 text-krtext p-4 md:p-6">
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <div className="mb-6">
+          <div className="flex items-center gap-3">
+            <span className="text-4xl">⚙️</span>
+            <div>
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-krgold to-kryellow bg-clip-text text-transparent">Data Settings</h1>
+              <p className="text-krmuted text-sm mt-1">Manage your data, backups, and preferences</p>
+            </div>
           </div>
         </div>
-      </div>
+      
+        {/* Currency Settings */}
+        <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-5 mb-6">
+          <div className="flex items-center gap-2 mb-4">
+            <span className="text-2xl">💱</span>
+            <h2 className="text-lg font-semibold text-krtext">Currency Settings</h2>
+          </div>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-krtext mb-2">
+                Select Currency (used throughout the application)
+              </label>
+              <select
+                value={currency.code}
+                onChange={(e) => {
+                  const selected = currencies.find(c => c.code === e.target.value)
+                  if (selected) setCurrency(selected)
+                }}
+                className="w-full px-3 py-2 border border-krborder/30 rounded-xl bg-krblack/30 text-krtext focus:ring-2 focus:ring-krgold/20 focus:border-krgold transition-all"
+              >
+                {currencies.map(c => (
+                  <option key={c.code} value={c.code} className="bg-krcard text-krtext">
+                    {c.symbol} - {c.name} ({c.code})
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="text-sm text-krmuted bg-krblack/30 rounded-lg p-3 border border-krborder/30">
+              Current: <strong className="text-krtext">{currency.symbol} {currency.name}</strong> (Rate: {currency.rate} to USD)
+            </div>
+          </div>
+        </div>
 
-      {/* Email Backup Settings */}
-      <div className="bg-krcard rounded-xl shadow-sm border border-krborder p-6 mb-6">
+        {/* Email Backup Settings */}
+        <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-5 mb-6">
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <Mail className="text-krgold" size={20} />
-            <h2 className="text-lg font-semibold text-krtext">Email Backup & Security</h2>
+          <div className="flex items-center gap-3">
+            <span className="text-3xl">📧</span>
+            <div>
+              <h2 className="text-lg font-semibold text-krtext">Email Backup & Security</h2>
+              <p className="text-xs text-krmuted">Automated backup delivery and anti-phishing protection</p>
+            </div>
           </div>
           <div className="flex items-center gap-3">
             {emailSaved && (
@@ -358,7 +374,7 @@ export default function DataSettings(){
                   }
                 }}
                 onFocus={() => setShowEmail(true)}
-                className="w-full px-3 py-2 pr-12 border border-krborder rounded-xl bg-krblack text-krtext focus:ring-1 focus:ring-krgold"
+                className="w-full px-3 py-2 pr-12 rounded-xl bg-krblack/30 border border-krborder text-krtext focus:ring-2 focus:ring-krgold/20 focus:border-krgold/50 transition-all"
                 placeholder="your.email@example.com"
                 readOnly={!showEmail}
               />
@@ -384,7 +400,7 @@ export default function DataSettings(){
             <select
               value={emailFrequency}
               onChange={(e) => setEmailFrequency(e.target.value as EmailFrequency)}
-              className="w-full px-3 py-2 border border-krborder rounded-xl bg-krblack text-krtext focus:ring-1 focus:ring-krgold"
+              className="w-full px-3 py-2 rounded-xl bg-krblack/30 border border-krborder text-krtext focus:ring-2 focus:ring-krgold/20 focus:border-krgold/50 transition-all"
             >
               <option value="disabled">Disabled (Manual only)</option>
               <option value="on-add">When Data is Added</option>
@@ -421,7 +437,7 @@ export default function DataSettings(){
                     }
                   }}
                   onFocus={() => setShowPhishingCode(true)}
-                  className="w-full px-3 py-2 pr-12 border border-krborder rounded-xl bg-krblack text-krtext font-mono text-lg tracking-wider focus:ring-1 focus:ring-krgold"
+                  className="w-full px-3 py-2 pr-12 rounded-xl bg-krblack/30 border border-krborder text-krtext font-mono text-lg tracking-wider focus:ring-2 focus:ring-krgold/20 focus:border-krgold/50 transition-all"
                   placeholder="XXXXXXXX"
                   maxLength={8}
                   readOnly={!showPhishingCode}
@@ -437,7 +453,7 @@ export default function DataSettings(){
               </div>
               <button
                 onClick={generateRandomPhishingCode}
-                className="px-4 py-2 bg-krgold/20 text-krgold rounded-xl hover:bg-krgold/30 transition-colors whitespace-nowrap"
+                className="px-4 py-2 bg-krgold/20 text-krgold rounded-xl hover:bg-krgold/30 hover:shadow-md hover:shadow-krgold/20 transition-all whitespace-nowrap"
               >
                 Generate
               </button>
@@ -454,7 +470,7 @@ export default function DataSettings(){
           <div className="flex gap-3 pt-2">
             <button
               onClick={saveEmailSettings}
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-krgold text-krblack rounded-xl hover:bg-kryellow transition-colors font-semibold"
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-krgold text-krblack rounded-xl hover:bg-kryellow hover:shadow-lg hover:shadow-krgold/30 transition-all font-semibold"
             >
               <Save size={18} />
               Save Email Settings
@@ -462,7 +478,7 @@ export default function DataSettings(){
             <button
               onClick={handleSendEmail}
               disabled={!email || sendingEmail}
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700 hover:shadow-lg hover:shadow-green-600/30 transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {sendingEmail ? (
                 <>
@@ -480,26 +496,33 @@ export default function DataSettings(){
         </div>
       </div>
       
-      <div className="bg-krcard rounded-xl shadow-sm border border-krborder p-6 mb-6">
-        <h2 className="text-lg font-semibold mb-4 text-krtext">Data Management</h2>
+      {/* Data Management */}
+      <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-5 mb-6">
+        <div className="flex items-center gap-3 mb-5">
+          <span className="text-3xl">💾</span>
+          <div>
+            <h2 className="text-lg font-semibold text-krtext">Data Management</h2>
+            <p className="text-xs text-krmuted">Export, import, or delete all your trading data</p>
+          </div>
+        </div>
         <div className="grid sm:grid-cols-3 gap-4">
           <button 
             onClick={() => setShowExportModal(true)}
-            className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-600/30 transition-all"
           >
             <Save size={20} />
             Export Data
           </button>
           <button 
             onClick={() => setShowImportModal(true)}
-            className="flex items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+            className="flex items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700 hover:shadow-lg hover:shadow-green-600/30 transition-all"
           >
             <Link2 size={20} />
             Import Data
           </button>
           <button 
             onClick={() => setShowDeleteModal(true)}
-            className="flex items-center justify-center gap-2 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+            className="flex items-center justify-center gap-2 px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 hover:shadow-lg hover:shadow-red-600/30 transition-all"
           >
             <Trash2 size={20} />
             Delete All Data
@@ -507,11 +530,18 @@ export default function DataSettings(){
         </div>
       </div>
 
-      <div className="bg-krcard rounded-xl shadow-sm border border-krborder p-6">
-        <h2 className="text-lg font-semibold mb-4 text-krtext">Discord Integration</h2>
+      {/* Discord Integration */}
+      <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-5">
+        <div className="flex items-center gap-3 mb-5">
+          <span className="text-3xl">🔔</span>
+          <div>
+            <h2 className="text-lg font-semibold text-krtext">Discord Integration</h2>
+            <p className="text-xs text-krmuted">Connect webhooks to receive notifications</p>
+          </div>
+        </div>
         <div className="space-y-6">
           {/* Add New Webhook */}
-          <div className="space-y-4 p-4 bg-krblack/50 rounded-lg">
+          <div className="space-y-4 p-4 bg-krblack/30 rounded-xl border border-krborder">
             <h3 className="font-medium text-krtext">Add New Webhook</h3>
             <div className="grid grid-cols-1 gap-4">
               <div>
@@ -520,7 +550,7 @@ export default function DataSettings(){
                 </label>
                 <input
                   type="text"
-                  className="w-full px-3 py-2 border border-krborder rounded-md bg-krblack text-krtext focus:ring-1 focus:ring-krgold"
+                  className="w-full px-3 py-2 rounded-xl bg-krblack/30 border border-krborder text-krtext focus:ring-2 focus:ring-krgold/20 focus:border-krgold/50 transition-all"
                   placeholder="e.g., Main Channel"
                   value={newWebhookName}
                   onChange={(e) => setNewWebhookName(e.target.value)}
@@ -532,7 +562,7 @@ export default function DataSettings(){
                 </label>
                 <input
                   type="url"
-                  className="w-full px-3 py-2 border border-krborder rounded-md bg-krblack text-krtext focus:ring-1 focus:ring-krgold"
+                  className="w-full px-3 py-2 rounded-xl bg-krblack/30 border border-krborder text-krtext focus:ring-2 focus:ring-krgold/20 focus:border-krgold/50 transition-all"
                   placeholder="https://discord.com/api/webhooks/..."
                   value={newWebhookUrl}
                   onChange={(e) => setNewWebhookUrl(e.target.value)}
@@ -541,7 +571,7 @@ export default function DataSettings(){
             </div>
             <button
               onClick={addWebhook}
-              className="w-full px-4 py-2 bg-krgold text-white rounded-md hover:bg-kryellow transition-colors"
+              className="w-full px-4 py-2 bg-krgold text-krblack rounded-xl hover:bg-kryellow hover:shadow-lg hover:shadow-krgold/30 transition-all font-semibold"
             >
               Add Webhook
             </button>
@@ -554,20 +584,20 @@ export default function DataSettings(){
               {webhooks.map((webhook) => (
                 <div 
                   key={webhook.id} 
-                  className={`p-4 rounded-lg border ${webhook.id === activeWebhookId ? 'border-krgold bg-krgold/5' : 'border-krborder'}`}
+                  className={`p-4 rounded-xl border transition-all ${webhook.id === activeWebhookId ? 'border-krgold bg-krgold/5 shadow-md shadow-krgold/10' : 'border-krborder hover:border-krgold/50'}`}
                 >
                   {editingWebhook?.id === webhook.id ? (
                     <div className="space-y-3">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <input
                           type="text"
-                          className="w-full px-3 py-2 border border-krborder rounded-md focus:ring-1 focus:ring-krgold"
+                          className="w-full px-3 py-2 rounded-xl bg-krblack/30 border border-krborder focus:ring-2 focus:ring-krgold/20 focus:border-krgold/50 transition-all"
                           value={editingWebhook.name}
                           onChange={(e) => setEditingWebhook({...editingWebhook, name: e.target.value})}
                         />
                         <input
                           type="url"
-                          className="w-full px-3 py-2 border border-krborder rounded-md focus:ring-1 focus:ring-krgold"
+                          className="w-full px-3 py-2 rounded-xl bg-krblack/30 border border-krborder focus:ring-2 focus:ring-krgold/20 focus:border-krgold/50 transition-all"
                           value={editingWebhook.url}
                           onChange={(e) => setEditingWebhook({...editingWebhook, url: e.target.value})}
                         />
@@ -575,13 +605,13 @@ export default function DataSettings(){
                       <div className="flex gap-2">
                         <button 
                           onClick={updateWebhook}
-                          className="px-3 py-1 bg-krgold text-white rounded hover:bg-kryellow transition-colors text-sm"
+                          className="px-3 py-1 bg-krgold text-krblack rounded-lg hover:bg-kryellow hover:shadow-md hover:shadow-krgold/20 transition-all text-sm font-semibold"
                         >
                           Save
                         </button>
                         <button 
                           onClick={() => setEditingWebhook(null)}
-                          className="px-3 py-1 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors text-sm"
+                          className="px-3 py-1 bg-gray-500 text-white rounded-lg hover:bg-gray-600 hover:shadow-md transition-all text-sm"
                         >
                           Cancel
                         </button>
@@ -599,7 +629,7 @@ export default function DataSettings(){
                         ) : (
                           <button
                             onClick={() => handleSetActive(webhook.id)}
-                            className="px-3 py-1 border border-krgold text-krgold rounded hover:bg-krgold hover:text-white transition-colors text-sm whitespace-nowrap"
+                            className="px-3 py-1 border border-krgold text-krgold rounded-lg hover:bg-krgold hover:text-krblack hover:shadow-md hover:shadow-krgold/20 transition-all text-sm whitespace-nowrap"
                           >
                             Set Active
                           </button>
@@ -634,7 +664,7 @@ export default function DataSettings(){
       <Modal
         isOpen={showExportModal}
         onClose={() => !isExporting && setShowExportModal(false)}
-        title="Export Data"
+        title="💾 Export Data"
       >
         <div className="space-y-4">
           {isExporting ? (
@@ -645,19 +675,19 @@ export default function DataSettings(){
             </div>
           ) : (
             <>
-              <p className="text-gray-600">
+              <p className="text-krtext">
                 This will download all your data as a JSON file. You can use this file to backup or transfer your data.
               </p>
               <div className="flex justify-end gap-3">
                 <button
                   onClick={() => setShowExportModal(false)}
-                  className="px-4 py-2 border rounded-md hover:bg-gray-50"
+                  className="px-4 py-2 border border-krborder rounded-xl hover:bg-krcard/50 transition-all"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleExport}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-600/30 transition-all"
                 >
                   Export
                 </button>
@@ -671,7 +701,7 @@ export default function DataSettings(){
       <Modal
         isOpen={showImportModal}
         onClose={() => !isImporting && setShowImportModal(false)}
-        title="Import Data"
+        title="📥 Import Data"
       >
         <div className="space-y-4">
           {isImporting ? (
@@ -685,7 +715,7 @@ export default function DataSettings(){
             </div>
           ) : (
             <>
-              <p className="text-gray-600">
+              <p className="text-krtext">
                 Select a JSON file to import. Choose whether to merge with existing data or overwrite everything.
               </p>
               <div>
@@ -694,16 +724,16 @@ export default function DataSettings(){
                   type="file"
                   accept="application/json"
                   onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
-                  className="mb-4"
+                  className="mb-4 text-krtext"
                 />
                 {selectedFile && (
-                  <p className="text-sm text-green-600 mt-2">
+                  <p className="text-sm text-green-400 mt-2">
                     ✓ Selected: {selectedFile.name}
                   </p>
                 )}
               </div>
               <div className="flex gap-4 mb-4">
-                <label className="flex items-center">
+                <label className="flex items-center text-krtext cursor-pointer">
                   <input
                     type="radio"
                     checked={importMode === 'merge'}
@@ -712,7 +742,7 @@ export default function DataSettings(){
                   />
                   Merge with existing data
                 </label>
-                <label className="flex items-center">
+                <label className="flex items-center text-krtext cursor-pointer">
                   <input
                     type="radio"
                     checked={importMode === 'overwrite'}
@@ -722,7 +752,7 @@ export default function DataSettings(){
                   Overwrite all data
                 </label>
               </div>
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-sm text-yellow-800">
+              <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-3 text-sm text-yellow-300">
                 <strong>⚠️ {importMode === 'overwrite' ? 'Warning' : 'Note'}:</strong>{' '}
                 {importMode === 'overwrite' 
                   ? 'This will replace ALL your current data with the imported file. Make sure you have a backup!'
@@ -731,14 +761,14 @@ export default function DataSettings(){
               <div className="flex justify-end gap-3">
                 <button
                   onClick={() => setShowImportModal(false)}
-                  className="px-4 py-2 border rounded-md hover:bg-gray-50"
+                  className="px-4 py-2 border border-krborder rounded-xl hover:bg-krcard/50 transition-all"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleImport}
                   disabled={!selectedFile}
-                  className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700 hover:shadow-lg hover:shadow-green-600/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Import
                 </button>
@@ -752,40 +782,41 @@ export default function DataSettings(){
       <Modal
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
-        title="Delete All Data"
+        title="🗑️ Delete All Data"
       >
         <div className="space-y-4">
-          <div className="flex items-center gap-3 p-3 bg-red-50 text-red-800 rounded-md">
+          <div className="flex items-center gap-3 p-3 bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl">
             <AlertTriangle className="flex-shrink-0" />
             <p>This action cannot be undone. All your data will be permanently deleted.</p>
           </div>
-          <p className="text-gray-600">
+          <p className="text-krtext">
             Type "delete" below to confirm:
           </p>
           <input
             type="text"
             value={deleteConfirm}
             onChange={(e) => setDeleteConfirm(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-red-500"
+            className="w-full px-3 py-2 rounded-xl bg-krblack/30 border border-krborder text-krtext focus:ring-2 focus:ring-red-500/20 focus:border-red-500/50 transition-all"
             placeholder="Type 'delete' to confirm"
           />
           <div className="flex justify-end gap-3">
             <button
               onClick={() => setShowDeleteModal(false)}
-              className="px-4 py-2 border rounded-md hover:bg-gray-50"
+              className="px-4 py-2 border border-krborder rounded-xl hover:bg-krcard/50 transition-all"
             >
               Cancel
             </button>
             <button
               onClick={handleDelete}
               disabled={deleteConfirm.toLowerCase() !== 'delete'}
-              className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50"
+              className="px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 hover:shadow-lg hover:shadow-red-600/30 transition-all disabled:opacity-50"
             >
               Delete All Data
             </button>
           </div>
         </div>
       </Modal>
+    </div>
     </div>
   )
 }
