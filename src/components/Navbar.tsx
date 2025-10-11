@@ -1,9 +1,8 @@
 import React, { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Menu, ChevronDown } from 'lucide-react'
+import { Menu, ChevronDown, Settings } from 'lucide-react'
 
 const nav = [
-  { to: '/', label: 'Dashboard' },
   { to: '/vision', label: 'Vision' },
   { 
     to: '/news', 
@@ -13,7 +12,14 @@ const nav = [
       { to: '/data-market', label: 'Data Market' }
     ]
   },
-  { to: '/journal', label: 'Journal' },
+  { 
+    to: '/journal', 
+    label: 'Journal',
+    dropdown: [
+      { to: '/journal/entries', label: 'Entries' },
+      { to: '/journal/analytics', label: 'Trade Analytics' }
+    ]
+  },
   { 
     to: '/playbook', 
     label: 'Strategy',
@@ -22,11 +28,11 @@ const nav = [
     ]
   },
   { 
-    to: '/charts', 
+    to: '/snapshots', 
     label: 'Snapshots',
     dropdown: [
-      { to: '/charts?tab=chart', label: 'Chart' },
-      { to: '/charts?tab=pnl', label: 'PNL Overview' }
+      { to: '/snapshots/charts', label: 'Charts' },
+      { to: '/snapshots/pnl', label: 'PNL Overview' }
     ]
   },
   { to: '/wallet', label: 'Wallet' },
@@ -46,7 +52,8 @@ export default function Navbar(){
         <nav className="hidden md:flex gap-4 items-center">
           {nav.map(n => {
             if (n.dropdown) {
-              const isActive = loc.pathname === n.to
+              // Check if any dropdown item or the parent path matches
+              const isActive = loc.pathname === n.to || n.dropdown.some(item => loc.pathname === item.to) || loc.pathname.startsWith(n.to + '/')
               return (
                 <div 
                   key={n.to}
@@ -84,7 +91,9 @@ export default function Navbar(){
               </Link>
             )
           })}
-          <Link to="/settings" className="px-3 py-2 rounded-md text-sm bg-krgray/60">Data</Link>
+          <Link to="/settings" className="p-2 rounded-md bg-krgray/60 hover:bg-krgold/20 transition-colors" title="Settings">
+            <Settings size={20} className="text-krwhite" />
+          </Link>
         </nav>
         <div className="md:hidden text-krwhite">
           <Menu />

@@ -1,10 +1,12 @@
 import React from 'react'
 import { Routes, Route, Link } from 'react-router-dom'
-import Dashboard from './pages/Dashboard'
 import VisionBoard from './pages/VisionBoard'
 import Journal from './pages/Journal'
+import JournalOverview from './pages/JournalOverview'
+import TradeAnalytics from './pages/TradeAnalytics'
 import Playbook from './pages/Playbook'
 import Charts from './pages/Charts'
+import SnapshotsOverview from './pages/SnapshotsOverview'
 import Wallet from './pages/Wallet'
 import News from './pages/News'
 import DataMarket from './pages/DataMarket'
@@ -19,12 +21,17 @@ export default function App() {
         <Navbar />
         <div className="container mx-auto px-6 py-8">
           <Routes>
-            <Route path="/" element={<Dashboard />} />
+            <Route path="/" element={<JournalOverview />} />
             <Route path="/vision" element={<VisionBoard />} />
             <Route path="/news" element={<News />} />
             <Route path="/data-market" element={<DataMarket />} />
-            <Route path="/journal" element={<Journal />} />
+            <Route path="/journal" element={<JournalOverview />} />
+            <Route path="/journal/entries" element={<Journal />} />
+            <Route path="/journal/analytics" element={<TradeAnalytics />} />
             <Route path="/playbook" element={<Playbook />} />
+            <Route path="/snapshots" element={<SnapshotsOverview />} />
+            <Route path="/snapshots/charts" element={<Charts />} />
+            <Route path="/snapshots/pnl" element={<Charts />} />
             <Route path="/charts" element={<Charts />} />
             <Route path="/wallet" element={<Wallet />} />
             <Route path="/settings" element={<DataSettings />} />
