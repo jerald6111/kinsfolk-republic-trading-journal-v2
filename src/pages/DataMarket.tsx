@@ -29,16 +29,12 @@ export default function DataMarket() {
     gainers: CryptoItem[]
     losers: CryptoItem[]
     highVolume: CryptoItem[]
-    tokenUnlocks: any[]
-    tokenUnlocks2: any[]
     loading: boolean
   }>({
     trending: [],
     gainers: [],
     losers: [],
     highVolume: [],
-    tokenUnlocks: [],
-    tokenUnlocks2: [],
     loading: true
   })
   const [selectedModal, setSelectedModal] = useState<{
@@ -74,39 +70,11 @@ export default function DataMarket() {
         const highVolume = [...markets]
           .sort((a, b) => (b.total_volume || 0) - (a.total_volume || 0))
 
-
-
-        // Fetch incoming token unlocks (based on CoinGecko data)
-        const tokenUnlocks = [
-          { name: "Aethir", symbol: "ATH", unlock_date: "0 Days", amount: "1.3B ATH", value: "$52.05M", percentage: "8.85%" },
-          { name: "World Mobile Token", symbol: "WMTX", unlock_date: "0 Days 14 Hrs", amount: "830K WMTX", value: "$146.67K", percentage: "0.11%" },
-          { name: "Cheelee", symbol: "CHEEL", unlock_date: "0 Days 14 Hrs", amount: "21M CHEEL", value: "$22.31M", percentage: "-" },
-          { name: "BlueMove", symbol: "MOVE", unlock_date: "0 Days 14 Hrs", amount: "6.1M MOVE", value: "$4.66K", percentage: "2.79%" },
-          { name: "Gods Unchained", symbol: "GODS", unlock_date: "0 Days 14 Hrs", amount: "2.6M GODS", value: "$258.56K", percentage: "0.66%" },
-          { name: "Slash Vision Labs", symbol: "SVL", unlock_date: "1 Days 14 Hrs", amount: "4.8M SVL", value: "$209.70K", percentage: "0.1%" },
-          { name: "Puffer", symbol: "PUFFER", unlock_date: "1 Days 14 Hrs", amount: "19M PUFFER", value: "$1.9M", percentage: "9.4%" },
-          { name: "Fusionist", symbol: "ACE", unlock_date: "1 Days 14 Hrs", amount: "1.8M ACE", value: "$538.58K", percentage: "2.31%" },
-          { name: "CYBER", symbol: "CYBER", unlock_date: "1 Days 22 Hrs", amount: "890K CYBER", value: "$871.33K", percentage: "1.8%" },
-          { name: "Starknet", symbol: "STRK", unlock_date: "2 Days 14 Hrs", amount: "130M STRK", value: "$14.43M", percentage: "2.94%" },
-          { name: "Onyxcoin", symbol: "XCN", unlock_date: "2 Days 14 Hrs", amount: "300M XCN", value: "$2.83M", percentage: "0.84%" },
-          { name: "IOTA", symbol: "IOTA", unlock_date: "2 Days 14 Hrs", amount: "12M IOTA", value: "$1.75M", percentage: "0.3%" },
-          { name: "Sei", symbol: "SEI", unlock_date: "3 Days 02 Hrs", amount: "56M SEI", value: "$11.38M", percentage: "0.91%" },
-          { name: "Arbitrum", symbol: "ARB", unlock_date: "4 Days 03 Hrs", amount: "93M ARB", value: "$28.34M", percentage: "1.71%" },
-          { name: "deBridge", symbol: "DBR", unlock_date: "4 Days 14 Hrs", amount: "620M DBR", value: "$16.97M", percentage: "17.59%" },
-          { name: "Astar", symbol: "ASTR", unlock_date: "4 Days 14 Hrs", amount: "9.7M ASTR", value: "$181.43K", percentage: "0.12%" },
-          { name: "ZKsync", symbol: "ZK", unlock_date: "4 Days 22 Hrs", amount: "170M ZK", value: "$6.70M", percentage: "2.39%" },
-          { name: "Wormhole", symbol: "W", unlock_date: "5 Days 01 Hrs", amount: "50M W", value: "$3.60M", percentage: "1.06%" },
-          { name: "ApeCoin", symbol: "APE", unlock_date: "5 Days 02 Hrs", amount: "16M APE", value: "$5.97M", percentage: "1.72%" },
-          { name: "LayerZero", symbol: "ZRO", unlock_date: "8 Days 01 Hrs", amount: "26M ZRO", value: "$45.11M", percentage: "23.13%" }
-        ]
-
         setCryptoData({
           trending: trending.coins || [],
           gainers,
           losers,
           highVolume,
-          tokenUnlocks: tokenUnlocks.slice(0, 10), // First 10 for first widget
-          tokenUnlocks2: tokenUnlocks.slice(10, 20), // Next 10 for second widget
           loading: false
         })
       } catch (error) {
@@ -148,44 +116,52 @@ export default function DataMarket() {
           "operation": "in_range", 
           "right": ["BINANCE", "BYBIT", "OKX"]
         }
-      ],
-      "range": "12M"
+      ]
     })
 
     container.appendChild(script)
 
     return () => {
-      if (container) {
-        container.innerHTML = ''
-      }
+      container.innerHTML = ''
     }
   }, [])
 
-  // Utility functions
+  // Helper functions
   const formatPrice = (price: number) => {
-    if (price < 0.01) return `$${price.toFixed(6)}`
-    if (price < 1) return `$${price.toFixed(4)}`
-    return `$${price.toLocaleString()}`
+    if (price < 0.01) {
+      return `$${price.toFixed(6)}`
+    } else if (price < 1) {
+      return `$${price.toFixed(4)}`
+    } else {
+      return `$${price.toFixed(2)}`
+    }
   }
 
-  const formatMarketCap = (value: number) => {
-    if (value >= 1e9) return `$${(value / 1e9).toFixed(1)}B`
-    if (value >= 1e6) return `$${(value / 1e6).toFixed(1)}M`
-    if (value >= 1e3) return `$${(value / 1e3).toFixed(1)}K`
-    return `$${value.toLocaleString()}`
+  const formatMarketCap = (cap: number) => {
+    if (cap >= 1e12) {
+      return `$${(cap / 1e12).toFixed(2)}T`
+    } else if (cap >= 1e9) {
+      return `$${(cap / 1e9).toFixed(2)}B`
+    } else if (cap >= 1e6) {
+      return `$${(cap / 1e6).toFixed(2)}M`
+    } else if (cap >= 1e3) {
+      return `$${(cap / 1e3).toFixed(2)}K`
+    } else {
+      return `$${cap.toFixed(2)}`
+    }
   }
 
   const openModal = (type: string, title: string, data: any[]) => {
     setSelectedModal({ type, title, data })
   }
 
-  // Widget component
-  const CryptoWidget = ({ 
-    title, 
-    emoji, 
-    data, 
+  // Crypto Widget Component
+  const CryptoWidget = ({
+    title,
+    emoji,
+    data,
     type,
-    renderItem 
+    renderItem
   }: {
     title: string
     emoji: string
@@ -193,7 +169,7 @@ export default function DataMarket() {
     type: string
     renderItem: (item: any, index: number) => React.ReactNode
   }) => (
-    <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/50 transition-all duration-300 p-5">
+    <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-5">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
           <span className="text-2xl">{emoji}</span>
@@ -335,58 +311,6 @@ export default function DataMarket() {
               )}
             />
 
-            {/* Incoming Token Unlocks (2) */}
-            <CryptoWidget
-              title="Incoming Token Unlocks"
-              emoji="🔓"
-              data={cryptoData.tokenUnlocks2}
-              type="unlocks2"
-              renderItem={(unlock: any, index: number) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-krblack/40 rounded-lg hover:bg-krblack/60 transition-all">
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs text-krgold font-bold w-6">#{index + 1}</span>
-                    <div className="w-6 h-6 bg-orange-500/20 rounded-full flex items-center justify-center">
-                      <span className="text-xs font-bold text-orange-400">🔓</span>
-                    </div>
-                    <div>
-                      <div className="font-medium text-sm">{unlock.name}</div>
-                      <div className="text-xs text-krmuted uppercase">{unlock.symbol}</div>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-xs text-orange-400">{unlock.amount}</div>
-                    <div className="text-xs text-krmuted">{unlock.unlock_date}</div>
-                  </div>
-                </div>
-              )}
-            />
-
-            {/* Incoming Token Unlocks */}
-            <CryptoWidget
-              title="Incoming Token Unlocks"
-              emoji="�"
-              data={cryptoData.tokenUnlocks}
-              type="unlocks"
-              renderItem={(unlock: any, index: number) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-krblack/40 rounded-lg hover:bg-krblack/60 transition-all">
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs text-krgold font-bold w-6">#{index + 1}</span>
-                    <div className="w-6 h-6 bg-orange-500/20 rounded-full flex items-center justify-center">
-                      <span className="text-xs font-bold text-orange-400">�</span>
-                    </div>
-                    <div>
-                      <div className="font-medium text-sm">{unlock.name}</div>
-                      <div className="text-xs text-krmuted uppercase">{unlock.symbol}</div>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-xs text-orange-400">{unlock.amount}</div>
-                    <div className="text-xs text-krmuted">{unlock.unlock_date}</div>
-                  </div>
-                </div>
-              )}
-            />
-
             {/* Highest Volume */}
             <CryptoWidget
               title="Highest Volume"
@@ -417,7 +341,6 @@ export default function DataMarket() {
                 </div>
               )}
             />
-
 
           </div>
 
@@ -455,29 +378,6 @@ export default function DataMarket() {
                 {selectedModal.data.map((item: any, index: number) => {
                   const coin = selectedModal.type === 'trending' ? item.item : item
                   
-                  // Handle Token Unlocks display
-                  if (selectedModal.type === 'unlocks' || selectedModal.type === 'unlocks2') {
-                    return (
-                      <div key={index} className="flex items-center justify-between p-4 bg-krblack/40 rounded-lg hover:bg-krblack/60 transition-all">
-                        <div className="flex items-center gap-4">
-                          <span className="text-sm text-krgold font-bold w-8">#{index + 1}</span>
-                          <div className="w-8 h-8 bg-orange-500/20 rounded-full flex items-center justify-center">
-                            <span className="text-sm font-bold text-orange-400">�</span>
-                          </div>
-                          <div>
-                            <div className="font-medium">{coin.name}</div>
-                            <div className="text-sm text-krmuted uppercase">{coin.symbol}</div>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <div className="font-medium text-orange-400">{coin.amount}</div>
-                          <div className="text-sm text-krmuted">{coin.unlock_date}</div>
-                          <div className="text-sm text-kryellow">{coin.value}</div>
-                        </div>
-                      </div>
-                    )
-                  }
-                  
                   // Handle regular crypto coins (trending, gainers, losers, volume)
                   return (
                     <div key={coin.id || index} className="flex items-center justify-between p-4 bg-krblack/40 rounded-lg hover:bg-krblack/60 transition-all">
@@ -508,6 +408,11 @@ export default function DataMarket() {
                             Vol: {formatMarketCap(coin.total_volume)}
                           </div>
                         )}
+                        {coin.market_cap && (
+                          <div className="text-sm text-krmuted">
+                            MCap: {formatMarketCap(coin.market_cap)}
+                          </div>
+                        )}
                       </div>
                     </div>
                   )
@@ -517,6 +422,23 @@ export default function DataMarket() {
           </div>
         </div>
       )}
+
+      <style jsx>{`
+        .crypto-list-scroll::-webkit-scrollbar {
+          width: 4px;
+        }
+        .crypto-list-scroll::-webkit-scrollbar-track {
+          background: rgba(0, 0, 0, 0.1);
+          border-radius: 2px;
+        }
+        .crypto-list-scroll::-webkit-scrollbar-thumb {
+          background: rgba(218, 165, 32, 0.3);
+          border-radius: 2px;
+        }
+        .crypto-list-scroll::-webkit-scrollbar-thumb:hover {
+          background: rgba(218, 165, 32, 0.5);
+        }
+      `}</style>
     </div>
   )
 }
