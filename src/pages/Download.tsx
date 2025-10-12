@@ -94,10 +94,10 @@ export default function Download() {
                 
                 <button 
                   onClick={() => {
-                    // This would trigger the download
+                    // Direct download from website hosting
                     const link = document.createElement('a')
-                    link.href = 'https://github.com/jerald6111/kinsfolk-republic-trading-journal-v2/releases/download/v1.0.0/Kinsfolk-Republic-Trading-Journal-Setup-1.0.0.exe'
-                    link.download = 'Kinsfolk-Republic-Trading-Journal-Setup-1.0.0.exe'
+                    link.href = '/downloads/KRTJ-Desktop-Setup.exe'
+                    link.download = 'KRTJ-Desktop-Setup.exe'
                     document.body.appendChild(link)
                     link.click()
                     document.body.removeChild(link)
@@ -216,8 +216,8 @@ export default function Download() {
                 <button 
                   onClick={() => {
                     const link = document.createElement('a')
-                    link.href = 'https://github.com/jerald6111/kinsfolk-republic-trading-journal-v2/releases/download/v1.0.0/Kinsfolk-Republic-Trading-Journal-Setup-1.0.0.exe'
-                    link.download = 'Kinsfolk-Republic-Trading-Journal-Setup-1.0.0.exe'
+                    link.href = '/downloads/KRTJ-Desktop-Setup.exe'
+                    link.download = 'KRTJ-Desktop-Setup.exe'
                     document.body.appendChild(link)
                     link.click()
                     document.body.removeChild(link)

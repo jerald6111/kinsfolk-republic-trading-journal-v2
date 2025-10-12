@@ -1,0 +1,23 @@
+{
+  "version": "1.0.0",
+  "releaseDate": "2025-10-13",
+  "downloadUrl": "/downloads/KRTJ-Desktop-Setup.exe",
+  "releaseNotes": {
+    "title": "KRTJ Desktop v1.0.0 - Initial Release! 🎉",
+    "features": [
+      "Complete offline trading journal functionality",
+      "Dark theme optimized for trading environments", 
+      "AI-powered trading assistant with live market data",
+      "Advanced analytics and performance tracking",
+      "System tray integration for quick access",
+      "Automatic update notifications (this feature!)"
+    ],
+    "improvements": [],
+    "bugFixes": [],
+    "notes": "Welcome to KRTJ Desktop! Experience the power of offline trading analysis with enhanced security and performance."
+  },
+  "minimumVersion": "1.0.0",
+  "isRequired": false,
+  "fileSize": "45.2 MB",
+  "checksum": ""
+}

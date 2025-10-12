@@ -1,0 +1,32 @@
+{
+  "version": "1.1.0",
+  "releaseDate": "2025-10-14",
+  "downloadUrl": "/downloads/KRTJ-Desktop-Setup.exe",
+  "releaseNotes": {
+    "title": "KRTJ Desktop v1.1.0 - Enhanced Update System! 🔥",
+    "features": [
+      "Rich update notifications with detailed changelogs",
+      "System tray balloon notifications for new updates",
+      "Periodic automatic update checking (every 4 hours)",
+      "Direct download integration from KRTJ website",
+      "Copy changelog to clipboard functionality",
+      "Improved update UI with better user control"
+    ],
+    "improvements": [
+      "Faster app startup and reduced memory usage",
+      "Enhanced dark theme consistency across all dialogs",
+      "Better error handling for network connectivity issues",
+      "Smoother animations and transitions"
+    ],
+    "bugFixes": [
+      "Fixed occasional crash when checking market prices",
+      "Resolved system tray icon not showing on some Windows versions",
+      "Fixed journal entry saving in offline mode"
+    ],
+    "notes": "This update introduces a completely revamped update system! You'll now receive rich notifications with detailed changelogs, and can choose exactly when to update. No more surprise restarts - you're always in control!"
+  },
+  "minimumVersion": "1.0.0",
+  "isRequired": false,
+  "fileSize": "46.1 MB",
+  "checksum": "abc123def456..."
+}
