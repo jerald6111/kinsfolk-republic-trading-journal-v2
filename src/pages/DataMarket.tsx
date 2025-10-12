@@ -208,7 +208,7 @@ export default function DataMarket() {
               </h1>
             </div>
             <p className="text-krmuted text-sm md:text-base ml-14">
-              Powered by CoinLore (CoinMarketCap alternative) & TradingView - Professional crypto market analysis tools
+              Powered by CoinGecko & TradingView - Professional crypto market analysis tools with 1-minute updates
             </p>
           </div>
 

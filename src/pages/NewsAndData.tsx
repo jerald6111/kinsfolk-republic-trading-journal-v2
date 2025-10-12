@@ -527,7 +527,7 @@ export default function NewsAndData() {
           <div className="mt-6 bg-krgold/10 backdrop-blur-sm rounded-xl border border-krgold/30 p-4">
             <p className="text-sm text-center text-krmuted">
               <span className="text-krgold font-semibold">Data Sources:</span> Economic calendar and crypto market data powered by <a href="https://www.tradingview.com" target="_blank" rel="noopener noreferrer" className="text-krgold hover:underline">TradingView</a> • 
-              Multi-market news aggregated from premium sources • Updates every 5 minutes
+              Multi-market news aggregated from premium sources • Crypto data updates every 1 minute
             </p>
           </div>
         </div>

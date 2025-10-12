@@ -886,7 +886,7 @@ export default function News() {
               <span className="text-blue-400 mx-2">📈 Stocks</span> • 
               <span className="text-green-400 mx-2">💱 Forex</span> • 
               <span className="text-purple-400 mx-2">🌍 Global</span> • 
-              Updates every 5 minutes
+              Updates every 1 minute
             </p>
           </div>
         </div>
