@@ -10,6 +10,7 @@ import Charts from './pages/Charts'
 import SnapshotsOverview from './pages/SnapshotsOverview'
 import Wallet from './pages/Wallet'
 import News from './pages/News'
+import NewsAndData from './pages/NewsAndData'
 import DataMarket from './pages/DataMarket'
 import DataSettings from './pages/DataSettings'
 import Navbar from './components/Navbar'
@@ -26,6 +27,7 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/vision" element={<VisionBoard />} />
           <Route path="/news" element={<News />} />
+          <Route path="/news-and-data" element={<NewsAndData />} />
           <Route path="/data-market" element={<DataMarket />} />
           <Route path="/journal" element={<JournalOverview />} />
           <Route path="/journal/entries" element={<Journal />} />

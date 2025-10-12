@@ -5,10 +5,11 @@ import { Menu, ChevronDown, Settings } from 'lucide-react'
 const nav = [
   { to: '/vision', label: 'Vision' },
   { 
-    to: '/news', 
-    label: 'News and Data',
+    to: '/news-and-data', 
+    label: 'News & Data',
     dropdown: [
-      { to: '/news', label: 'News' },
+      { to: '/news', label: 'Market News' },
+      { to: '/news-and-data', label: 'News & Data Hub' },
       { to: '/data-market', label: 'Data Market' }
     ]
   },
