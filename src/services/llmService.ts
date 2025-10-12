@@ -41,9 +41,14 @@ class LLMService {
 Remember: You're a mentor focused on helping traders develop discipline, emotional control, and systematic approaches to trading through the KRTJ platform.`
 
   constructor() {
-    this.apiKey = process.env.REACT_APP_GROQ_API_KEY || ''
+    // @ts-ignore - Vite environment variables
+    this.apiKey = import.meta.env?.VITE_GROQ_API_KEY || ''
     if (!this.apiKey) {
       console.warn('Groq API key not found. LLM features will be disabled.')
+      // @ts-ignore - Debug environment variables
+      console.log('Available env vars:', import.meta.env)
+    } else {
+      console.log('Groq API key loaded successfully')
     }
   }
 
