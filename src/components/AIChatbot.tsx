@@ -29,6 +29,7 @@ export default function AIChatbot() {
   const [userInfo, setUserInfo] = useState<UserInfo>({ name: '', email: '', hasProvidedInfo: false })
   const [showEmailPrompt, setShowEmailPrompt] = useState(false)
   const [showConversationSender, setShowConversationSender] = useState(false)
+  const [loadingPriceData, setLoadingPriceData] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const quickActions: QuickAction[] = [
@@ -87,11 +88,80 @@ Remember: Focus on process over profits. Your Journal is your mirror! 🪞`
 • Sometimes the best trade is no trade
 
 What's your biggest trading challenge right now? 🤔`
+    },
+    {
+      id: 'market_data',
+      label: 'Check Prices',
+      icon: <TrendingUp className="w-4 h-4" />,
+      response: `💰 **Live Market Data Available!**
+
+I can check real-time prices from CoinGecko for:
+• **Bitcoin (BTC)** - "What's BTC price?"
+• **Ethereum (ETH)** - "ETH price now"
+• **Solana (SOL)** - "How much is SOL?"
+• **And many more!** ADA, DOGE, BNB, XRP, AVAX, MATIC, DOT, LINK
+
+Just ask naturally like "Bitcoin price" or "How much is ETH?" and I'll pull live data with 24h changes, market cap, and volume!
+
+Which coin are you watching? 📊`
     }
   ]
 
-  const getSmartResponse = (message: string): string => {
+  const getSmartResponse = async (message: string): Promise<string> => {
     const lowerMessage = message.toLowerCase().trim()
+    
+    // Price queries - CoinGecko integration
+    if (lowerMessage.includes('price') || lowerMessage.includes('btc') || lowerMessage.includes('eth') || 
+        lowerMessage.includes('bitcoin') || lowerMessage.includes('ethereum') || 
+        lowerMessage.match(/what.*(cost|worth|trading)/i)) {
+      
+      // Extract coin mentions
+      const coinMap: Record<string, string> = {
+        'bitcoin': 'bitcoin',
+        'btc': 'bitcoin',
+        'ethereum': 'ethereum', 
+        'eth': 'ethereum',
+        'solana': 'solana',
+        'sol': 'solana',
+        'cardano': 'cardano',
+        'ada': 'cardano',
+        'dogecoin': 'dogecoin',
+        'doge': 'dogecoin',
+        'bnb': 'binancecoin',
+        'binance': 'binancecoin',
+        'xrp': 'ripple',
+        'ripple': 'ripple',
+        'avax': 'avalanche-2',
+        'avalanche': 'avalanche-2',
+        'matic': 'matic-network',
+        'polygon': 'matic-network',
+        'dot': 'polkadot',
+        'polkadot': 'polkadot',
+        'link': 'chainlink',
+        'chainlink': 'chainlink'
+      }
+
+      for (const [keyword, coinId] of Object.entries(coinMap)) {
+        if (lowerMessage.includes(keyword)) {
+          const priceData = await fetchCoinPrice(coinId)
+          return formatPriceData(priceData, keyword)
+        }
+      }
+
+      // Generic price request
+      if (lowerMessage.includes('price') && !Object.keys(coinMap).some(k => lowerMessage.includes(k))) {
+        return `💰 **I can check prices for you!** Just ask like:
+
+• "What's the Bitcoin price?"
+• "BTC price now" 
+• "How much is ETH?"
+• "Solana price check"
+
+**Supported coins**: BTC, ETH, SOL, ADA, DOGE, BNB, XRP, AVAX, MATIC, DOT, LINK, and more!
+
+Which coin price do you want to check? 📊`
+      }
+    }
     
     // Emotional responses for trading situations
     if (lowerMessage.includes('liquidated') || lowerMessage.includes('rekt') || lowerMessage.includes('account wiped')) {
@@ -176,13 +246,28 @@ All features work offline after initial load. No account needed - start journali
 Your data never leaves your browser. Privacy-first design! 🛡️`
     }
     
+    // Market analysis requests
+    if (lowerMessage.includes('market') && (lowerMessage.includes('analysis') || lowerMessage.includes('outlook') || lowerMessage.includes('trend'))) {
+      return `📈 **Market Analysis:**
+
+I can help with price data, but for deep market analysis, here's my take:
+
+**Always Remember:**
+• Markets are unpredictable - focus on risk management
+• Your Journal shows your real edge, not market predictions
+• Stick to your tested setups regardless of market sentiment
+• When in doubt, size down and wait for clarity
+
+Want me to check specific coin prices for your analysis? Just ask "BTC price" or "ETH price"! 💰`
+    }
+
     // Greetings
     if (lowerMessage.includes('hello') || lowerMessage.includes('hi') || lowerMessage.includes('hey')) {
-      return "Hey! 👋 I'm your Kinsfolk Assistant - part customer service, part trading mentor. I'm here to help you navigate KRTJ and level up your trading game. What's on your mind?"
+      return "Hey! 👋 I'm your Kinsfolk Assistant - part customer service, part trading mentor. I can help with KRTJ navigation, check live crypto prices via CoinGecko, and guide you through trading challenges. What's on your mind?"
     }
     
     // Default response
-    return "I'm here to help with KRTJ navigation, trading guidance, and platform questions. Try asking about 'how to use the journal', 'analytics help', or share what's happening with your trades. What's your biggest challenge right now? 🤔"
+    return "I'm here to help with KRTJ navigation, live crypto prices (via CoinGecko), trading guidance, and platform questions. Try asking 'Bitcoin price', 'how to use the journal', 'analytics help', or share what's happening with your trades. What do you need? 🤔"
   }
 
   useEffect(() => {
@@ -246,7 +331,67 @@ Your data never leaves your browser. Privacy-first design! 🛡️`
     setShowConversationSender(false)
   }
 
-  const handleSendMessage = () => {
+  // CoinGecko API integration
+  const fetchCoinPrice = async (coinId: string) => {
+    try {
+      setLoadingPriceData(true)
+      const response = await fetch(
+        `https://api.coingecko.com/api/v3/simple/price?ids=${coinId}&vs_currencies=usd&include_24hr_change=true&include_market_cap=true&include_24hr_vol=true`
+      )
+      const data = await response.json()
+      return data[coinId]
+    } catch (error) {
+      console.error('CoinGecko API error:', error)
+      return null
+    } finally {
+      setLoadingPriceData(false)
+    }
+  }
+
+  const searchCoin = async (query: string) => {
+    try {
+      const response = await fetch(`https://api.coingecko.com/api/v3/search?query=${query}`)
+      const data = await response.json()
+      return data.coins?.slice(0, 5) || []
+    } catch (error) {
+      console.error('CoinGecko search error:', error)
+      return []
+    }
+  }
+
+  const formatPriceData = (priceData: any, coinName: string) => {
+    if (!priceData) return "Sorry, I couldn't fetch that price data right now. CoinGecko might be busy! 📊"
+
+    const price = priceData.usd?.toLocaleString('en-US', { 
+      style: 'currency', 
+      currency: 'USD',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 6 
+    })
+    
+    const change24h = priceData.usd_24h_change
+    const changeEmoji = change24h > 0 ? '🟢' : change24h < 0 ? '🔴' : '⚪'
+    const changeText = change24h > 0 ? `+${change24h.toFixed(2)}%` : `${change24h.toFixed(2)}%`
+    
+    const marketCap = priceData.usd_market_cap ? 
+      `$${(priceData.usd_market_cap / 1000000000).toFixed(2)}B` : 'N/A'
+    
+    const volume24h = priceData.usd_24h_vol ? 
+      `$${(priceData.usd_24h_vol / 1000000).toFixed(2)}M` : 'N/A'
+
+    return `💰 **${coinName.toUpperCase()} Price Update:**
+
+• **Price**: ${price}
+• **24h Change**: ${changeEmoji} ${changeText}
+• **Market Cap**: ${marketCap}
+• **24h Volume**: ${volume24h}
+
+*Data from CoinGecko* 📈
+
+What's your take on this price action? Planning any moves?`
+  }
+
+  const handleSendMessage = async () => {
     if (!inputMessage.trim()) return
 
     // Request user info after a few messages if not provided
@@ -259,12 +404,19 @@ Your data never leaves your browser. Privacy-first design! 🛡️`
     setInputMessage('')
     setIsTyping(true)
 
-    // Simulate bot typing delay
-    setTimeout(() => {
-      const response = getSmartResponse(currentMessage)
-      addBotMessage(response)
-      setIsTyping(false)
-    }, 1000 + Math.random() * 1000) // Random delay between 1-2 seconds
+    // Handle async responses (like price data)
+    try {
+      const response = await getSmartResponse(currentMessage)
+      setTimeout(() => {
+        addBotMessage(response)
+        setIsTyping(false)
+      }, 800 + Math.random() * 800) // Delay for realism
+    } catch (error) {
+      setTimeout(() => {
+        addBotMessage("Oops! Something went wrong while fetching that info. Try asking again! 🤖")
+        setIsTyping(false)
+      }, 800)
+    }
   }
 
   const handleQuickAction = (action: QuickAction) => {
@@ -392,6 +544,9 @@ Your data never leaves your browser. Privacy-first design! 🛡️`
                     <div className="w-2 h-2 bg-krgold rounded-full animate-bounce"></div>
                     <div className="w-2 h-2 bg-krgold rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
                     <div className="w-2 h-2 bg-krgold rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                    {loadingPriceData && (
+                      <span className="ml-2 text-xs text-krmuted">Fetching live data...</span>
+                    )}
                   </div>
                 </div>
               </div>
