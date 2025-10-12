@@ -871,29 +871,13 @@ export default function News() {
                       </p>
                     </div>
 
-                    {/* External Link */}
-                    {selectedArticle.url && selectedArticle.url !== '#' && (
-                      <div className="flex justify-center">
-                        <a
-                          href={selectedArticle.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 bg-krgold text-krblack px-4 py-2 rounded-lg font-medium hover:bg-kryellow transition-colors"
-                        >
-                          <ExternalLink size={16} />
-                          Read Full Article
-                        </a>
-                      </div>
-                    )}
-                    
-                    {(!selectedArticle.url || selectedArticle.url === '#') && (
-                      <div className="text-center">
-                        <p className="text-xs text-krmuted bg-krblack/30 rounded-lg p-3">
-                          <strong>Live News Integration:</strong> This article is fetched from our real-time news feeds. 
-                          For the complete article, visit the source website directly.
-                        </p>
-                      </div>
-                    )}
+                    {/* News Source Information */}
+                    <div className="text-center">
+                      <p className="text-xs text-krmuted bg-krblack/30 rounded-lg p-3">
+                        <strong>Live News Integration:</strong> This article is sourced from {selectedArticle.source}. 
+                        Visit their website directly for complete coverage and additional details.
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
