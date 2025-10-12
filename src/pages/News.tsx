@@ -64,7 +64,7 @@ export default function News() {
               publishedAt: new Date().toISOString(),
               category: 'stocks' as const,
               summary: 'Major technology companies led the market surge today, with artificial intelligence and semiconductor stocks showing particularly strong performance amid positive earnings reports.',
-              url: '#'
+              url: 'https://www.marketwatch.com/investing/index/spx'
             },
             {
               id: 'stocks-2', 
@@ -73,7 +73,7 @@ export default function News() {
               publishedAt: new Date().toISOString(),
               category: 'stocks' as const,
               summary: 'Fed officials hint at more accommodative monetary policy next year as inflation shows signs of cooling and labor market conditions normalize.',
-              url: '#'
+              url: 'https://www.bloomberg.com/markets/rates-bonds'
             },
             {
               id: 'stocks-3',
@@ -82,7 +82,7 @@ export default function News() {
               publishedAt: new Date().toISOString(),
               category: 'stocks' as const,
               summary: 'Crude oil prices climb as global demand increases and supply constraints persist, boosting energy company valuations across major exchanges.',
-              url: '#'
+              url: 'https://www.cnbc.com/energy/'
             },
             {
               id: 'stocks-4',
@@ -174,7 +174,7 @@ export default function News() {
               publishedAt: new Date().toISOString(),
               category: 'forex' as const,
               summary: 'USD/EUR pair climbs to 3-week highs as European Central Bank maintains cautious stance while U.S. economic data continues to show resilience.',
-              url: '#'
+              url: 'https://www.forexlive.com/news/eurusd/'
             },
             {
               id: 'forex-2', 
@@ -302,7 +302,7 @@ export default function News() {
               publishedAt: new Date().toISOString(),
               category: 'world' as const,
               summary: 'Philippine GDP growth remains robust despite global headwinds, driven by strong domestic consumption and infrastructure development projects.',
-              url: '#'
+              url: 'https://www.gmanetwork.com/news/money/'
             },
             {
               id: 'world-4',
@@ -401,7 +401,7 @@ export default function News() {
               publishedAt: new Date().toISOString(), 
               category: 'crypto',
               summary: 'Major financial institutions continue to add Bitcoin to their portfolios, driving price momentum and market confidence across traditional finance sectors.',
-              url: '#'
+              url: 'https://cointelegraph.com/bitcoin-price-index'
             },
             { 
               id: 'crypto-fallback-2', 
@@ -410,7 +410,7 @@ export default function News() {
               publishedAt: new Date().toISOString(), 
               category: 'crypto',
               summary: 'Arbitrum and Optimism report unprecedented transaction volumes as users seek lower gas fees and faster settlement times.',
-              url: '#'
+              url: 'https://coindesk.com/tech/2024/01/15/ethereum-layer-2-solutions/'
             },
             { 
               id: 'crypto-fallback-3', 
