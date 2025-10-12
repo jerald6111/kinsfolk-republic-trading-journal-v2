@@ -62,7 +62,7 @@ export default function News() {
           const cryptoData = await cryptoResponse.json()
           
           if (cryptoData.items) {
-            const cryptoNews = cryptoData.items.slice(0, 12).map((item: any) => ({
+            const cryptoNews = cryptoData.items.map((item: any) => ({
               id: `crypto-${Date.now()}-${Math.random()}`,
               title: item.title,
               source: 'CoinTelegraph',
@@ -70,7 +70,7 @@ export default function News() {
               category: 'crypto' as const,
               summary: item.description?.replace(/<[^>]*>/g, '').substring(0, 200) + '...',
               url: item.link,
-              image: generateNewsImage(item.title, 'crypto')
+              image: item.enclosure?.link || item.thumbnail || generateNewsImage(item.title, 'crypto')
             }))
             allNews.push(...cryptoNews)
           }
@@ -84,7 +84,7 @@ export default function News() {
           const stocksData = await stocksResponse.json()
           
           if (stocksData.items) {
-            const stocksNews = stocksData.items.slice(0, 12).map((item: any) => ({
+            const stocksNews = stocksData.items.map((item: any) => ({
               id: `stocks-${Date.now()}-${Math.random()}`,
               title: item.title,
               source: 'MarketWatch',
@@ -92,7 +92,7 @@ export default function News() {
               category: 'stocks' as const,
               summary: item.description?.replace(/<[^>]*>/g, '').substring(0, 200) + '...',
               url: item.link,
-              image: generateNewsImage(item.title, 'stocks')
+              image: item.enclosure?.link || item.thumbnail || generateNewsImage(item.title, 'stocks')
             }))
             allNews.push(...stocksNews)
           }
@@ -106,7 +106,7 @@ export default function News() {
           const forexData = await forexResponse.json()
           
           if (forexData.items) {
-            const forexNews = forexData.items.slice(0, 12).map((item: any) => ({
+            const forexNews = forexData.items.map((item: any) => ({
               id: `forex-${Date.now()}-${Math.random()}`,
               title: item.title,
               source: 'ForexLive',
@@ -114,7 +114,7 @@ export default function News() {
               category: 'forex' as const,
               summary: item.description?.replace(/<[^>]*>/g, '').substring(0, 200) + '...',
               url: item.link,
-              image: generateNewsImage(item.title, 'forex')
+              image: item.enclosure?.link || item.thumbnail || generateNewsImage(item.title, 'forex')
             }))
             allNews.push(...forexNews)
           }
@@ -122,26 +122,47 @@ export default function News() {
           console.error('Failed to fetch forex news:', error)
         }
 
-        // WORLD NEWS - Reuters RSS
+        // WORLD NEWS - BBC World News RSS (Better Global Coverage)
         try {
-          const worldResponse = await fetch('https://api.rss2json.com/v1/api.json?rss_url=https://feeds.reuters.com/reuters/businessNews')
+          const worldResponse = await fetch('https://api.rss2json.com/v1/api.json?rss_url=http://feeds.bbci.co.uk/news/world/rss.xml')
           const worldData = await worldResponse.json()
           
           if (worldData.items) {
-            const worldNews = worldData.items.slice(0, 12).map((item: any) => ({
+            const worldNews = worldData.items.map((item: any) => ({
               id: `world-${Date.now()}-${Math.random()}`,
               title: item.title,
-              source: 'Reuters',
+              source: 'BBC News',
               publishedAt: item.pubDate,
               category: 'world' as const,
               summary: item.description?.replace(/<[^>]*>/g, '').substring(0, 200) + '...',
               url: item.link,
-              image: generateNewsImage(item.title, 'world')
+              image: item.enclosure?.link || item.thumbnail || generateNewsImage(item.title, 'world')
             }))
             allNews.push(...worldNews)
           }
         } catch (error) {
           console.error('Failed to fetch world news:', error)
+          // Try alternative global news source
+          try {
+            const altResponse = await fetch('https://api.rss2json.com/v1/api.json?rss_url=https://feeds.npr.org/1001/rss.xml')
+            const altData = await altResponse.json()
+            
+            if (altData.items) {
+              const worldNews = altData.items.map((item: any) => ({
+                id: `world-${Date.now()}-${Math.random()}`,
+                title: item.title,
+                source: 'NPR',
+                publishedAt: item.pubDate,
+                category: 'world' as const,
+                summary: item.description?.replace(/<[^>]*>/g, '').substring(0, 200) + '...',
+                url: item.link,
+                image: item.enclosure?.link || item.thumbnail || generateNewsImage(item.title, 'world')
+              }))
+              allNews.push(...worldNews)
+            }
+          } catch (altError) {
+            console.error('Failed to fetch alternative world news:', altError)
+          }
         }
 
         // Set all news data
@@ -191,44 +212,47 @@ export default function News() {
   return (
     <div className="min-h-screen bg-krbg text-krtext">
       {/* News Ticker */}
-      <div className="bg-black/50 backdrop-blur-sm border-b border-krgold/30 py-2">
+      <div className="bg-krblack/50 backdrop-blur-sm border-b border-krgold/30 py-2">
         <div className="news-ticker-wrapper">
           <div className="news-ticker">
             {tickerNews.map((item, index) => (
               <div key={`${item.id}-${index}`} className="news-ticker-item px-8">
                 <span className="text-krgold font-semibold">{item.source}:</span>
-                <span className="ml-2 text-white">{item.title}</span>
+                <span className="ml-2 text-krtext">{item.title}</span>
               </div>
             ))}
           </div>
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-6 py-8">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-krgold to-orange-400 bg-clip-text text-transparent">
-            Live Market News
-          </h1>
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-8 h-8 rounded bg-gradient-to-br from-krgold to-kryellow flex items-center justify-center">
+              <span className="text-krblack font-bold text-sm">📰</span>
+            </div>
+            <h1 className="text-3xl font-bold text-krtext">Market News</h1>
+          </div>
           <p className="text-krmuted text-lg">
-            Real-time updates from global financial markets • 1-minute refresh intervals
+            Multi-market intelligence, economic events, and live trading insights
           </p>
         </div>
 
         {/* Category Navigation */}
-        <div className="flex justify-center mb-8">
-          <div className="flex space-x-1 bg-krgray/20 backdrop-blur-sm rounded-xl p-1 border border-krgold/20">
+        <div className="mb-8">
+          <div className="flex flex-wrap gap-3 justify-center">
             {categories.map((category) => (
               <button
                 key={category.id}
                 onClick={() => setActiveCategory(category.id)}
-                className={`px-6 py-3 rounded-lg font-medium transition-all duration-200 flex items-center space-x-2 ${
+                className={`px-6 py-3 rounded-lg font-medium transition-all duration-200 flex items-center gap-2 ${
                   activeCategory === category.id
                     ? 'bg-krgold text-krblack shadow-lg shadow-krgold/20'
-                    : 'text-krmuted hover:text-krgold hover:bg-krgray/30'
+                    : 'bg-krcard border border-krborder text-krtext hover:border-krgold/50 hover:bg-krgold/10'
                 }`}
               >
-                <span>{category.icon}</span>
+                <span className="text-lg">{category.icon}</span>
                 <span>{category.label}</span>
               </button>
             ))}
@@ -245,49 +269,46 @@ export default function News() {
 
         {/* Featured News Section - Only show for crypto category */}
         {!loading && activeCategory === 'crypto' && featuredNews.length > 0 && (
-          <div className="mb-12">
-            <h2 className="text-2xl font-bold mb-6 text-krgold">Featured Crypto Stories</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {featuredNews.map((article) => (
+          <div className="mb-8">
+            <h2 className="text-xl font-bold mb-4 text-krtext flex items-center gap-2">
+              <span className="text-krgold">🔥</span>
+              Featured {activeCategory.charAt(0).toUpperCase() + activeCategory.slice(1)} Stories
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {featuredNews.slice(0, 3).map((article) => (
                 <div
                   key={article.id}
-                  className="bg-krgray/10 backdrop-blur-sm rounded-xl border border-krgold/30 overflow-hidden hover:border-krgold/60 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-300 cursor-pointer group"
+                  className="bg-krcard border border-krborder rounded-lg overflow-hidden hover:border-krgold/50 transition-all duration-200 cursor-pointer group"
                   onClick={() => setSelectedArticle(article)}
                 >
-                  <div className="relative h-48 bg-gradient-to-r from-krgold/20 to-krgold/10 flex items-center justify-center">
+                  <div className="relative h-40 bg-krgray/20 flex items-center justify-center overflow-hidden">
                     {article.image ? (
                       <img
                         src={article.image}
                         alt={article.title}
-                        className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                        className="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-300"
                         onError={(e) => {
                           const img = e.target as HTMLImageElement;
                           img.style.display = 'none';
                           const parent = img.parentElement;
                           if (parent) {
-                            parent.innerHTML = `<div class="flex items-center justify-center h-48 text-krgold"><span class="text-4xl">${categories.find(c => c.id === article.category)?.icon || '📰'}</span></div>`;
+                            parent.innerHTML = `<div class="flex items-center justify-center h-40 text-krgold"><span class="text-3xl">${categories.find(c => c.id === article.category)?.icon || '📰'}</span></div>`;
                           }
                         }}
                       />
                     ) : (
-                      <div className="flex items-center justify-center h-48 text-krgold">
-                        <span className="text-4xl">{categories.find(c => c.id === article.category)?.icon || '📰'}</span>
+                      <div className="flex items-center justify-center h-40 text-krgold">
+                        <span className="text-3xl">{categories.find(c => c.id === article.category)?.icon || '📰'}</span>
                       </div>
                     )}
                   </div>
-                  <div className="p-6">
-                    <h3 className="font-semibold text-lg mb-2 line-clamp-2 text-white">
+                  <div className="p-4">
+                    <h3 className="font-semibold text-sm mb-2 line-clamp-2 text-krtext group-hover:text-krgold transition-colors duration-200">
                       {article.title}
                     </h3>
-                    <p className="text-krmuted text-sm mb-3 line-clamp-3">
-                      {article.summary}
-                    </p>
                     <div className="flex justify-between items-center text-xs text-krmuted">
                       <span className="text-krgold font-medium">{article.source}</span>
-                      <div className="flex items-center space-x-1">
-                        <Calendar className="w-3 h-3" />
-                        <span>{new Date(article.publishedAt).toLocaleDateString()}</span>
-                      </div>
+                      <span>{new Date(article.publishedAt).toLocaleDateString()}</span>
                     </div>
                   </div>
                 </div>
@@ -296,48 +317,28 @@ export default function News() {
           </div>
         )}
 
-        {/* News Grid */}
+        {/* News Grid - Stack all news articles */}
         {!loading && filteredNews.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredNews.map((article) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredNews.map((article, index) => (
               <div
                 key={article.id}
-                className="bg-krgray/10 backdrop-blur-sm rounded-xl border border-krgray/30 overflow-hidden hover:border-krgold/50 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-300 cursor-pointer group"
+                className="bg-krcard border border-krborder rounded-lg overflow-hidden hover:border-krgold/50 transition-all duration-200 cursor-pointer group"
                 onClick={() => setSelectedArticle(article)}
               >
-                <div className="relative h-48 bg-gradient-to-r from-krgold/20 to-krgold/10 flex items-center justify-center">
-                  {article.image ? (
-                    <img
-                      src={article.image}
-                      alt={article.title}
-                      className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                      onError={(e) => {
-                        const img = e.target as HTMLImageElement;
-                        img.style.display = 'none';
-                        const parent = img.parentElement;
-                        if (parent) {
-                          parent.innerHTML = `<div class="flex items-center justify-center h-48 text-krgold"><span class="text-4xl">${categories.find(c => c.id === article.category)?.icon || '📰'}</span></div>`;
-                        }
-                      }}
-                    />
-                  ) : (
-                    <div className="flex items-center justify-center h-48 text-krgold">
-                      <span className="text-4xl">{categories.find(c => c.id === article.category)?.icon || '📰'}</span>
+                <div className="p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-8 h-8 rounded bg-krgold/20 flex items-center justify-center">
+                      <span className="text-krgold text-sm font-bold">{categories.find(c => c.id === article.category)?.icon}</span>
                     </div>
-                  )}
-                </div>
-                <div className="p-6">
-                  <h3 className="font-semibold text-lg mb-2 line-clamp-2 text-white group-hover:text-krgold transition-colors duration-200">
-                    {article.title}
-                  </h3>
-                  <p className="text-krmuted text-sm mb-3 line-clamp-3">
-                    {article.summary}
-                  </p>
-                  <div className="flex justify-between items-center text-xs text-krmuted">
-                    <span className="text-krgold font-medium">{article.source}</span>
-                    <div className="flex items-center space-x-1">
-                      <Calendar className="w-3 h-3 text-krgold" />
-                      <span>{new Date(article.publishedAt).toLocaleDateString()}</span>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-sm text-krtext group-hover:text-krgold transition-colors duration-200 line-clamp-2 mb-2">
+                        {article.title}
+                      </h3>
+                      <div className="flex items-center justify-between text-xs text-krmuted">
+                        <span className="text-krgold font-medium">{article.source}</span>
+                        <span>{new Date(article.publishedAt).toLocaleDateString()}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -358,22 +359,19 @@ export default function News() {
         {/* Article Modal */}
         {selectedArticle && (
           <div className="fixed inset-0 bg-krblack/90 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-            <div className="bg-krgray/20 backdrop-blur-md rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto border border-krgold/40 shadow-2xl shadow-krgold/20">
-              <div className="sticky top-0 bg-krgray/30 backdrop-blur-md p-6 border-b border-krgold/30">
+            <div className="bg-krcard border border-krborder rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="p-6 border-b border-krborder">
                 <div className="flex justify-between items-start">
-                  <div>
-                    <h2 className="text-2xl font-bold text-white mb-2">{selectedArticle.title}</h2>
-                    <div className="flex items-center space-x-4 text-sm text-krmuted">
+                  <div className="flex-1">
+                    <h2 className="text-xl font-bold text-krtext mb-2">{selectedArticle.title}</h2>
+                    <div className="flex items-center gap-4 text-sm text-krmuted">
                       <span className="text-krgold font-medium">{selectedArticle.source}</span>
-                      <div className="flex items-center space-x-1">
-                        <Calendar className="w-4 h-4 text-krgold" />
-                        <span>{new Date(selectedArticle.publishedAt).toLocaleDateString()}</span>
-                      </div>
+                      <span>{new Date(selectedArticle.publishedAt).toLocaleDateString()}</span>
                     </div>
                   </div>
                   <button
                     onClick={() => setSelectedArticle(null)}
-                    className="text-krmuted hover:text-krgold transition-colors text-2xl font-bold"
+                    className="text-krmuted hover:text-krgold transition-colors text-xl ml-4"
                   >
                     ×
                   </button>
@@ -381,46 +379,46 @@ export default function News() {
               </div>
               
               <div className="p-6">
-                <div className="relative h-64 bg-gradient-to-r from-krgold/20 to-krgold/10 rounded-lg mb-6 flex items-center justify-center">
-                  {selectedArticle.image ? (
+                {selectedArticle.image && (
+                  <div className="relative h-48 bg-krgray/20 rounded-lg mb-4 overflow-hidden">
                     <img
                       src={selectedArticle.image}
                       alt={selectedArticle.title}
-                      className="w-full h-64 object-cover rounded-lg"
+                      className="w-full h-48 object-cover"
                       onError={(e) => {
                         const img = e.target as HTMLImageElement;
                         img.style.display = 'none';
-                        const parent = img.parentElement;
-                        if (parent) {
-                          parent.innerHTML = `<div class="flex items-center justify-center h-64 text-krgold"><span class="text-6xl">${categories.find(c => c.id === selectedArticle.category)?.icon || '📰'}</span></div>`;
-                        }
                       }}
                     />
-                  ) : (
-                    <div className="flex items-center justify-center h-64 text-krgold">
-                      <span className="text-6xl">{categories.find(c => c.id === selectedArticle.category)?.icon || '📰'}</span>
-                    </div>
-                  )}
-                </div>
-                <div className="prose prose-invert max-w-none">
-                  <p className="text-white leading-relaxed text-lg">
-                    {selectedArticle.summary}
-                  </p>
-                </div>
+                  </div>
+                )}
+                <p className="text-krtext leading-relaxed">
+                  {selectedArticle.summary}
+                </p>
+                {selectedArticle.url && selectedArticle.url !== '#' && (
+                  <a
+                    href={selectedArticle.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 mt-4 text-krgold hover:text-kryellow transition-colors"
+                  >
+                    Read Full Article <ExternalLink className="w-4 h-4" />
+                  </a>
+                )}
               </div>
             </div>
           </div>
         )}
 
         {/* Info Footer */}
-        <div className="mt-8 bg-krgold/10 backdrop-blur-sm rounded-xl border border-krgold/30 p-4">
+        <div className="mt-8 bg-krcard border border-krborder rounded-lg p-4">
           <p className="text-sm text-center text-krmuted">
-            <span className="text-krgold font-semibold">Multi-Market News Coverage:</span> 
-            <span className="text-krgold mx-2">🔥 Crypto</span> • 
-            <span className="text-krsuccess mx-2">📈 Stocks</span> • 
-            <span className="text-kryellow mx-2">💱 Forex</span> • 
-            <span className="text-krwhite mx-2">🌍 Global</span> • 
-            <span className="text-krgold">LIVE updates every 1 minute from RSS feeds</span>
+            <span className="text-krgold font-semibold">Live Feed Sources:</span> 
+            <span className="text-krgold mx-1">CoinTelegraph</span> • 
+            <span className="text-krsuccess mx-1">MarketWatch</span> • 
+            <span className="text-kryellow mx-1">ForexLive</span> • 
+            <span className="text-krtext mx-1">BBC News</span> • 
+            <span className="text-krgold">Updated every minute</span>
           </p>
         </div>
       </div>

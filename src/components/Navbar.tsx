@@ -8,9 +8,8 @@ const nav = [
     to: '/news-and-data', 
     label: 'News & Data',
     dropdown: [
-      { to: '/news', label: 'Market News' },
-      { to: '/news-and-data', label: 'News & Data Hub' },
-      { to: '/data-market', label: 'Data Market' }
+      { to: '/data-market', label: 'Data Market' },
+      { to: '/news', label: 'Market News' }
     ]
   },
   { 
