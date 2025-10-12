@@ -1,23 +1,32 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "releaseDate": "2025-10-13",
   "downloadUrl": "/downloads/KRTJ-Desktop-Setup.exe",
   "releaseNotes": {
-    "title": "KRTJ Desktop v1.0.0 - Initial Release! 🎉",
+    "title": "KRTJ Desktop v1.1.0 - Enhanced Update System! 🚀",
     "features": [
-      "Complete offline trading journal functionality",
-      "Dark theme optimized for trading environments", 
-      "AI-powered trading assistant with live market data",
-      "Advanced analytics and performance tracking",
-      "System tray integration for quick access",
-      "Automatic update notifications (this feature!)"
+      "Rich update notifications with detailed changelogs",
+      "System tray balloon notifications for new updates",
+      "Direct download integration from KRTJ website",
+      "Copy changelog to clipboard functionality",
+      "Periodic automatic update checking (every 4 hours)",
+      "Enhanced update UI with 'View Details' option"
     ],
-    "improvements": [],
-    "bugFixes": [],
-    "notes": "Welcome to KRTJ Desktop! Experience the power of offline trading analysis with enhanced security and performance."
+    "improvements": [
+      "Faster app startup and reduced memory usage",
+      "Enhanced dark theme consistency across all dialogs",
+      "Better error handling for network connectivity issues",
+      "Improved system tray integration and responsiveness"
+    ],
+    "bugFixes": [
+      "Fixed potential memory leaks in update checking",
+      "Resolved system tray balloon notifications on Windows 11",
+      "Fixed edge case crashes during startup update checks"
+    ],
+    "notes": "This major update introduces our new intelligent update system! You'll now receive rich notifications with detailed changelogs and can choose exactly when to update. No more surprise restarts - you're always in control of your KRTJ experience!"
   },
   "minimumVersion": "1.0.0",
   "isRequired": false,
-  "fileSize": "45.2 MB",
+  "fileSize": "46.3 MB",
   "checksum": ""
 }
