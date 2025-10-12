@@ -21,6 +21,44 @@ export default function News() {
   const [selectedArticle, setSelectedArticle] = useState<NewsItem | null>(null)
   const [categoryLoading, setCategoryLoading] = useState(false)
 
+  // Generate contextual image URL based on news title and category
+  const generateContextualImage = (title: string, category: string, articleId: string) => {
+    // Extract key terms from title for more relevant images
+    const titleLower = title.toLowerCase()
+    
+    // Define contextual keywords based on title content
+    let keywords = ''
+    
+    if (category === 'crypto') {
+      if (titleLower.includes('bitcoin')) keywords = 'bitcoin,cryptocurrency,digital'
+      else if (titleLower.includes('ethereum')) keywords = 'ethereum,blockchain,smart-contracts'
+      else if (titleLower.includes('defi') || titleLower.includes('exchange')) keywords = 'defi,trading,exchange'
+      else if (titleLower.includes('nft')) keywords = 'nft,digital-art,blockchain'
+      else keywords = 'cryptocurrency,blockchain,digital-money'
+    } else if (category === 'stocks') {
+      if (titleLower.includes('tech') || titleLower.includes('ai')) keywords = 'technology,artificial-intelligence,innovation'
+      else if (titleLower.includes('fed') || titleLower.includes('rate')) keywords = 'federal-reserve,interest-rates,economy'
+      else if (titleLower.includes('energy') || titleLower.includes('oil')) keywords = 'energy,oil,renewable'
+      else if (titleLower.includes('pharma') || titleLower.includes('drug')) keywords = 'pharmaceutical,medicine,healthcare'
+      else keywords = 'stock-market,finance,trading'
+    } else if (category === 'forex') {
+      if (titleLower.includes('dollar') || titleLower.includes('usd')) keywords = 'us-dollar,currency,exchange'
+      else if (titleLower.includes('euro') || titleLower.includes('eur')) keywords = 'euro,european-currency,finance'
+      else if (titleLower.includes('yen') || titleLower.includes('japan')) keywords = 'japanese-yen,japan,currency'
+      else if (titleLower.includes('pound') || titleLower.includes('gbp')) keywords = 'british-pound,uk,currency'
+      else keywords = 'foreign-exchange,currency,global-finance'
+    } else { // world
+      if (titleLower.includes('china') || titleLower.includes('chinese')) keywords = 'china,asia,economy'
+      else if (titleLower.includes('philippines') || titleLower.includes('asean')) keywords = 'philippines,southeast-asia,development'
+      else if (titleLower.includes('europe') || titleLower.includes('eu')) keywords = 'europe,european-union,global'
+      else if (titleLower.includes('trade') || titleLower.includes('global')) keywords = 'international-trade,global-economy,business'
+      else keywords = 'world-economy,international,business'
+    }
+    
+    // Use Unsplash Source API with contextual keywords
+    return `https://source.unsplash.com/400x250/?${keywords}`
+  }
+
   // Fetch comprehensive news data from multiple APIs
   useEffect(() => {
     const fetchNews = async () => {
@@ -684,11 +722,12 @@ export default function News() {
                   {/* Featured Article Image */}
                   <div className="w-full h-40 overflow-hidden bg-gradient-to-r from-orange-500/10 to-yellow-500/10">
                     <img 
-                      src={article.image || 'https://images.unsplash.com/photo-1518546305927-5a555bb7020d?w=400&h=250&fit=crop&q=80'} 
+                      src={article.image || generateContextualImage(article.title, article.category, article.id)} 
                       alt={article.title}
                       className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
                       onError={(e) => {
-                        e.currentTarget.src = 'https://images.unsplash.com/photo-1518546305927-5a555bb7020d?w=400&h=250&fit=crop&q=80'
+                        // Crypto-specific contextual fallback
+                        e.currentTarget.src = 'https://source.unsplash.com/400x200/?cryptocurrency,bitcoin,digital'
                       }}
                     />
                   </div>
@@ -754,25 +793,18 @@ export default function News() {
                 {/* Article Image */}
                 <div className="w-full h-48 overflow-hidden bg-gradient-to-r from-gray-800 to-gray-900">
                   <img 
-                    src={article.image || (() => {
-                      const fallbackImages = {
-                        crypto: 'https://images.unsplash.com/photo-1518546305927-5a555bb7020d?w=400&h=250&fit=crop&q=80',
-                        stocks: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=250&fit=crop&q=80',
-                        forex: 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=400&h=250&fit=crop&q=80',
-                        world: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=250&fit=crop&q=80'
-                      }
-                      return fallbackImages[article.category]
-                    })()} 
+                    src={article.image || generateContextualImage(article.title, article.category, article.id)} 
                     alt={article.title}
                     className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
                     onError={(e) => {
-                      const fallbackImages = {
-                        crypto: 'https://images.unsplash.com/photo-1518546305927-5a555bb7020d?w=400&h=250&fit=crop&q=80',
-                        stocks: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=250&fit=crop&q=80',
-                        forex: 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=400&h=250&fit=crop&q=80',
-                        world: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=250&fit=crop&q=80'
+                      // Final fallback - generic category images as last resort
+                      const categoryFallbacks = {
+                        crypto: `https://source.unsplash.com/400x250/?cryptocurrency,digital`,
+                        stocks: `https://source.unsplash.com/400x250/?finance,chart`,
+                        forex: `https://source.unsplash.com/400x250/?currency,money`,
+                        world: `https://source.unsplash.com/400x250/?global,business`
                       }
-                      e.currentTarget.src = fallbackImages[article.category]
+                      e.currentTarget.src = categoryFallbacks[article.category]
                     }}
                   />
                 </div>
