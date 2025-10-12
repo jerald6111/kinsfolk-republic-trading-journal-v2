@@ -27,6 +27,7 @@ export default function AIChatbot() {
   const [inputMessage, setInputMessage] = useState('')
   const [isTyping, setIsTyping] = useState(false)
   const [userInfo, setUserInfo] = useState<UserInfo>({ name: '', email: '', hasProvidedInfo: false })
+  const [showNamePrompt, setShowNamePrompt] = useState(false)
   const [showEmailPrompt, setShowEmailPrompt] = useState(false)
   const [showConversationSender, setShowConversationSender] = useState(false)
   const [loadingPriceData, setLoadingPriceData] = useState(false)
@@ -271,10 +272,14 @@ Want me to check specific coin prices for your analysis? Just ask "BTC price" or
   }
 
   useEffect(() => {
-    if (isOpen && messages.length === 0) {
-      addBotMessage("Hey! 👋 I'm your Kinsfolk Assistant - part customer service, part trading mentor. I help with KRTJ navigation, analytics questions, and trading mindset. Whether you're celebrating wins or dealing with losses, I'm here to help. What's on your trading mind today?")
+    if (isOpen && messages.length === 0 && !userInfo.hasProvidedInfo) {
+      // Show name prompt immediately when chat opens
+      setShowNamePrompt(true)
+    } else if (isOpen && messages.length === 0 && userInfo.hasProvidedInfo) {
+      // Welcome back message if name is already provided
+      addBotMessage(`Welcome back, ${userInfo.name}! 👋 Ready to tackle the markets together? What's on your trading mind today?`)
     }
-  }, [isOpen, messages.length])
+  }, [isOpen, messages.length, userInfo.hasProvidedInfo])
 
   useEffect(() => {
     scrollToBottom()
@@ -304,16 +309,24 @@ Want me to check specific coin prices for your analysis? Just ask "BTC price" or
     setMessages(prev => [...prev, newMessage])
   }
 
-  const requestUserInfo = () => {
-    if (!userInfo.hasProvidedInfo) {
-      setShowEmailPrompt(true)
-    }
+  const handleNameSubmit = (name: string) => {
+    setUserInfo(prev => ({ ...prev, name, hasProvidedInfo: true }))
+    setShowNamePrompt(false)
+    addBotMessage(`Nice to meet you, ${name}! 🤝 I'm your Kinsfolk Assistant - part customer service, part trading mentor. I help with KRTJ navigation, live crypto prices, analytics questions, and trading mindset. Whether you're celebrating wins or dealing with losses, I'm here to help. What's on your trading mind today?`)
   }
 
-  const handleUserInfoSubmit = (name: string, email: string) => {
-    setUserInfo({ name, email, hasProvidedInfo: true })
+  const handleEmailSubmit = (email: string) => {
+    setUserInfo(prev => ({ ...prev, email }))
     setShowEmailPrompt(false)
-    addBotMessage(`Nice to meet you, ${name}! 🤝 I've got your email (${email}) saved for our conversation summary. Now, how can I help you dominate the markets today?`)
+    addBotMessage(`Perfect! 📧 I've saved your email (${email}) for conversation summaries. Now you can get a copy of our chat whenever you want!`)
+  }
+
+  const requestEmailForConversation = () => {
+    if (!userInfo.email) {
+      setShowEmailPrompt(true)
+    } else {
+      setShowConversationSender(true)
+    }
   }
 
   const sendConversationEmail = async () => {
@@ -392,12 +405,7 @@ What's your take on this price action? Planning any moves?`
   }
 
   const handleSendMessage = async () => {
-    if (!inputMessage.trim()) return
-
-    // Request user info after a few messages if not provided
-    if (messages.length > 3 && !userInfo.hasProvidedInfo) {
-      setTimeout(() => requestUserInfo(), 2000)
-    }
+    if (!inputMessage.trim() || !userInfo.hasProvidedInfo) return
 
     addUserMessage(inputMessage)
     const currentMessage = inputMessage
@@ -467,9 +475,9 @@ What's your take on this price action? Planning any moves?`
             <div className="flex items-center gap-2">
               {messages.length > 3 && userInfo.hasProvidedInfo && (
                 <button
-                  onClick={() => setShowConversationSender(true)}
+                  onClick={requestEmailForConversation}
                   className="hover:bg-black/10 p-1 rounded transition-colors"
-                  title="Send conversation to email"
+                  title="Save conversation"
                 >
                   <Mail className="w-4 h-4" />
                 </button>
@@ -484,7 +492,7 @@ What's your take on this price action? Planning any moves?`
           </div>
 
           {/* Quick Actions */}
-          {messages.length <= 1 && (
+          {messages.length <= 1 && userInfo.hasProvidedInfo && (
             <div className="p-3 border-b border-krborder">
               <p className="text-xs text-krmuted mb-2">Quick Actions:</p>
               <div className="flex flex-wrap gap-2">
@@ -562,13 +570,13 @@ What's your take on this price action? Planning any moves?`
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="Ask about navigation, security, features..."
-                className="flex-1 bg-krgray text-krtext px-3 py-2 rounded-lg text-sm border border-krborder focus:border-krgold focus:outline-none"
-                disabled={isTyping}
+                placeholder={userInfo.hasProvidedInfo ? "Ask about trading, prices, or KRTJ features..." : "Please introduce yourself first"}
+                className="flex-1 bg-krgray text-krtext px-3 py-2 rounded-lg text-sm border border-krborder focus:border-krgold focus:outline-none disabled:opacity-50"
+                disabled={isTyping || !userInfo.hasProvidedInfo}
               />
               <button
                 onClick={handleSendMessage}
-                disabled={!inputMessage.trim() || isTyping}
+                disabled={!inputMessage.trim() || isTyping || !userInfo.hasProvidedInfo}
                 className="bg-krgold text-krblack p-2 rounded-lg hover:bg-kryellow transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Send className="w-4 h-4" />
@@ -581,44 +589,82 @@ What's your take on this price action? Planning any moves?`
         </div>
       )}
 
+      {/* Name Prompt Modal */}
+      {showNamePrompt && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60]">
+          <div className="bg-krcard border border-krborder rounded-xl p-6 max-w-md w-full mx-4">
+            <div className="flex items-center gap-2 mb-4">
+              <Bot className="w-5 h-5 text-krgold" />
+              <h3 className="font-bold text-krtext">Welcome to Kinsfolk Assistant!</h3>
+            </div>
+            <p className="text-krmuted text-sm mb-4">
+              Hey there! 👋 I'm your trading mentor and KRTJ guide. What should I call you?
+            </p>
+            <input
+              type="text"
+              placeholder="Your name"
+              className="w-full bg-krgray text-krtext px-3 py-2 rounded-lg text-sm border border-krborder focus:border-krgold focus:outline-none mb-4"
+              onChange={(e) => setUserInfo(prev => ({ ...prev, name: e.target.value }))}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter' && userInfo.name.trim()) {
+                  handleNameSubmit(userInfo.name.trim())
+                }
+              }}
+              autoFocus
+            />
+            <button
+              onClick={() => handleNameSubmit(userInfo.name.trim())}
+              disabled={!userInfo.name.trim()}
+              className="w-full px-4 py-2 text-sm bg-krgold text-krblack rounded-lg hover:bg-kryellow transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Let's Start Trading! 🚀
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Email Prompt Modal */}
       {showEmailPrompt && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60]">
           <div className="bg-krcard border border-krborder rounded-xl p-6 max-w-md w-full mx-4">
             <div className="flex items-center gap-2 mb-4">
               <Mail className="w-5 h-5 text-krgold" />
-              <h3 className="font-bold text-krtext">Quick Info</h3>
+              <h3 className="font-bold text-krtext">Save Our Conversation</h3>
             </div>
             <p className="text-krmuted text-sm mb-4">
-              I can send you a copy of our conversation when we're done! Just need your name and email:
+              Want to save our conversation? I can email you a copy! Just provide your email address:
             </p>
-            <div className="space-y-3">
-              <input
-                type="text"
-                placeholder="Your name"
-                className="w-full bg-krgray text-krtext px-3 py-2 rounded-lg text-sm border border-krborder focus:border-krgold focus:outline-none"
-                onChange={(e) => setUserInfo(prev => ({ ...prev, name: e.target.value }))}
-              />
-              <input
-                type="email"
-                placeholder="Your email"
-                className="w-full bg-krgray text-krtext px-3 py-2 rounded-lg text-sm border border-krborder focus:border-krgold focus:outline-none"
-                onChange={(e) => setUserInfo(prev => ({ ...prev, email: e.target.value }))}
-              />
-            </div>
-            <div className="flex gap-2 mt-4">
+            <input
+              type="email"
+              placeholder="Your email address"
+              className="w-full bg-krgray text-krtext px-3 py-2 rounded-lg text-sm border border-krborder focus:border-krgold focus:outline-none mb-4"
+              onChange={(e) => setUserInfo(prev => ({ ...prev, email: e.target.value }))}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter' && userInfo.email.trim()) {
+                  handleEmailSubmit(userInfo.email.trim())
+                  setShowConversationSender(true)
+                }
+              }}
+              autoFocus
+            />
+            <div className="flex gap-2">
               <button
                 onClick={() => setShowEmailPrompt(false)}
                 className="flex-1 px-4 py-2 text-sm text-krmuted border border-krborder rounded-lg hover:border-krgold/50 transition-colors"
               >
-                Skip
+                Not Now
               </button>
               <button
-                onClick={() => handleUserInfoSubmit(userInfo.name, userInfo.email)}
-                disabled={!userInfo.name || !userInfo.email}
+                onClick={() => {
+                  if (userInfo.email.trim()) {
+                    handleEmailSubmit(userInfo.email.trim())
+                    setShowConversationSender(true)
+                  }
+                }}
+                disabled={!userInfo.email.trim()}
                 className="flex-1 px-4 py-2 text-sm bg-krgold text-krblack rounded-lg hover:bg-kryellow transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Continue
+                Save & Send
               </button>
             </div>
           </div>
