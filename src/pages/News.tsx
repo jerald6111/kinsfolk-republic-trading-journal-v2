@@ -75,7 +75,7 @@ export default function News() {
         const priceChangeParam = timeframeParams.join(',')
         
         const response = await fetch(
-          `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false&price_change_percentage=${priceChangeParam}`
+          `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=300&page=1&sparkline=false&price_change_percentage=${priceChangeParam}`
         )
         const data: any[] = await response.json()
         
@@ -289,7 +289,7 @@ export default function News() {
                 ))}
               </div>
             </div>
-            <div className="h-[500px] overflow-y-auto">
+            <div className="h-[500px] overflow-y-auto crypto-list-scroll">
               {cryptoLoading ? (
                 <div className="flex items-center justify-center h-full">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-krgold"></div>
@@ -357,7 +357,7 @@ export default function News() {
                 ))}
               </div>
             </div>
-            <div className="h-[500px] overflow-y-auto">
+            <div className="h-[500px] overflow-y-auto crypto-list-scroll">
               {cryptoLoading ? (
                 <div className="flex items-center justify-center h-full">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-krgold"></div>
