@@ -28,6 +28,8 @@ export default function News() {
   const [newsItems, setNewsItems] = useState<NewsItem[]>([])
   const [loading, setLoading] = useState(true)
   const [cryptoLoading, setCryptoLoading] = useState(true)
+  const [gainersTimeframe, setGainersTimeframe] = useState<'1h' | '24h' | '7d'>('24h')
+  const [losersTimeframe, setLosersTimeframe] = useState<'1h' | '24h' | '7d'>('24h')
 
   // Economic Calendar Widget
   useEffect(() => {
@@ -64,20 +66,47 @@ export default function News() {
     const fetchCryptoData = async () => {
       setCryptoLoading(true)
       try {
+        // Build the price change percentage parameter based on timeframes
+        const timeframeParams = []
+        if (gainersTimeframe === '1h' || losersTimeframe === '1h') timeframeParams.push('1h')
+        if (gainersTimeframe === '24h' || losersTimeframe === '24h') timeframeParams.push('24h')
+        if (gainersTimeframe === '7d' || losersTimeframe === '7d') timeframeParams.push('7d')
+        
+        const priceChangeParam = timeframeParams.join(',')
+        
         const response = await fetch(
-          'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false&price_change_percentage=24h'
+          `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false&price_change_percentage=${priceChangeParam}`
         )
-        const data: CryptoData[] = await response.json()
+        const data: any[] = await response.json()
         
-        // Sort by 24h percentage change to get gainers and losers
-        const sortedByChange = [...data].sort((a, b) => b.price_change_percentage_24h - a.price_change_percentage_24h)
+        // Get the appropriate price change field for each timeframe
+        const getChangeField = (timeframe: string) => {
+          switch (timeframe) {
+            case '1h': return 'price_change_percentage_1h_in_currency'
+            case '24h': return 'price_change_percentage_24h_in_currency' 
+            case '7d': return 'price_change_percentage_7d_in_currency'
+            default: return 'price_change_percentage_24h_in_currency'
+          }
+        }
         
-        // Get top 10 gainers (positive change)
-        const gainers = sortedByChange.filter(coin => coin.price_change_percentage_24h > 0).slice(0, 10)
+        // Process gainers
+        const gainersChangeField = getChangeField(gainersTimeframe)
+        const gainersData = data.map(coin => ({
+          ...coin,
+          price_change_percentage_24h: coin[gainersChangeField] || coin.price_change_percentage_24h || 0
+        }))
+        const sortedGainers = [...gainersData].sort((a, b) => b.price_change_percentage_24h - a.price_change_percentage_24h)
+        const gainers = sortedGainers.filter(coin => coin.price_change_percentage_24h > 0).slice(0, 10)
         setTopGainers(gainers)
         
-        // Get top 10 losers (negative change)  
-        const losers = sortedByChange.filter(coin => coin.price_change_percentage_24h < 0).slice(-10).reverse()
+        // Process losers
+        const losersChangeField = getChangeField(losersTimeframe)
+        const losersData = data.map(coin => ({
+          ...coin,
+          price_change_percentage_24h: coin[losersChangeField] || coin.price_change_percentage_24h || 0
+        }))
+        const sortedLosers = [...losersData].sort((a, b) => a.price_change_percentage_24h - b.price_change_percentage_24h)
+        const losers = sortedLosers.filter(coin => coin.price_change_percentage_24h < 0).slice(0, 10)
         setTopLosers(losers)
         
       } catch (error) {
@@ -108,7 +137,7 @@ export default function News() {
     const interval = setInterval(fetchCryptoData, 2 * 60 * 1000)
     
     return () => clearInterval(interval)
-  }, [])
+  }, [gainersTimeframe, losersTimeframe])
 
 
 
@@ -232,13 +261,32 @@ export default function News() {
         <div className="xl:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Top Gainers */}
           <div className="bg-krcard/90 backdrop-blur-md rounded-2xl shadow-2xl border border-green-500/20 p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="p-2 bg-green-500/20 rounded-lg">
-                <TrendingUp className="text-green-400" size={24} />
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <div className="p-2 bg-green-500/20 rounded-lg">
+                  <TrendingUp className="text-green-400" size={24} />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-krtext">Top Crypto Gainers</h2>
+                  <p className="text-xs text-krmuted">{gainersTimeframe} crypto performance leaders</p>
+                </div>
               </div>
-              <div>
-                <h2 className="text-xl font-bold text-krtext">Top Crypto Gainers</h2>
-                <p className="text-xs text-krmuted">24h crypto performance leaders</p>
+              
+              {/* Timeframe Selector */}
+              <div className="flex bg-krblack/40 rounded-lg p-1">
+                {(['1h', '24h', '7d'] as const).map((timeframe) => (
+                  <button
+                    key={timeframe}
+                    onClick={() => setGainersTimeframe(timeframe)}
+                    className={`px-3 py-1 rounded text-xs font-semibold transition-all ${
+                      gainersTimeframe === timeframe
+                        ? 'bg-green-500 text-krblack'
+                        : 'text-krmuted hover:text-green-400'
+                    }`}
+                  >
+                    {timeframe}
+                  </button>
+                ))}
               </div>
             </div>
             <div className="h-[500px] overflow-y-auto">
@@ -264,7 +312,7 @@ export default function News() {
                           ${coin.current_price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 })}
                         </div>
                         <div className="text-sm font-bold text-green-400">
-                          +{coin.price_change_percentage_24h.toFixed(2)}%
+                          +{coin.price_change_percentage_24h.toFixed(2)}% ({gainersTimeframe})
                         </div>
                       </div>
                     </div>
@@ -281,13 +329,32 @@ export default function News() {
 
           {/* Top Losers */}
           <div className="bg-krcard/90 backdrop-blur-md rounded-2xl shadow-2xl border border-red-500/20 p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="p-2 bg-red-500/20 rounded-lg">
-                <TrendingDown className="text-red-400" size={24} />
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <div className="p-2 bg-red-500/20 rounded-lg">
+                  <TrendingDown className="text-red-400" size={24} />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-krtext">Top Crypto Losers</h2>
+                  <p className="text-xs text-krmuted">{losersTimeframe} crypto performance decliners</p>
+                </div>
               </div>
-              <div>
-                <h2 className="text-xl font-bold text-krtext">Top Crypto Losers</h2>
-                <p className="text-xs text-krmuted">24h crypto performance decliners</p>
+              
+              {/* Timeframe Selector */}
+              <div className="flex bg-krblack/40 rounded-lg p-1">
+                {(['1h', '24h', '7d'] as const).map((timeframe) => (
+                  <button
+                    key={timeframe}
+                    onClick={() => setLosersTimeframe(timeframe)}
+                    className={`px-3 py-1 rounded text-xs font-semibold transition-all ${
+                      losersTimeframe === timeframe
+                        ? 'bg-red-500 text-krblack'
+                        : 'text-krmuted hover:text-red-400'
+                    }`}
+                  >
+                    {timeframe}
+                  </button>
+                ))}
               </div>
             </div>
             <div className="h-[500px] overflow-y-auto">
@@ -313,7 +380,7 @@ export default function News() {
                           ${coin.current_price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 })}
                         </div>
                         <div className="text-sm font-bold text-red-400">
-                          {coin.price_change_percentage_24h.toFixed(2)}%
+                          {coin.price_change_percentage_24h.toFixed(2)}% ({losersTimeframe})
                         </div>
                       </div>
                     </div>
