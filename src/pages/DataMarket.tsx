@@ -41,67 +41,35 @@ export default function DataMarket() {
     data: any[]
   } | null>(null)
 
-  // Fetch crypto data from CoinMarketCap
+  // Fetch crypto data from CoinGecko (faster updates)
   useEffect(() => {
     const fetchCryptoData = async () => {
       try {
-        // Using CoinMarketCap public API via CORS proxy for better accuracy
-        const proxyUrl = 'https://api.allorigins.win/get?url='
-        const cmcUrl = encodeURIComponent('https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest?limit=250&convert=USD')
-        
-        // Fallback to a free CoinMarketCap-compatible API
-        const response = await fetch('https://api.coinlore.net/api/tickers/?start=0&limit=250')
-        const data = await response.json()
-        
-        if (data && data.data) {
-          const markets = data.data.map((coin: any) => ({
-            id: coin.id,
-            symbol: coin.symbol,
-            name: coin.name,
-            image: `https://coinlore.com/img/${coin.symbol.toLowerCase()}.png`,
-            current_price: parseFloat(coin.price_usd) || 0,
-            market_cap: parseFloat(coin.market_cap_usd) || 0,
-            price_change_percentage_24h: parseFloat(coin.percent_change_24h) || 0,
-            price_change_percentage_1h: parseFloat(coin.percent_change_1h) || 0,
-            price_change_percentage_7d: parseFloat(coin.percent_change_7d) || 0,
-            total_volume: parseFloat(coin.volume24) || 0
-          }))
+        const [trendingRes, marketsRes] = await Promise.all([
+          fetch('https://api.coingecko.com/api/v3/search/trending'),
+          fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&price_change_percentage=1h,24h,7d')
+        ])
 
-          // Sort gainers and losers based on 24h change
-          const gainers = [...markets]
-            .filter(coin => coin.price_change_percentage_24h > 0)
-            .sort((a, b) => (b.price_change_percentage_24h || 0) - (a.price_change_percentage_24h || 0))
+        const [trending, markets] = await Promise.all([
+          trendingRes.json(),
+          marketsRes.json()
+        ])
 
-          const losers = [...markets]
-            .filter(coin => coin.price_change_percentage_24h < 0)
-            .sort((a, b) => (a.price_change_percentage_24h || 0) - (b.price_change_percentage_24h || 0))
+        // Sort gainers and losers
+        const gainers = [...markets]
+          .filter(coin => coin.price_change_percentage_24h > 0)
+          .sort((a, b) => (b.price_change_percentage_24h || 0) - (a.price_change_percentage_24h || 0))
 
-          // Create trending data from top market cap coins
-          const trending = markets.slice(0, 10).map((coin: any) => ({
-            item: {
-              id: coin.id,
-              coin_id: coin.id,
-              name: coin.name,
-              symbol: coin.symbol,
-              market_cap_rank: null,
-              thumb: coin.image,
-              small: coin.image,
-              large: coin.image,
-              slug: coin.name.toLowerCase().replace(/\s+/g, '-'),
-              price_btc: 0,
-              score: 0
-            }
-          }))
+        const losers = [...markets]
+          .filter(coin => coin.price_change_percentage_24h < 0)
+          .sort((a, b) => (a.price_change_percentage_24h || 0) - (b.price_change_percentage_24h || 0))
 
-          setCryptoData({
-            trending,
-            gainers,
-            losers,
-            loading: false
-          })
-        } else {
-          throw new Error('Invalid data structure from API')
-        }
+        setCryptoData({
+          trending: trending.coins || [],
+          gainers,
+          losers,
+          loading: false
+        })
       } catch (error) {
         console.error('Error fetching crypto data:', error)
         setCryptoData(prev => ({ ...prev, loading: false }))
