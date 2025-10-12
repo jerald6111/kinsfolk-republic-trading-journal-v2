@@ -135,21 +135,23 @@ export default function DataMarket() {
     script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-screener.js'
     script.async = true
     script.innerHTML = JSON.stringify({
-      width: '100%',
-      height: '800',
-      defaultColumn: 'overview',
-      defaultScreen: 'crypto_mkt_cap_desc',
-      market: 'crypto',
-      showToolbar: true,
-      colorTheme: 'dark',
-      locale: 'en',
-      isTransparent: true,
-      largeChartUrl: '',
-      screener_type: 'crypto_mkt',
-      displayCurrency: 'USD',
-      filter: [
-        { left: 'exchange', operation: 'in_range', right: ['BINANCE', 'BYBIT', 'OKX'] }
-      ]
+      "width": "100%",
+      "height": 800,
+      "defaultColumn": "overview",
+      "screener_type": "crypto_mkt",
+      "displayCurrency": "USD",
+      "colorTheme": "dark",
+      "locale": "en",
+      "isTransparent": true,
+      "showToolbar": true,
+      "filter": [
+        {
+          "left": "exchange",
+          "operation": "in_range", 
+          "right": ["BINANCE", "BYBIT", "OKX"]
+        }
+      ],
+      "range": "12M"
     })
 
     container.appendChild(script)
