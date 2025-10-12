@@ -16,6 +16,7 @@ import DataSettings from './pages/DataSettings'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import FloatingSupportButton from './components/FloatingSupportButton'
+import AIChatbot from './components/AIChatbot'
 import { CurrencyProvider } from './context/CurrencyContext'
 
 export default function App() {
@@ -42,6 +43,7 @@ export default function App() {
         </Routes>
         <Footer />
         <FloatingSupportButton />
+        <AIChatbot />
       </div>
     </CurrencyProvider>
   )
