@@ -1,8 +1,100 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
+
+interface CryptoItem {
+  id: string
+  symbol: string
+  name: string
+  image?: string
+  current_price?: number
+  price_change_percentage_24h?: number
+  market_cap?: number
+  total_volume?: number
+  market_cap_rank?: number
+  activated_at?: number
+}
+
+interface TrendingItem {
+  item: CryptoItem & {
+    thumb?: string
+    small?: string
+    large?: string
+    score?: number
+  }
+}
 
 export default function DataMarket() {
   const screenerRef = useRef<HTMLDivElement>(null)
+  const [cryptoData, setCryptoData] = useState<{
+    trending: TrendingItem[]
+    gainers: CryptoItem[]
+    losers: CryptoItem[]
+    newCoins: CryptoItem[]
+    highVolume: CryptoItem[]
+    loading: boolean
+  }>({
+    trending: [],
+    gainers: [],
+    losers: [],
+    newCoins: [],
+    highVolume: [],
+    loading: true
+  })
+  const [selectedModal, setSelectedModal] = useState<{
+    type: string
+    title: string
+    data: any[]
+  } | null>(null)
 
+  // Fetch crypto data from CoinGecko
+  useEffect(() => {
+    const fetchCryptoData = async () => {
+      try {
+        const [trendingRes, marketsRes, newCoinsRes] = await Promise.all([
+          fetch('https://api.coingecko.com/api/v3/search/trending'),
+          fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&price_change_percentage=1h,24h,7d'),
+          fetch('https://api.coingecko.com/api/v3/coins/list/new').catch(() => ({ json: () => [] })) // New coins endpoint may require API key
+        ])
+
+        const [trending, markets, newCoins] = await Promise.all([
+          trendingRes.json(),
+          marketsRes.json(),
+          newCoinsRes.json ? newCoinsRes.json() : []
+        ])
+
+        // Sort gainers and losers
+        const gainers = [...markets]
+          .filter(coin => coin.price_change_percentage_24h > 0)
+          .sort((a, b) => (b.price_change_percentage_24h || 0) - (a.price_change_percentage_24h || 0))
+
+        const losers = [...markets]
+          .filter(coin => coin.price_change_percentage_24h < 0)
+          .sort((a, b) => (a.price_change_percentage_24h || 0) - (b.price_change_percentage_24h || 0))
+
+        // Sort by volume
+        const highVolume = [...markets]
+          .sort((a, b) => (b.total_volume || 0) - (a.total_volume || 0))
+
+        setCryptoData({
+          trending: trending.coins || [],
+          gainers,
+          losers,
+          newCoins: Array.isArray(newCoins) ? newCoins : [],
+          highVolume,
+          loading: false
+        })
+      } catch (error) {
+        console.error('Error fetching crypto data:', error)
+        setCryptoData(prev => ({ ...prev, loading: false }))
+      }
+    }
+
+    fetchCryptoData()
+    const interval = setInterval(fetchCryptoData, 60000) // Update every minute
+
+    return () => clearInterval(interval)
+  }, [])
+
+  // Initialize TradingView screener
   useEffect(() => {
     if (!screenerRef.current) return
 
@@ -17,22 +109,16 @@ export default function DataMarket() {
       width: '100%',
       height: '800',
       defaultColumn: 'overview',
-      defaultScreen: 'general',
+      defaultScreen: 'crypto_mkt_cap_desc',
       market: 'crypto',
       showToolbar: true,
       colorTheme: 'dark',
       locale: 'en',
       isTransparent: true,
       largeChartUrl: '',
-      // Pre-configured filter for Binance, Bybit, and OKX perpetuals
-      symbols: [
-        { s: 'BINANCE:BTCUSDT.P' },
-        { s: 'BINANCE:ETHUSDT.P' },
-        { s: 'BYBIT:BTCUSDT.P' },
-        { s: 'BYBIT:ETHUSDT.P' },
-        { s: 'OKX:BTCUSDT.P' },
-        { s: 'OKX:ETHUSDT.P' }
-      ],
+      screener_type: 'crypto_mkt',
+      displayCurrency: 'USD',
+      exchanges: ['BINANCE', 'BYBIT', 'OKX'],
       defaultExchange: 'BINANCE'
     })
 
@@ -45,6 +131,67 @@ export default function DataMarket() {
     }
   }, [])
 
+  // Utility functions
+  const formatPrice = (price: number) => {
+    if (price < 0.01) return `$${price.toFixed(6)}`
+    if (price < 1) return `$${price.toFixed(4)}`
+    return `$${price.toLocaleString()}`
+  }
+
+  const formatMarketCap = (value: number) => {
+    if (value >= 1e9) return `$${(value / 1e9).toFixed(1)}B`
+    if (value >= 1e6) return `$${(value / 1e6).toFixed(1)}M`
+    if (value >= 1e3) return `$${(value / 1e3).toFixed(1)}K`
+    return `$${value.toLocaleString()}`
+  }
+
+  const openModal = (type: string, title: string, data: any[]) => {
+    setSelectedModal({ type, title, data })
+  }
+
+  // Widget component
+  const CryptoWidget = ({ 
+    title, 
+    emoji, 
+    data, 
+    type,
+    renderItem 
+  }: {
+    title: string
+    emoji: string
+    data: any[]
+    type: string
+    renderItem: (item: any, index: number) => React.ReactNode
+  }) => (
+    <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/50 transition-all duration-300 p-5">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3">
+          <span className="text-2xl">{emoji}</span>
+          <h3 className="text-lg font-semibold text-krtext">{title}</h3>
+        </div>
+        {data.length > 10 && (
+          <button
+            onClick={() => openModal(type, title, data)}
+            className="text-xs text-krgold hover:text-kryellow transition-colors px-2 py-1 rounded border border-krgold/30 hover:border-krgold/60"
+          >
+            View More
+          </button>
+        )}
+      </div>
+      <div className="space-y-2 crypto-list-scroll max-h-[300px] overflow-y-auto">
+        {cryptoData.loading ? (
+          <div className="flex items-center justify-center py-8">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-krgold"></div>
+          </div>
+        ) : data.length === 0 ? (
+          <div className="text-center text-krmuted py-8 text-sm">No data available</div>
+        ) : (
+          data.slice(0, 10).map(renderItem)
+        )}
+      </div>
+    </div>
+  )
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-950 via-krblack to-gray-950 text-krtext relative overflow-hidden">
       {/* Animated gradient accents */}
@@ -52,35 +199,274 @@ export default function DataMarket() {
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-kryellow/5 via-transparent to-transparent pointer-events-none"></div>
       
       <div className="relative z-10 p-4 md:p-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-6">
-          <div className="flex items-center gap-3 mb-2">
-            <span className="text-4xl">📊</span>
-            <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-krgold to-kryellow bg-clip-text text-transparent">
-              Data Market
-            </h1>
+        <div className="max-w-7xl mx-auto">
+          {/* Header */}
+          <div className="mb-8">
+            <div className="flex items-center gap-3 mb-2">
+              <span className="text-4xl">📊</span>
+              <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-krgold to-kryellow bg-clip-text text-transparent">
+                Data Market
+              </h1>
+            </div>
+            <p className="text-krmuted text-sm md:text-base ml-14">
+              Powered by CoinGecko & TradingView - Professional crypto market analysis tools
+            </p>
           </div>
-          <p className="text-krmuted text-sm md:text-base ml-14">
-            Powered by TradingView - Professional crypto market analysis tools
-          </p>
-        </div>
 
-        {/* Crypto Screener */}
-        <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-5">
-          <div className="flex items-center gap-3 mb-4">
-            <span className="text-2xl">🔍</span>
-            <div>
-              <h2 className="text-lg font-semibold text-krtext">Perpetual Futures Screener</h2>
-              <p className="text-xs text-krmuted">Binance • Bybit • OKX</p>
+          {/* Crypto Data Widgets Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            {/* Trending Coins */}
+            <CryptoWidget
+              title="Trending Coins"
+              emoji="🔥"
+              data={cryptoData.trending}
+              type="trending"
+              renderItem={(trending: TrendingItem, index: number) => (
+                <div key={trending.item.id} className="flex items-center justify-between p-3 bg-krblack/40 rounded-lg hover:bg-krblack/60 transition-all">
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs text-krgold font-bold w-6">#{index + 1}</span>
+                    <img 
+                      src={trending.item.thumb || trending.item.image} 
+                      alt={trending.item.name}
+                      className="w-6 h-6 rounded-full"
+                      onError={(e) => { e.currentTarget.src = '/placeholder-coin.svg' }}
+                    />
+                    <div>
+                      <div className="font-medium text-sm">{trending.item.name}</div>
+                      <div className="text-xs text-krmuted uppercase">{trending.item.symbol}</div>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-xs text-krgold">Trending #{trending.item.score !== undefined ? trending.item.score + 1 : index + 1}</div>
+                  </div>
+                </div>
+              )}
+            />
+
+            {/* Top Gainers */}
+            <CryptoWidget
+              title="Top Gainers"
+              emoji="🚀"
+              data={cryptoData.gainers}
+              type="gainers"
+              renderItem={(coin: CryptoItem, index: number) => (
+                <div key={coin.id} className="flex items-center justify-between p-3 bg-krblack/40 rounded-lg hover:bg-krblack/60 transition-all">
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs text-krgold font-bold w-6">#{index + 1}</span>
+                    <img 
+                      src={coin.image} 
+                      alt={coin.name}
+                      className="w-6 h-6 rounded-full"
+                      onError={(e) => { e.currentTarget.src = '/placeholder-coin.svg' }}
+                    />
+                    <div>
+                      <div className="font-medium text-sm">{coin.name}</div>
+                      <div className="text-xs text-krmuted uppercase">{coin.symbol}</div>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-sm font-medium">{coin.current_price ? formatPrice(coin.current_price) : 'N/A'}</div>
+                    <div className="text-xs text-green-400">
+                      +{coin.price_change_percentage_24h?.toFixed(2) || 0}%
+                    </div>
+                  </div>
+                </div>
+              )}
+            />
+
+            {/* Top Losers */}
+            <CryptoWidget
+              title="Top Losers"
+              emoji="🚨"
+              data={cryptoData.losers}
+              type="losers"
+              renderItem={(coin: CryptoItem, index: number) => (
+                <div key={coin.id} className="flex items-center justify-between p-3 bg-krblack/40 rounded-lg hover:bg-krblack/60 transition-all">
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs text-krgold font-bold w-6">#{index + 1}</span>
+                    <img 
+                      src={coin.image} 
+                      alt={coin.name}
+                      className="w-6 h-6 rounded-full"
+                      onError={(e) => { e.currentTarget.src = '/placeholder-coin.svg' }}
+                    />
+                    <div>
+                      <div className="font-medium text-sm">{coin.name}</div>
+                      <div className="text-xs text-krmuted uppercase">{coin.symbol}</div>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-sm font-medium">{coin.current_price ? formatPrice(coin.current_price) : 'N/A'}</div>
+                    <div className="text-xs text-red-400">
+                      {coin.price_change_percentage_24h?.toFixed(2) || 0}%
+                    </div>
+                  </div>
+                </div>
+              )}
+            />
+
+            {/* New Coins */}
+            <CryptoWidget
+              title="New Coins"
+              emoji="✨"
+              data={cryptoData.newCoins}
+              type="new"
+              renderItem={(coin: CryptoItem, index: number) => (
+                <div key={coin.id} className="flex items-center justify-between p-3 bg-krblack/40 rounded-lg hover:bg-krblack/60 transition-all">
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs text-krgold font-bold w-6">#{index + 1}</span>
+                    <div className="w-6 h-6 bg-krgold/20 rounded-full flex items-center justify-center">
+                      <span className="text-xs font-bold">N</span>
+                    </div>
+                    <div>
+                      <div className="font-medium text-sm">{coin.name}</div>
+                      <div className="text-xs text-krmuted uppercase">{coin.symbol}</div>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-xs text-kryellow">New</div>
+                    {coin.activated_at && (
+                      <div className="text-xs text-krmuted">
+                        {new Date(coin.activated_at * 1000).toLocaleDateString()}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            />
+
+            {/* Highest Volume */}
+            <CryptoWidget
+              title="Highest Volume"
+              emoji="🥤"
+              data={cryptoData.highVolume}
+              type="volume"
+              renderItem={(coin: CryptoItem, index: number) => (
+                <div key={coin.id} className="flex items-center justify-between p-3 bg-krblack/40 rounded-lg hover:bg-krblack/60 transition-all">
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs text-krgold font-bold w-6">#{index + 1}</span>
+                    <img 
+                      src={coin.image} 
+                      alt={coin.name}
+                      className="w-6 h-6 rounded-full"
+                      onError={(e) => { e.currentTarget.src = '/placeholder-coin.svg' }}
+                    />
+                    <div>
+                      <div className="font-medium text-sm">{coin.name}</div>
+                      <div className="text-xs text-krmuted uppercase">{coin.symbol}</div>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-sm font-medium">{coin.current_price ? formatPrice(coin.current_price) : 'N/A'}</div>
+                    <div className="text-xs text-kryellow">
+                      Vol: {coin.total_volume ? formatMarketCap(coin.total_volume) : 'N/A'}
+                    </div>
+                  </div>
+                </div>
+              )}
+            />
+
+            {/* Coming Soon Widgets */}
+            <div className="bg-krcard/40 backdrop-blur-sm rounded-xl border border-krborder/50 p-5 flex flex-col items-center justify-center">
+              <span className="text-3xl mb-2">🔓</span>
+              <h3 className="text-lg font-semibold text-krtext mb-2">Token Unlocks</h3>
+              <p className="text-xs text-krmuted text-center">Coming Soon</p>
+              <p className="text-xs text-krmuted text-center mt-1">Track upcoming token unlock events</p>
+            </div>
+
+            <div className="bg-krcard/40 backdrop-blur-sm rounded-xl border border-krborder/50 p-5 flex flex-col items-center justify-center">
+              <span className="text-3xl mb-2">👀</span>
+              <h3 className="text-lg font-semibold text-krtext mb-2">Most Viewed</h3>
+              <p className="text-xs text-krmuted text-center">Coming Soon</p>
+              <p className="text-xs text-krmuted text-center mt-1">Most viewed coins on CoinGecko</p>
+            </div>
+
+            <div className="bg-krcard/40 backdrop-blur-sm rounded-xl border border-krborder/50 p-5 flex flex-col items-center justify-center">
+              <span className="text-3xl mb-2">🎟️</span>
+              <h3 className="text-lg font-semibold text-krtext mb-2">Most Voted</h3>
+              <p className="text-xs text-krmuted text-center">Coming Soon</p>
+              <p className="text-xs text-krmuted text-center mt-1">Community favorites and voting trends</p>
+            </div>
+
+            <div className="bg-krcard/40 backdrop-blur-sm rounded-xl border border-krborder/50 p-5 flex flex-col items-center justify-center">
+              <span className="text-3xl mb-2">📅</span>
+              <h3 className="text-lg font-semibold text-krtext mb-2">Upcoming Coins</h3>
+              <p className="text-xs text-krmuted text-center">Coming Soon</p>
+              <p className="text-xs text-krmuted text-center mt-1">Pre-launch and upcoming projects</p>
             </div>
           </div>
-          <div className="tradingview-widget-container">
-            <div ref={screenerRef} className="tradingview-widget-container__widget"></div>
+
+          {/* Crypto Screener */}
+          <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-5">
+            <div className="flex items-center gap-3 mb-4">
+              <span className="text-2xl">🔍</span>
+              <div>
+                <h2 className="text-lg font-semibold text-krtext">Crypto Screener</h2>
+                <p className="text-xs text-krmuted">Binance • Bybit • OKX</p>
+              </div>
+            </div>
+            <div className="tradingview-widget-container">
+              <div ref={screenerRef} className="tradingview-widget-container__widget"></div>
+            </div>
           </div>
         </div>
       </div>
-      </div>
+
+      {/* Modal */}
+      {selectedModal && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-krcard border border-krborder rounded-xl max-w-4xl w-full max-h-[80vh] overflow-hidden">
+            <div className="flex items-center justify-between p-6 border-b border-krborder">
+              <h2 className="text-xl font-semibold text-krtext">{selectedModal.title}</h2>
+              <button
+                onClick={() => setSelectedModal(null)}
+                className="text-krmuted hover:text-krtext transition-colors text-2xl"
+              >
+                ×
+              </button>
+            </div>
+            <div className="p-6 overflow-y-auto crypto-list-scroll max-h-[60vh]">
+              <div className="space-y-3">
+                {selectedModal.data.map((item: any, index: number) => {
+                  const coin = selectedModal.type === 'trending' ? item.item : item
+                  return (
+                    <div key={coin.id || index} className="flex items-center justify-between p-4 bg-krblack/40 rounded-lg hover:bg-krblack/60 transition-all">
+                      <div className="flex items-center gap-4">
+                        <span className="text-sm text-krgold font-bold w-8">#{index + 1}</span>
+                        <img 
+                          src={coin.thumb || coin.image} 
+                          alt={coin.name}
+                          className="w-8 h-8 rounded-full"
+                          onError={(e) => { e.currentTarget.src = '/placeholder-coin.svg' }}
+                        />
+                        <div>
+                          <div className="font-medium">{coin.name}</div>
+                          <div className="text-sm text-krmuted uppercase">{coin.symbol}</div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        {coin.current_price && (
+                          <div className="font-medium">{formatPrice(coin.current_price)}</div>
+                        )}
+                        {coin.price_change_percentage_24h !== undefined && (
+                          <div className={`text-sm ${coin.price_change_percentage_24h >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                            {coin.price_change_percentage_24h >= 0 ? '+' : ''}{coin.price_change_percentage_24h.toFixed(2)}%
+                          </div>
+                        )}
+                        {coin.total_volume && (
+                          <div className="text-sm text-kryellow">
+                            Vol: {formatMarketCap(coin.total_volume)}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
