@@ -210,9 +210,14 @@ export default function News() {
   ]
 
   return (
-    <div className="min-h-screen bg-krbg text-krtext">
-      {/* News Ticker */}
-      <div className="bg-krblack/50 backdrop-blur-sm border-b border-krgold/30 py-2">
+    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-krblack to-gray-950 text-krtext relative overflow-hidden">
+      {/* Animated gradient accents */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-krgold/10 via-transparent to-transparent pointer-events-none"></div>
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-kryellow/5 via-transparent to-transparent pointer-events-none"></div>
+      
+      <div className="relative z-10">
+        {/* News Ticker */}
+        <div className="bg-krblack/50 backdrop-blur-sm border-b border-krgold/30 py-2">
         <div className="news-ticker-wrapper">
           <div className="news-ticker">
             {tickerNews.map((item, index) => (
@@ -421,6 +426,8 @@ export default function News() {
             <span className="text-krgold">Updated every minute</span>
           </p>
         </div>
+      </div>
+      
       </div>
 
       {/* News Ticker Styles */}
