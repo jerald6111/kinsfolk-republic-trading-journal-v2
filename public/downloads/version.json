@@ -1,32 +1,30 @@
 {
-  "version": "1.1.0",
-  "releaseDate": "2025-10-13",
+  "version": "1.2.1",
+  "releaseDate": "2025-01-15",
   "downloadUrl": "/downloads/KRTJ-Desktop-Setup.exe",
   "releaseNotes": {
-    "title": "KRTJ Desktop v1.1.0 - Enhanced Update System! 🚀",
+    "title": "KRTJ Desktop v1.2.1 - System Connectivity Fix! 🔧",
     "features": [
-      "Rich update notifications with detailed changelogs",
-      "System tray balloon notifications for new updates",
-      "Direct download integration from KRTJ website",
-      "Copy changelog to clipboard functionality",
-      "Periodic automatic update checking (every 4 hours)",
-      "Enhanced update UI with 'View Details' option"
+      "Updated website integration with latest UI improvements",
+      "Enhanced desktop app with synchronized content",
+      "Improved system reliability and stability"
     ],
     "improvements": [
-      "Faster app startup and reduced memory usage",
-      "Enhanced dark theme consistency across all dialogs",
-      "Better error handling for network connectivity issues",
-      "Improved system tray integration and responsiveness"
+      "Fixed update notification system connectivity",
+      "Enhanced error handling for network requests",
+      "Better domain resolution and URL handling",
+      "Improved user experience during updates"
     ],
     "bugFixes": [
-      "Fixed potential memory leaks in update checking",
-      "Resolved system tray balloon notifications on Windows 11",
-      "Fixed edge case crashes during startup update checks"
+      "Fixed update check URL configuration error",
+      "Resolved domain connectivity issues preventing notifications",
+      "Corrected automatic update detection system",
+      "Fixed JSON parsing errors in update responses"
     ],
-    "notes": "This major update introduces our new intelligent update system! You'll now receive rich notifications with detailed changelogs and can choose exactly when to update. No more surprise restarts - you're always in control of your KRTJ experience!"
+    "notes": "This critical update fixes the update notification system connectivity issues. Your app will now properly check for updates and show notifications when new versions are available! 🚀"
   },
   "minimumVersion": "1.0.0",
   "isRequired": false,
-  "fileSize": "46.3 MB",
+  "fileSize": "92.1 MB",
   "checksum": ""
 }
