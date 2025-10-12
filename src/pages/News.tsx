@@ -86,7 +86,8 @@ export default function News() {
               publishedAt: new Date().toISOString(),
               category: 'stocks' as const,
               summary: 'Crude oil prices climb as global demand increases and supply constraints persist, boosting energy company valuations across major exchanges.',
-              url: 'https://www.cnbc.com/energy/'
+              url: 'https://www.cnbc.com/energy/',
+              image: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=250&fit=crop&q=80'
             },
             {
               id: 'stocks-4',
@@ -95,7 +96,8 @@ export default function News() {
               publishedAt: new Date().toISOString(),
               category: 'stocks' as const,
               summary: 'FDA approves innovative treatment for rare disease, boosting biotech sector valuations and sparking investor interest in pharmaceutical research.',
-              url: '#'
+              url: '#',
+              image: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400&h=250&fit=crop&q=80'
             },
             {
               id: 'stocks-5',
@@ -188,7 +190,8 @@ export default function News() {
               publishedAt: new Date().toISOString(), 
               category: 'forex' as const,
               summary: 'Japanese central bank continues accommodative monetary policy as inflation remains below target, weakening yen against major currencies.',
-              url: '#'
+              url: '#',
+              image: 'https://images.unsplash.com/photo-1590736969955-71cc94901144?w=400&h=250&fit=crop&q=80'
             },
             {
               id: 'forex-3',
@@ -289,7 +292,8 @@ export default function News() {
               publishedAt: new Date().toISOString(),
               category: 'world' as const,
               summary: 'International trade volumes surge as supply chain disruptions ease and consumer demand rebounds across major economies worldwide.',
-              url: '#'
+              url: '#',
+              image: 'https://images.unsplash.com/photo-1586974548833-62c4219fad6e?w=400&h=250&fit=crop&q=80'
             },
             { 
               id: 'world-2', 
@@ -678,18 +682,16 @@ export default function News() {
                   onClick={() => setSelectedArticle(article)}
                 >
                   {/* Featured Article Image */}
-                  {article.image && (
-                    <div className="w-full h-40 overflow-hidden">
-                      <img 
-                        src={article.image} 
-                        alt={article.title}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          e.currentTarget.src = 'https://images.unsplash.com/photo-1518546305927-5a555bb7020d?w=400&h=250&fit=crop&q=80'
-                        }}
-                      />
-                    </div>
-                  )}
+                  <div className="w-full h-40 overflow-hidden bg-gradient-to-r from-orange-500/10 to-yellow-500/10">
+                    <img 
+                      src={article.image || 'https://images.unsplash.com/photo-1518546305927-5a555bb7020d?w=400&h=250&fit=crop&q=80'} 
+                      alt={article.title}
+                      className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                      onError={(e) => {
+                        e.currentTarget.src = 'https://images.unsplash.com/photo-1518546305927-5a555bb7020d?w=400&h=250&fit=crop&q=80'
+                      }}
+                    />
+                  </div>
                   
                   <div className="p-6">
                     <div className="flex items-start gap-3 mb-3">
@@ -746,31 +748,36 @@ export default function News() {
             ) : filteredNews.map((article) => (
               <div
                 key={`${activeCategory}-${article.id}`}
-                className={`bg-gradient-to-br ${categoryColors[article.category]} border rounded-xl overflow-hidden hover:scale-[1.02] transition-all cursor-pointer backdrop-blur-sm`}
+                className={`bg-gradient-to-br ${categoryColors[article.category]} border rounded-xl overflow-hidden hover:scale-[1.02] transition-all cursor-pointer backdrop-blur-sm min-h-[400px] flex flex-col`}
                 onClick={() => setSelectedArticle(article)}
               >
                 {/* Article Image */}
-                {article.image && (
-                  <div className="w-full h-48 overflow-hidden">
-                    <img 
-                      src={article.image} 
-                      alt={article.title}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        // Fallback image based on category
-                        const fallbackImages = {
-                          crypto: 'https://images.unsplash.com/photo-1518546305927-5a555bb7020d?w=400&h=250&fit=crop&q=80',
-                          stocks: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=250&fit=crop&q=80',
-                          forex: 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=400&h=250&fit=crop&q=80',
-                          world: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=250&fit=crop&q=80'
-                        }
-                        e.currentTarget.src = fallbackImages[article.category]
-                      }}
-                    />
-                  </div>
-                )}
+                <div className="w-full h-48 overflow-hidden bg-gradient-to-r from-gray-800 to-gray-900">
+                  <img 
+                    src={article.image || (() => {
+                      const fallbackImages = {
+                        crypto: 'https://images.unsplash.com/photo-1518546305927-5a555bb7020d?w=400&h=250&fit=crop&q=80',
+                        stocks: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=250&fit=crop&q=80',
+                        forex: 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=400&h=250&fit=crop&q=80',
+                        world: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=250&fit=crop&q=80'
+                      }
+                      return fallbackImages[article.category]
+                    })()} 
+                    alt={article.title}
+                    className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                    onError={(e) => {
+                      const fallbackImages = {
+                        crypto: 'https://images.unsplash.com/photo-1518546305927-5a555bb7020d?w=400&h=250&fit=crop&q=80',
+                        stocks: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=250&fit=crop&q=80',
+                        forex: 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=400&h=250&fit=crop&q=80',
+                        world: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=250&fit=crop&q=80'
+                      }
+                      e.currentTarget.src = fallbackImages[article.category]
+                    }}
+                  />
+                </div>
                 
-                <div className="p-6">
+                <div className="p-6 flex-grow flex flex-col">
                   <div className="flex items-start gap-3 mb-3">
                     {categoryIcons[article.category]}
                     <div className="flex-1">
@@ -779,21 +786,25 @@ export default function News() {
                       </h3>
                     </div>
                   </div>
-                {article.summary && (
-                  <p className="text-krmuted text-sm mb-4 line-clamp-3">
-                    {article.summary}
-                  </p>
-                )}
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-krgold font-medium">{article.source}</span>
-                  <span className="text-krmuted flex items-center gap-1">
-                    <Clock size={12} />
-                    {new Date(article.publishedAt).toLocaleDateString()}
-                  </span>
-                </div>
-                  <div className="mt-3 flex items-center text-xs text-krmuted">
-                    <ExternalLink size={12} className="mr-1" />
-                    Click to read more
+                  <div className="flex-grow">
+                    {article.summary && (
+                      <p className="text-krmuted text-sm mb-4 line-clamp-3">
+                        {article.summary}
+                      </p>
+                    )}
+                  </div>
+                  <div className="mt-auto">
+                    <div className="flex items-center justify-between text-xs mb-3">
+                      <span className="text-krgold font-medium">{article.source}</span>
+                      <span className="text-krmuted flex items-center gap-1">
+                        <Clock size={12} />
+                        {new Date(article.publishedAt).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <div className="flex items-center text-xs text-krmuted">
+                      <ExternalLink size={12} className="mr-1" />
+                      Click to read more
+                    </div>
                   </div>
                 </div>
               </div>
