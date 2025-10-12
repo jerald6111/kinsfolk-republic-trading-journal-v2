@@ -28,13 +28,11 @@ export default function DataMarket() {
     trending: TrendingItem[]
     gainers: CryptoItem[]
     losers: CryptoItem[]
-    highVolume: CryptoItem[]
     loading: boolean
   }>({
     trending: [],
     gainers: [],
     losers: [],
-    highVolume: [],
     loading: true
   })
   const [selectedModal, setSelectedModal] = useState<{
@@ -66,15 +64,10 @@ export default function DataMarket() {
           .filter(coin => coin.price_change_percentage_24h < 0)
           .sort((a, b) => (a.price_change_percentage_24h || 0) - (b.price_change_percentage_24h || 0))
 
-        // Sort by volume
-        const highVolume = [...markets]
-          .sort((a, b) => (b.total_volume || 0) - (a.total_volume || 0))
-
         setCryptoData({
           trending: trending.coins || [],
           gainers,
           losers,
-          highVolume,
           loading: false
         })
       } catch (error) {
@@ -311,37 +304,6 @@ export default function DataMarket() {
               )}
             />
 
-            {/* Highest Volume */}
-            <CryptoWidget
-              title="Highest Volume"
-              emoji="🥤"
-              data={cryptoData.highVolume}
-              type="volume"
-              renderItem={(coin: CryptoItem, index: number) => (
-                <div key={coin.id} className="flex items-center justify-between p-3 bg-krblack/40 rounded-lg hover:bg-krblack/60 transition-all">
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs text-krgold font-bold w-6">#{index + 1}</span>
-                    <img 
-                      src={coin.image} 
-                      alt={coin.name}
-                      className="w-6 h-6 rounded-full"
-                      onError={(e) => { e.currentTarget.src = '/placeholder-coin.svg' }}
-                    />
-                    <div>
-                      <div className="font-medium text-sm">{coin.name}</div>
-                      <div className="text-xs text-krmuted uppercase">{coin.symbol}</div>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-sm font-medium">{coin.current_price ? formatPrice(coin.current_price) : 'N/A'}</div>
-                    <div className="text-xs text-kryellow">
-                      Vol: {coin.total_volume ? formatMarketCap(coin.total_volume) : 'N/A'}
-                    </div>
-                  </div>
-                </div>
-              )}
-            />
-
           </div>
 
           {/* Crypto Screener */}
@@ -423,7 +385,7 @@ export default function DataMarket() {
         </div>
       )}
 
-      <style jsx>{`
+      <style>{`
         .crypto-list-scroll::-webkit-scrollbar {
           width: 4px;
         }
