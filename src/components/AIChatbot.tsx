@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { MessageCircle, X, Send, Bot, User, Shield, Navigation, HelpCircle, TrendingUp, Mail } from 'lucide-react'
+import llmService from '../services/llmService'
 
 interface Message {
   id: string
@@ -111,205 +112,63 @@ Which coin are you watching? 📊`
 
   const getSmartResponse = async (message: string): Promise<string> => {
     const lowerMessage = message.toLowerCase().trim()
+    let priceData = null
     
-    // Price queries - CoinGecko integration
-    if (lowerMessage.includes('price') || lowerMessage.includes('btc') || lowerMessage.includes('eth') || 
-        lowerMessage.includes('bitcoin') || lowerMessage.includes('ethereum') || 
-        lowerMessage.match(/what.*(cost|worth|trading)/i)) {
-      
-      // Extract coin mentions
+    // Check if this is a price query and fetch live data if needed
+    if (llmService.isPriceQuery(message)) {
+      // Extract coin mentions for price data
       const coinMap: Record<string, string> = {
-        'bitcoin': 'bitcoin',
-        'btc': 'bitcoin',
-        'ethereum': 'ethereum', 
-        'eth': 'ethereum',
-        'solana': 'solana',
-        'sol': 'solana',
-        'cardano': 'cardano',
-        'ada': 'cardano',
-        'dogecoin': 'dogecoin',
-        'doge': 'dogecoin',
-        'bnb': 'binancecoin',
-        'binance': 'binancecoin',
-        'xrp': 'ripple',
-        'ripple': 'ripple',
-        'avax': 'avalanche-2',
-        'avalanche': 'avalanche-2',
-        'matic': 'matic-network',
-        'polygon': 'matic-network',
-        'dot': 'polkadot',
-        'polkadot': 'polkadot',
-        'link': 'chainlink',
-        'chainlink': 'chainlink'
+        'bitcoin': 'bitcoin', 'btc': 'bitcoin',
+        'ethereum': 'ethereum', 'eth': 'ethereum',
+        'solana': 'solana', 'sol': 'solana',
+        'cardano': 'cardano', 'ada': 'cardano',
+        'dogecoin': 'dogecoin', 'doge': 'dogecoin',
+        'bnb': 'binancecoin', 'binance': 'binancecoin',
+        'xrp': 'ripple', 'ripple': 'ripple',
+        'avax': 'avalanche-2', 'avalanche': 'avalanche-2',
+        'matic': 'matic-network', 'polygon': 'matic-network',
+        'dot': 'polkadot', 'polkadot': 'polkadot',
+        'link': 'chainlink', 'chainlink': 'chainlink'
       }
 
       for (const [keyword, coinId] of Object.entries(coinMap)) {
         if (lowerMessage.includes(keyword)) {
-          const priceData = await fetchCoinPrice(coinId)
-          return formatPriceData(priceData, keyword)
+          try {
+            priceData = await fetchCoinPrice(coinId)
+            priceData.coinName = keyword.toUpperCase()
+            break
+          } catch (error) {
+            console.error('Error fetching price data:', error)
+          }
         }
       }
+    }
 
-      // Generic price request
-      if (lowerMessage.includes('price') && !Object.keys(coinMap).some(k => lowerMessage.includes(k))) {
-        return `💰 **I can check prices for you!** Just ask like:
-
-• "What's the Bitcoin price?"
-• "BTC price now" 
-• "How much is ETH?"
-• "Solana price check"
-
-**Supported coins**: BTC, ETH, SOL, ADA, DOGE, BNB, XRP, AVAX, MATIC, DOT, LINK, and more!
-
-Which coin price do you want to check? 📊`
+    // Get conversation history for LLM context
+    const conversationHistory = llmService.formatConversationHistory(messages)
+    
+    // Generate intelligent response using LLM
+    try {
+      const response = await llmService.generateResponse(
+        message,
+        conversationHistory,
+        priceData,
+        userInfo.name
+      )
+      
+      return response
+      
+    } catch (error) {
+      console.error('LLM Service Error:', error)
+      
+      // Fallback to basic price response if it's a price query
+      if (priceData) {
+        return formatPriceData(priceData, priceData.coinName)
       }
+      
+      // Generic fallback
+      return "I'm having a moment of digital confusion! 🤖 Could you rephrase that? I'm here to help with KRTJ navigation, crypto prices, and trading guidance!"
     }
-    
-    // Emotional responses for trading situations
-    
-    // Loss and emotional support - this should catch "lost $100", "cope", etc.
-    if (lowerMessage.includes('lost') || lowerMessage.includes('lose') || lowerMessage.includes('losing') || 
-        lowerMessage.includes('cope') || lowerMessage.includes('devastated') || lowerMessage.includes('upset') ||
-        lowerMessage.includes('$') && (lowerMessage.includes('gone') || lowerMessage.includes('lost'))) {
-      return `I feel you 💔 Losses hurt, especially when it's real money. Here's how to cope:
-
-**Immediate Steps:**
-• Take a deep breath - you're not defined by one loss
-• Step away from the charts for at least 30 minutes
-• Don't revenge trade - that's how small losses become big ones
-
-**Recovery Process:**
-• Journal this trade - what happened? Was it part of your plan?
-• If it was a planned loss (stop-loss hit), you did well following rules
-• If it was emotional/unplanned, identify the trigger to avoid next time
-• $100 is tuition to the market - expensive but educational
-
-You're still in the game. Focus on process, not the pain. What exactly happened? 🤔`
-    }
-
-    if (lowerMessage.includes('liquidated') || lowerMessage.includes('rekt') || lowerMessage.includes('account wiped')) {
-      return "Ouch 😬 liquidation stings. Happens to all of us. Reset, refocus, and rebuild smarter. Was it overleverage or no stop-loss? Let's check that trade in your Journal - the lesson is usually hiding there."
-    }
-    
-    if (lowerMessage.includes('stop loss') || lowerMessage.includes('sl hit') || lowerMessage.includes('stopped out')) {
-      return "SL hit - and that's okay. That's risk management doing its job. You followed the plan. Losses within plan are wins in discipline. 📉"
-    }
-    
-    if (lowerMessage.includes('fomo') || lowerMessage.includes('chased') || lowerMessage.includes('entered late')) {
-      return "FOMO's sneaky huh? 😂 Missing one trade won't ruin your month, forcing one will. FOMO entries feel good short-term, but they're emotionally expensive. Did you have an alert set or just reacted?"
-    }
-    
-    if (lowerMessage.includes('revenge trade') || lowerMessage.includes('emotional entry') || lowerMessage.includes('angry')) {
-      return "That's your emotions talking. Walk away before your account becomes collateral. Revenge trades feel justified, but they're just losses in disguise. Take a 15-minute break before touching another trade."
-    }
-    
-    if (lowerMessage.includes('losing streak') || lowerMessage.includes('drawdown') || lowerMessage.includes('red week')) {
-      return "Drawdowns test character. Focus on process, not PNL. Red weeks happen - the goal is to limit damage, not avoid it. Cut size, stay calm, journal every trade until the storm passes."
-    }
-    
-    if (lowerMessage.includes('overtrading') || lowerMessage.includes('too many trades')) {
-      return "If you're clicking nonstop, you're not trading - you're gambling. Overtrading is usually boredom in disguise. Sometimes the best trade is no trade. Chill mode = profit mode."
-    }
-
-    // General emotional support keywords
-    if (lowerMessage.includes('stressed') || lowerMessage.includes('anxiety') || lowerMessage.includes('worried') ||
-        lowerMessage.includes('scared') || lowerMessage.includes('panic') || lowerMessage.includes('help me')) {
-      return `Take a breath 🫁 Trading stress is real, and you're not alone in feeling this way.
-
-**Right Now:**
-• Step away from the screen for 10 minutes
-• Remember: markets will be here tomorrow
-• Your mental health > any trade
-
-**Longer Term:**
-• Reduce position sizes until you sleep peacefully
-• Set strict daily loss limits and stick to them
-• Journal your emotional state before each trade
-• Consider taking a complete break if overwhelmed
-
-The best traders aren't fearless - they're disciplined with their emotions. What's triggering the stress? 🤔`
-    }
-    
-    if (lowerMessage.includes('big win') || lowerMessage.includes('massive win') || lowerMessage.includes('crushing it')) {
-      return "Nice one! 🎯 Don't let euphoria take over though. Celebrate it, then log it and review what went right so you can repeat it, not chase it. Stick to the same risk per trade even when winning."
-    }
-    
-    // Platform-specific questions
-    if (lowerMessage.includes('roi not updating') || lowerMessage.includes('roi not changing')) {
-      return "Withdrawals from profit don't affect ROI. ROI only changes with trading performance, not balance withdrawals. That's normal - ROI is based on deposits and trade results. 📊"
-    }
-    
-    if (lowerMessage.includes('trade missing') || lowerMessage.includes('trade didn\'t save')) {
-      return "Make sure you hit 'Save Trade'. Try refreshing - sometimes the sheet or local data just needs to reload. Could be a temporary cache issue. Save again and check your Journal tab."
-    }
-    
-    if (lowerMessage.includes('hyperlink') || lowerMessage.includes('link disappeared')) {
-      return "Hyperlinks can't be saved directly due to a script limitation. Add them as plain text or image references. You can paste links as text - the clickable link won't stick yet due to spreadsheet restrictions."
-    }
-    
-    // Trading guidance
-    if (lowerMessage.includes('improve win rate') || lowerMessage.includes('better win rate')) {
-      return "Review your losing trades weekly and identify if losses are from poor setups or emotions. Filter out impulsive entries. Focus on execution, not outcome. Your Journal doesn't lie - it shows who you are as a trader."
-    }
-    
-    if (lowerMessage.includes('good roi') || lowerMessage.includes('what roi')) {
-      return "A consistent 5-10% monthly ROI with proper risk management is already excellent. Focus on consistency over speed. Don't chase big numbers - chase sustainable processes."
-    }
-    
-    if (lowerMessage.includes('profit factor') || lowerMessage.includes('low profit factor')) {
-      return "Profit Factor < 1 means your losses outweigh your wins. Check if you're cutting losses late or letting winners run too short. Above 1.5 shows you have a solid edge."
-    }
-    
-    // Platform navigation
-    if (lowerMessage.includes('how to use') || lowerMessage.includes('navigate') || lowerMessage.includes('getting started')) {
-      return `🧭 **Getting Started with KRTJ:**
-
-**Dashboard**: Your bird's-eye view showing Total Trades, Win Rate, PNL, ROI, Profit Factor
-**Journal**: Log every trade - entry, exit, setup, reasoning, screenshots
-**Vision Board**: Add charts, affirmations, goals to keep your vision clear  
-**Strategies**: Store your playbooks and trading systems
-**Snapshots**: Visual gallery for quick trade review
-**Wallets**: Track deposits/withdrawals (ROI only updates from trading results)
-
-All features work offline after initial load. No account needed - start journaling immediately! 🚀`
-    }
-    
-    // Security questions
-    if (lowerMessage.includes('secure') || lowerMessage.includes('privacy') || lowerMessage.includes('safe')) {
-      return `🔒 **Security & Privacy:**
-
-• **Client-Side Only**: All processing in your browser - no server storage
-• **No Data Collection**: We don't store your trading data or personal info
-• **Open Source**: Full transparency - check our GitHub
-• **No Login Required**: Use all features without accounts
-• **Local Storage**: Your data stays on your device
-• **HTTPS Encrypted**: All connections secure
-
-Your data never leaves your browser. Privacy-first design! 🛡️`
-    }
-    
-    // Market analysis requests
-    if (lowerMessage.includes('market') && (lowerMessage.includes('analysis') || lowerMessage.includes('outlook') || lowerMessage.includes('trend'))) {
-      return `📈 **Market Analysis:**
-
-I can help with price data, but for deep market analysis, here's my take:
-
-**Always Remember:**
-• Markets are unpredictable - focus on risk management
-• Your Journal shows your real edge, not market predictions
-• Stick to your tested setups regardless of market sentiment
-• When in doubt, size down and wait for clarity
-
-Want me to check specific coin prices for your analysis? Just ask "BTC price" or "ETH price"! 💰`
-    }
-
-    // Greetings
-    if (lowerMessage.includes('hello') || lowerMessage.includes('hi') || lowerMessage.includes('hey')) {
-      return "Hey! 👋 I'm your Kinsfolk Assistant. I can help with KRTJ navigation, check live crypto prices, and guide you through trading challenges. What's on your mind?"
-    }
-    
-    // Default response
-    return "I'm here to help with KRTJ navigation, live crypto prices, trading guidance, and platform questions. Try asking 'Bitcoin price', 'how to use the journal', 'analytics help', or share what's happening with your trades. What do you need? 🤔"
   }
 
   useEffect(() => {
