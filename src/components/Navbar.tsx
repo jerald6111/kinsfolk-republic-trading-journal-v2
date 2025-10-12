@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Menu, ChevronDown, Settings } from 'lucide-react'
+import { Menu, ChevronDown, Settings, Download } from 'lucide-react'
 
 const nav = [
   { to: '/vision', label: 'Vision' },
@@ -109,6 +109,40 @@ export default function Navbar(){
               </Link>
             )
           })}
+          {/* Download Dropdown */}
+          <div 
+            className="relative"
+            onMouseEnter={() => handleMouseEnter('/download')}
+            onMouseLeave={handleMouseLeave}
+          >
+            <button className="p-2 rounded-md bg-krgold/20 hover:bg-krgold/30 transition-colors border border-krgold/30 flex items-center gap-1" title="Download">
+              <Download size={20} className="text-krgold" />
+              <ChevronDown size={12} className={`text-krgold transition-transform ${hoveredDropdown === '/download' ? 'rotate-180' : ''}`} />
+            </button>
+            {hoveredDropdown === '/download' && (
+              <div className="absolute top-full right-0 pt-2 -mt-2 z-50">
+                <div className="bg-krcard border border-krborder rounded-xl shadow-lg min-w-[280px] overflow-hidden backdrop-blur-sm">
+                  <div className="p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Download size={16} className="text-krgold" />
+                      <span className="text-sm font-semibold text-krgold">Desktop App</span>
+                    </div>
+                    <p className="text-xs text-gray-400 mb-3">
+                      Want to use our app offline? No problem! Download our Windows desktop app for enhanced security and performance.
+                    </p>
+                    <Link
+                      to="/download"
+                      className="w-full bg-gradient-to-r from-krgold to-kryellow text-krblack px-3 py-2 rounded-lg font-medium hover:shadow-lg hover:shadow-krgold/30 transition-all text-sm flex items-center justify-center gap-1"
+                    >
+                      <Download size={14} />
+                      Download for Windows
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+          
           <Link to="/settings" className="p-2 rounded-md bg-krgray/60 hover:bg-krgold/20 transition-colors" title="Settings">
             <Settings size={20} className="text-krwhite" />
           </Link>

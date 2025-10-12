@@ -42,7 +42,10 @@ export default function AIChatbot() {
       icon: <Shield className="w-4 h-4" />,
       response: `🎯 **Kinsfolk Republic Trading Journal (KRTJ)**
 
-Hey! I'm your Kinsfolk Assistant. KRTJ is a web-based trading journal and analytics dashboard that helps you log, analyze, and improve your trading performance across crypto, stocks, and forex.
+Hey! I'm your Kinsfolk Assistant. KRTJ is a trading journal and analytics platform available both as a web app and Windows desktop application that helps you log, analyze, and improve your trading performance across crypto, stocks, and forex.
+
+**💻 NEW: Windows Desktop App Available!**
+Want enhanced security and offline access? Download our Windows desktop app for the ultimate trading journal experience!
 
 **Core Sections:**
 • **Vision Board**: Motivation hub for goals and affirmations
@@ -107,6 +110,31 @@ I can check real-time prices for:
 Just ask naturally like "Bitcoin price" or "How much is ETH?" and I'll pull live data with 24h changes, market cap, and volume!
 
 Which coin are you watching? 📊`
+    },
+    {
+      id: 'desktop_app',
+      label: 'Windows App',
+      icon: <Navigation className="w-4 h-4" />,
+      response: `💻 **KRTJ Windows Desktop App is Here!**
+
+**Why Go Desktop?**
+• **100% Offline** - No internet required once installed
+• **Enhanced Security** - Data never leaves your computer
+• **Lightning Performance** - Native desktop speed
+• **Dark Theme** - Optimized for trading environments
+
+**Perfect For:**
+• Traders wanting maximum privacy
+• Offline trading analysis
+• Enhanced performance over web version
+• Seamless system integration
+
+**Download Info:**
+• Free one-time download (~45MB)
+• Windows 10/11 compatible
+• Same features as web version
+
+Ready to upgrade your trading setup? Check out the download page! 🚀`
     }
   ]
 

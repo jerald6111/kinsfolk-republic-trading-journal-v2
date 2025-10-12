@@ -8,7 +8,10 @@ import {
   TrendingUp, 
   Calendar,
   Shield,
-  Zap
+  Zap,
+  Download,
+  Monitor,
+  ArrowRight
 } from 'lucide-react'
 
 export default function Home() {
@@ -54,6 +57,12 @@ export default function Home() {
 
   const news = [
     {
+      title: 'Windows Desktop App Now Available!',
+      date: 'October 13, 2025',
+      description: 'Take your trading journal offline! Download our new Windows desktop application for enhanced security, performance, and complete offline functionality.',
+      image: 'https://images.unsplash.com/photo-1587831990711-23ca6441447b?w=400&auto=format&fit=crop'
+    },
+    {
       title: 'New Analytics Features Released',
       date: 'October 10, 2025',
       description: 'We\'ve added advanced analytics including risk metrics, exposure analysis, and drawdown tracking to help you better understand your trading performance.',
@@ -64,12 +73,6 @@ export default function Home() {
       date: 'October 5, 2025',
       description: 'The journal entry system now supports both Spot and Futures trading with automatic P&L calculations and leverage tracking.',
       image: 'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=400&auto=format&fit=crop'
-    },
-    {
-      title: 'Vision Board & Goal Setting',
-      date: 'September 28, 2025',
-      description: 'Set and track your trading goals with our new Vision Board feature. Visualize your success and stay motivated.',
-      image: 'https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=400&auto=format&fit=crop'
     }
   ]
 
@@ -94,7 +97,7 @@ export default function Home() {
             <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
               Track, analyze, and improve your trading performance with powerful analytics, comprehensive journaling, and intuitive visualizations.
             </p>
-            <div className="flex gap-4 justify-center">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 to="/journal/entries"
                 className="bg-gradient-to-r from-krgold to-kryellow text-krblack px-8 py-3 rounded-xl font-semibold hover:shadow-lg hover:shadow-krgold/50 transition-all"
@@ -107,6 +110,95 @@ export default function Home() {
               >
                 View Analytics
               </Link>
+            </div>
+            
+            {/* Windows App Announcement */}
+            <div className="mt-8 inline-flex items-center gap-2 bg-krgold/10 border border-krgold/30 rounded-full px-4 py-2">
+              <Monitor className="text-krgold" size={16} />
+              <span className="text-sm text-krgold">
+                <Link to="/download" className="hover:underline font-medium">
+                  Now available as Windows desktop app! →
+                </Link>
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Desktop App Highlight Section */}
+      <section className="py-16 bg-gradient-to-r from-krgold/5 to-kryellow/5 border-y border-krgold/10">
+        <div className="container mx-auto px-6">
+          <div className="max-w-5xl mx-auto">
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              <div>
+                <div className="inline-flex items-center gap-2 bg-krgold/10 border border-krgold/20 rounded-full px-4 py-2 mb-4">
+                  <Monitor className="text-krgold" size={16} />
+                  <span className="text-sm text-krgold font-semibold">New: Desktop Application</span>
+                </div>
+                <h2 className="text-3xl md:text-4xl font-bold text-krwhite mb-4">
+                  Take KRTJ <span className="bg-gradient-to-r from-krgold to-kryellow bg-clip-text text-transparent">Offline</span>
+                </h2>
+                <p className="text-gray-300 mb-6 text-lg">
+                  Experience enhanced security, lightning-fast performance, and complete offline functionality with our Windows desktop application.
+                </p>
+                <div className="grid sm:grid-cols-2 gap-4 mb-6">
+                  <div className="flex items-center gap-2">
+                    <Shield className="text-krgold" size={16} />
+                    <span className="text-sm text-gray-300">100% Offline Security</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Zap className="text-krgold" size={16} />
+                    <span className="text-sm text-gray-300">Native Performance</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Monitor className="text-krgold" size={16} />
+                    <span className="text-sm text-gray-300">Dark Theme Optimized</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Download className="text-krgold" size={16} />
+                    <span className="text-sm text-gray-300">One-time Download</span>
+                  </div>
+                </div>
+                <Link
+                  to="/download"
+                  className="inline-flex items-center gap-2 bg-gradient-to-r from-krgold to-kryellow text-krblack px-6 py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-krgold/50 transition-all"
+                >
+                  <Download size={16} />
+                  Download for Windows
+                  <ArrowRight size={16} />
+                </Link>
+              </div>
+              
+              <div className="relative">
+                <div className="bg-krcard/60 backdrop-blur-sm border border-krborder rounded-xl p-6">
+                  <div className="bg-krblack rounded-lg p-4 mb-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                      <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                      <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                      <span className="text-xs text-gray-400 ml-auto">Kinsfolk Republic Trading Journal</span>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="h-2 bg-krgold/30 rounded w-3/4"></div>
+                      <div className="h-2 bg-krgray/30 rounded w-1/2"></div>
+                      <div className="h-2 bg-krgold/20 rounded w-2/3"></div>
+                      <div className="flex gap-2 mt-4">
+                        <div className="h-12 bg-krgold/20 rounded flex-1"></div>
+                        <div className="h-12 bg-krgray/20 rounded flex-1"></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-sm text-gray-400">
+                      <Monitor className="inline w-4 h-4 mr-1" />
+                      Windows 10/11 Compatible
+                    </p>
+                  </div>
+                </div>
+                <div className="absolute -top-4 -right-4 bg-krgold text-krblack rounded-full px-3 py-1 text-xs font-bold">
+                  NEW!
+                </div>
+              </div>
             </div>
           </div>
         </div>

@@ -13,6 +13,7 @@ import News from './pages/News'
 import NewsAndData from './pages/NewsAndData'
 import DataMarket from './pages/DataMarket'
 import DataSettings from './pages/DataSettings'
+import Download from './pages/Download'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import FloatingSupportButton from './components/FloatingSupportButton'
@@ -40,6 +41,7 @@ export default function App() {
           <Route path="/charts" element={<Charts />} />
           <Route path="/wallet" element={<Wallet />} />
           <Route path="/settings" element={<DataSettings />} />
+          <Route path="/download" element={<Download />} />
         </Routes>
         <Footer />
         <FloatingSupportButton />
