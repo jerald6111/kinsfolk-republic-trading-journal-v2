@@ -18,6 +18,7 @@ export default function News() {
   const [loading, setLoading] = useState(true)
   const [selectedArticle, setSelectedArticle] = useState<NewsItem | null>(null)
   const [currentPage, setCurrentPage] = useState(1)
+  const [fetchingNew, setFetchingNew] = useState(false)
   const articlesPerPage = 12
 
   // Generate contextual image for news articles
@@ -52,10 +53,14 @@ export default function News() {
 
   // Fetch live news from RSS feeds
   useEffect(() => {
-    const fetchNews = async () => {
+    const fetchNews = async (isInitialLoad = false) => {
       try {
-        setLoading(true)
-        const allNews: NewsItem[] = []
+        if (isInitialLoad) {
+          setLoading(true)
+        } else {
+          setFetchingNew(true)
+        }
+        const newArticles: NewsItem[] = []
 
         // CRYPTO NEWS - CoinTelegraph RSS
         try {
@@ -73,7 +78,7 @@ export default function News() {
               url: item.link,
               image: item.enclosure?.link || item.thumbnail || generateNewsImage(item.title, 'crypto')
             }))
-            allNews.push(...cryptoNews)
+            newArticles.push(...cryptoNews)
           }
         } catch (error) {
           console.error('Failed to fetch crypto news:', error)
@@ -95,7 +100,7 @@ export default function News() {
               url: item.link,
               image: item.enclosure?.link || item.thumbnail || generateNewsImage(item.title, 'stocks')
             }))
-            allNews.push(...stocksNews)
+            newArticles.push(...stocksNews)
           }
         } catch (error) {
           console.error('Failed to fetch stocks news:', error)
@@ -117,7 +122,7 @@ export default function News() {
               url: item.link,
               image: item.enclosure?.link || item.thumbnail || generateNewsImage(item.title, 'forex')
             }))
-            allNews.push(...forexNews)
+            newArticles.push(...forexNews)
           }
         } catch (error) {
           console.error('Failed to fetch forex news:', error)
@@ -159,27 +164,36 @@ export default function News() {
                 url: item.link,
                 image: item.enclosure?.link || item.thumbnail || generateNewsImage(item.title, 'world')
               }))
-              allNews.push(...worldNews)
+              newArticles.push(...worldNews)
             }
           } catch (altError) {
             console.error('Failed to fetch alternative world news:', altError)
           }
         }
 
-        // Set all news data
-        setNewsItems(allNews)
+        // Stack new articles with existing ones (avoid duplicates)
+        setNewsItems(prevItems => {
+          const existingIds = new Set(prevItems.map(item => item.url || item.title))
+          const uniqueNewArticles = newArticles.filter(article => 
+            !existingIds.has(article.url || article.title)
+          )
+          
+          // Add new articles to the beginning and keep recent 200 articles max
+          const combined = [...uniqueNewArticles, ...prevItems]
+          return combined.slice(0, 200) // Keep last 200 articles for performance
+        })
         
       } catch (error) {
         console.error('Failed to fetch live news:', error)
-        // No static fallback - live RSS feeds only per user requirement
-        setNewsItems([])
+        // Don't clear existing articles on error - keep what we have
       } finally {
         setLoading(false)
+        setFetchingNew(false)
       }
     }
 
-    fetchNews()
-    const interval = setInterval(fetchNews, 60 * 1000) // Refresh every 1 minute for truly LIVE updates
+    fetchNews(true) // Initial load
+    const interval = setInterval(() => fetchNews(false), 60 * 1000) // Refresh every 1 minute for truly LIVE updates
     
     return () => clearInterval(interval)
   }, [])
@@ -246,9 +260,15 @@ export default function News() {
               <span className="text-krblack font-bold text-sm">📰</span>
             </div>
             <h1 className="text-3xl font-bold text-krtext">Market News</h1>
+            {fetchingNew && (
+              <div className="ml-4 flex items-center gap-2 text-krgold text-sm">
+                <div className="animate-spin w-4 h-4 border-2 border-krgold border-t-transparent rounded-full"></div>
+                <span>Fetching latest news...</span>
+              </div>
+            )}
           </div>
           <p className="text-krmuted text-lg">
-            Multi-market intelligence, economic events, and live trading insights
+            Multi-market intelligence, economic events, and live trading insights • Updates every minute
           </p>
         </div>
 
