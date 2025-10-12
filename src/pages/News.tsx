@@ -14,10 +14,11 @@ interface NewsItem {
 
 export default function News() {
   const [newsItems, setNewsItems] = useState<NewsItem[]>([])
-  const [featuredNews, setFeaturedNews] = useState<NewsItem[]>([])
   const [activeCategory, setActiveCategory] = useState<'crypto' | 'stocks' | 'forex' | 'world'>('crypto')
   const [loading, setLoading] = useState(true)
   const [selectedArticle, setSelectedArticle] = useState<NewsItem | null>(null)
+  const [currentPage, setCurrentPage] = useState(1)
+  const articlesPerPage = 12
 
   // Generate contextual image for news articles
   const generateNewsImage = (title: string, category: string): string => {
@@ -168,15 +169,10 @@ export default function News() {
         // Set all news data
         setNewsItems(allNews)
         
-        // Set featured news (crypto as main focus)  
-        const featured = allNews.filter(item => item.category === 'crypto').slice(0, 3)
-        setFeaturedNews(featured)
-        
       } catch (error) {
         console.error('Failed to fetch live news:', error)
         // No static fallback - live RSS feeds only per user requirement
         setNewsItems([])
-        setFeaturedNews([])
       } finally {
         setLoading(false)
       }
@@ -192,6 +188,18 @@ export default function News() {
   const filteredNews = useMemo(() => {
     return newsItems.filter(item => item.category === activeCategory)
   }, [newsItems, activeCategory])
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredNews.length / articlesPerPage)
+  const paginatedNews = useMemo(() => {
+    const startIndex = (currentPage - 1) * articlesPerPage
+    return filteredNews.slice(startIndex, startIndex + articlesPerPage)
+  }, [filteredNews, currentPage, articlesPerPage])
+
+  // Reset pagination when category changes
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [activeCategory])
   
   // Get ticker news prioritizing crypto - memoized to prevent state contamination
   const tickerNews = useMemo(() => [
@@ -272,84 +280,129 @@ export default function News() {
           </div>
         )}
 
-        {/* Featured News Section - Only show for crypto category */}
-        {!loading && activeCategory === 'crypto' && featuredNews.length > 0 && (
-          <div className="mb-8">
-            <h2 className="text-xl font-bold mb-4 text-krtext flex items-center gap-2">
-              <span className="text-krgold">🔥</span>
-              Featured {activeCategory.charAt(0).toUpperCase() + activeCategory.slice(1)} Stories
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {featuredNews.slice(0, 3).map((article) => (
-                <div
-                  key={article.id}
-                  className="bg-krcard border border-krborder rounded-lg overflow-hidden hover:border-krgold/50 transition-all duration-200 cursor-pointer group"
-                  onClick={() => setSelectedArticle(article)}
-                >
-                  <div className="relative h-40 bg-krgray/20 flex items-center justify-center overflow-hidden">
-                    {article.image ? (
-                      <img
-                        src={article.image}
-                        alt={article.title}
-                        className="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-300"
-                        onError={(e) => {
-                          const img = e.target as HTMLImageElement;
-                          img.style.display = 'none';
-                          const parent = img.parentElement;
-                          if (parent) {
-                            parent.innerHTML = `<div class="flex items-center justify-center h-40 text-krgold"><span class="text-3xl">${categories.find(c => c.id === article.category)?.icon || '📰'}</span></div>`;
-                          }
-                        }}
-                      />
-                    ) : (
-                      <div className="flex items-center justify-center h-40 text-krgold">
-                        <span className="text-3xl">{categories.find(c => c.id === article.category)?.icon || '📰'}</span>
-                      </div>
-                    )}
-                  </div>
-                  <div className="p-4">
-                    <h3 className="font-semibold text-sm mb-2 line-clamp-2 text-krtext group-hover:text-krgold transition-colors duration-200">
-                      {article.title}
-                    </h3>
-                    <div className="flex justify-between items-center text-xs text-krmuted">
-                      <span className="text-krgold font-medium">{article.source}</span>
-                      <span>{new Date(article.publishedAt).toLocaleDateString()}</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
 
-        {/* News Grid - Stack all news articles */}
-        {!loading && filteredNews.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredNews.map((article, index) => (
+
+        {/* News Grid - Paginated articles */}
+        {!loading && paginatedNews.length > 0 && (
+          <>
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-bold text-krtext">
+                {activeCategory.charAt(0).toUpperCase() + activeCategory.slice(1)} News 
+                <span className="text-krmuted text-sm font-normal ml-2">
+                  ({filteredNews.length} articles)
+                </span>
+              </h2>
+              <div className="text-sm text-krmuted">
+                Page {currentPage} of {totalPages}
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {paginatedNews.map((article, index) => (
               <div
                 key={article.id}
                 className="bg-krcard border border-krborder rounded-lg overflow-hidden hover:border-krgold/50 transition-all duration-200 cursor-pointer group"
                 onClick={() => setSelectedArticle(article)}
               >
-                <div className="p-4">
-                  <div className="flex items-start gap-3">
-                    <div className="flex-shrink-0 w-8 h-8 rounded bg-krgold/20 flex items-center justify-center">
-                      <span className="text-krgold text-sm font-bold">{categories.find(c => c.id === article.category)?.icon}</span>
+                {/* Thumbnail */}
+                <div className="relative h-48 bg-krgray/20 overflow-hidden">
+                  {article.image ? (
+                    <img
+                      src={article.image}
+                      alt={article.title}
+                      className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                      onError={(e) => {
+                        const img = e.target as HTMLImageElement;
+                        img.style.display = 'none';
+                        const parent = img.parentElement;
+                        if (parent) {
+                          parent.innerHTML = `<div class="flex items-center justify-center h-48 text-krgold bg-krgray/20"><span class="text-4xl">${categories.find(c => c.id === article.category)?.icon || '📰'}</span></div>`;
+                        }
+                      }}
+                    />
+                  ) : (
+                    <div className="flex items-center justify-center h-48 text-krgold bg-krgray/20">
+                      <span className="text-4xl">{categories.find(c => c.id === article.category)?.icon || '📰'}</span>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-sm text-krtext group-hover:text-krgold transition-colors duration-200 line-clamp-2 mb-2">
-                        {article.title}
-                      </h3>
-                      <div className="flex items-center justify-between text-xs text-krmuted">
-                        <span className="text-krgold font-medium">{article.source}</span>
-                        <span>{new Date(article.publishedAt).toLocaleDateString()}</span>
-                      </div>
+                  )}
+                  
+                  {/* Category Badge */}
+                  <div className="absolute top-2 left-2">
+                    <div className="bg-krblack/80 backdrop-blur-sm rounded-md px-2 py-1 flex items-center gap-1">
+                      <span className="text-krgold text-xs">{categories.find(c => c.id === article.category)?.icon}</span>
+                      <span className="text-krtext text-xs font-medium capitalize">{article.category}</span>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Content */}
+                <div className="p-4">
+                  <h3 className="font-semibold text-sm text-krtext group-hover:text-krgold transition-colors duration-200 line-clamp-2 mb-3">
+                    {article.title}
+                  </h3>
+                  
+                  <div className="flex items-center justify-between text-xs text-krmuted">
+                    <span className="text-krgold font-medium">{article.source}</span>
+                    <div className="flex items-center gap-1">
+                      <Calendar className="w-3 h-3" />
+                      <span>{new Date(article.publishedAt).toLocaleDateString()}</span>
                     </div>
                   </div>
                 </div>
               </div>
             ))}
           </div>
+          
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="flex justify-center items-center gap-2 mt-8">
+              <button
+                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                disabled={currentPage === 1}
+                className="px-4 py-2 text-sm bg-krcard border border-krborder rounded-lg text-krtext hover:border-krgold/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                Previous
+              </button>
+              
+              <div className="flex gap-1">
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  let pageNum;
+                  if (totalPages <= 5) {
+                    pageNum = i + 1;
+                  } else if (currentPage <= 3) {
+                    pageNum = i + 1;
+                  } else if (currentPage >= totalPages - 2) {
+                    pageNum = totalPages - 4 + i;
+                  } else {
+                    pageNum = currentPage - 2 + i;
+                  }
+                  
+                  return (
+                    <button
+                      key={pageNum}
+                      onClick={() => setCurrentPage(pageNum)}
+                      className={`px-3 py-2 text-sm rounded-lg transition-colors ${
+                        currentPage === pageNum
+                          ? 'bg-krgold text-krblack font-medium'
+                          : 'bg-krcard border border-krborder text-krtext hover:border-krgold/50'
+                      }`}
+                    >
+                      {pageNum}
+                    </button>
+                  );
+                })}
+              </div>
+              
+              <button
+                onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                disabled={currentPage === totalPages}
+                className="px-4 py-2 text-sm bg-krcard border border-krborder rounded-lg text-krtext hover:border-krgold/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                Next
+              </button>
+            </div>
+          )}
+        </>
         )}
 
         {/* Empty State */}
