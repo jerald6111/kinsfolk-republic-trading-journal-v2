@@ -82,15 +82,16 @@ export default function News() {
       showFloatingTooltip: false,
       width: '100%',
       height: '100%',
-      plotLineColorGrowing: 'rgba(41, 98, 255, 1)',
-      plotLineColorFalling: 'rgba(41, 98, 255, 1)',
+      plotLineColorGrowing: 'rgba(212, 175, 55, 1)',
+      plotLineColorFalling: 'rgba(212, 175, 55, 1)',
       gridLineColor: 'rgba(42, 46, 57, 0)',
       scaleFontColor: 'rgba(209, 212, 220, 1)',
-      belowLineFillColorGrowing: 'rgba(41, 98, 255, 0.12)',
-      belowLineFillColorFalling: 'rgba(41, 98, 255, 0.12)',
-      belowLineFillColorGrowingBottom: 'rgba(41, 98, 255, 0)',
-      belowLineFillColorFallingBottom: 'rgba(41, 98, 255, 0)',
-      symbolActiveColor: 'rgba(41, 98, 255, 0.12)'
+      belowLineFillColorGrowing: 'rgba(34, 197, 94, 0.12)',
+      belowLineFillColorFalling: 'rgba(34, 197, 94, 0.12)',
+      belowLineFillColorGrowingBottom: 'rgba(34, 197, 94, 0)',
+      belowLineFillColorFallingBottom: 'rgba(34, 197, 94, 0)',
+      symbolActiveColor: 'rgba(212, 175, 55, 0.12)',
+      hotListType: 'gainers'
     })
 
     container.appendChild(script)
@@ -125,15 +126,16 @@ export default function News() {
       showFloatingTooltip: false,
       width: '100%',
       height: '100%',
-      plotLineColorGrowing: 'rgba(41, 98, 255, 1)',
-      plotLineColorFalling: 'rgba(41, 98, 255, 1)',
+      plotLineColorGrowing: 'rgba(212, 175, 55, 1)',
+      plotLineColorFalling: 'rgba(212, 175, 55, 1)',
       gridLineColor: 'rgba(42, 46, 57, 0)',
       scaleFontColor: 'rgba(209, 212, 220, 1)',
-      belowLineFillColorGrowing: 'rgba(41, 98, 255, 0.12)',
-      belowLineFillColorFalling: 'rgba(41, 98, 255, 0.12)',
-      belowLineFillColorGrowingBottom: 'rgba(41, 98, 255, 0)',
-      belowLineFillColorFallingBottom: 'rgba(41, 98, 255, 0)',
-      symbolActiveColor: 'rgba(41, 98, 255, 0.12)'
+      belowLineFillColorGrowing: 'rgba(239, 68, 68, 0.12)',
+      belowLineFillColorFalling: 'rgba(239, 68, 68, 0.12)',
+      belowLineFillColorGrowingBottom: 'rgba(239, 68, 68, 0)',
+      belowLineFillColorFallingBottom: 'rgba(239, 68, 68, 0)',
+      symbolActiveColor: 'rgba(212, 175, 55, 0.12)',
+      hotListType: 'losers'
     })
 
     container.appendChild(script)
@@ -270,8 +272,8 @@ export default function News() {
                 <TrendingUp className="text-green-400" size={24} />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-krtext">Top Gainers</h2>
-                <p className="text-xs text-krmuted">24h performance leaders</p>
+                <h2 className="text-xl font-bold text-krtext">Top Crypto Gainers</h2>
+                <p className="text-xs text-krmuted">24h crypto performance leaders</p>
               </div>
             </div>
             <div className="tradingview-widget-container h-[500px]">
@@ -279,7 +281,7 @@ export default function News() {
             </div>
             <div className="mt-4 pt-4 border-t border-krborder/30">
               <p className="text-xs text-krmuted text-center">
-                <span className="text-green-400 font-semibold">🚀 Trending Up</span> • Data from Binance
+                <span className="text-green-400 font-semibold">🚀 Crypto Trending Up</span> • Live data from Binance
               </p>
             </div>
           </div>
@@ -291,8 +293,8 @@ export default function News() {
                 <TrendingDown className="text-red-400" size={24} />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-krtext">Top Losers</h2>
-                <p className="text-xs text-krmuted">24h performance decliners</p>
+                <h2 className="text-xl font-bold text-krtext">Top Crypto Losers</h2>
+                <p className="text-xs text-krmuted">24h crypto performance decliners</p>
               </div>
             </div>
             <div className="tradingview-widget-container h-[500px]">
@@ -300,7 +302,7 @@ export default function News() {
             </div>
             <div className="mt-4 pt-4 border-t border-krborder/30">
               <p className="text-xs text-krmuted text-center">
-                <span className="text-red-400 font-semibold">📉 Trending Down</span> • Data from Binance
+                <span className="text-red-400 font-semibold">📉 Crypto Trending Down</span> • Live data from Binance
               </p>
             </div>
           </div>
