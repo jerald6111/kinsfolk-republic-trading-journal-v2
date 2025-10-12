@@ -21,14 +21,15 @@ interface UserInfo {
   hasProvidedInfo: boolean
 }
 
+type ConversationState = 'normal' | 'waiting_for_name' | 'waiting_for_email'
+
 export default function AIChatbot() {
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([])
   const [inputMessage, setInputMessage] = useState('')
   const [isTyping, setIsTyping] = useState(false)
   const [userInfo, setUserInfo] = useState<UserInfo>({ name: '', email: '', hasProvidedInfo: false })
-  const [showNamePrompt, setShowNamePrompt] = useState(false)
-  const [showEmailPrompt, setShowEmailPrompt] = useState(false)
+  const [conversationState, setConversationState] = useState<ConversationState>('normal')
   const [showConversationSender, setShowConversationSender] = useState(false)
   const [loadingPriceData, setLoadingPriceData] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -40,7 +41,7 @@ export default function AIChatbot() {
       icon: <Shield className="w-4 h-4" />,
       response: `🎯 **Kinsfolk Republic Trading Journal (KRTJ)**
 
-Hey! I'm your Kinsfolk Assistant - part customer service, part trading mentor. KRTJ is a web-based trading journal and analytics dashboard that helps you log, analyze, and improve your trading performance across crypto, stocks, and forex.
+Hey! I'm your Kinsfolk Assistant. KRTJ is a web-based trading journal and analytics dashboard that helps you log, analyze, and improve your trading performance across crypto, stocks, and forex.
 
 **Core Sections:**
 • **Vision Board**: Motivation hub for goals and affirmations
@@ -96,7 +97,7 @@ What's your biggest trading challenge right now? 🤔`
       icon: <TrendingUp className="w-4 h-4" />,
       response: `💰 **Live Market Data Available!**
 
-I can check real-time prices from CoinGecko for:
+I can check real-time prices for:
 • **Bitcoin (BTC)** - "What's BTC price?"
 • **Ethereum (ETH)** - "ETH price now"
 • **Solana (SOL)** - "How much is SOL?"
@@ -165,6 +166,27 @@ Which coin price do you want to check? 📊`
     }
     
     // Emotional responses for trading situations
+    
+    // Loss and emotional support - this should catch "lost $100", "cope", etc.
+    if (lowerMessage.includes('lost') || lowerMessage.includes('lose') || lowerMessage.includes('losing') || 
+        lowerMessage.includes('cope') || lowerMessage.includes('devastated') || lowerMessage.includes('upset') ||
+        lowerMessage.includes('$') && (lowerMessage.includes('gone') || lowerMessage.includes('lost'))) {
+      return `I feel you 💔 Losses hurt, especially when it's real money. Here's how to cope:
+
+**Immediate Steps:**
+• Take a deep breath - you're not defined by one loss
+• Step away from the charts for at least 30 minutes
+• Don't revenge trade - that's how small losses become big ones
+
+**Recovery Process:**
+• Journal this trade - what happened? Was it part of your plan?
+• If it was a planned loss (stop-loss hit), you did well following rules
+• If it was emotional/unplanned, identify the trigger to avoid next time
+• $100 is tuition to the market - expensive but educational
+
+You're still in the game. Focus on process, not the pain. What exactly happened? 🤔`
+    }
+
     if (lowerMessage.includes('liquidated') || lowerMessage.includes('rekt') || lowerMessage.includes('account wiped')) {
       return "Ouch 😬 liquidation stings. Happens to all of us. Reset, refocus, and rebuild smarter. Was it overleverage or no stop-loss? Let's check that trade in your Journal - the lesson is usually hiding there."
     }
@@ -187,6 +209,25 @@ Which coin price do you want to check? 📊`
     
     if (lowerMessage.includes('overtrading') || lowerMessage.includes('too many trades')) {
       return "If you're clicking nonstop, you're not trading - you're gambling. Overtrading is usually boredom in disguise. Sometimes the best trade is no trade. Chill mode = profit mode."
+    }
+
+    // General emotional support keywords
+    if (lowerMessage.includes('stressed') || lowerMessage.includes('anxiety') || lowerMessage.includes('worried') ||
+        lowerMessage.includes('scared') || lowerMessage.includes('panic') || lowerMessage.includes('help me')) {
+      return `Take a breath 🫁 Trading stress is real, and you're not alone in feeling this way.
+
+**Right Now:**
+• Step away from the screen for 10 minutes
+• Remember: markets will be here tomorrow
+• Your mental health > any trade
+
+**Longer Term:**
+• Reduce position sizes until you sleep peacefully
+• Set strict daily loss limits and stick to them
+• Journal your emotional state before each trade
+• Consider taking a complete break if overwhelmed
+
+The best traders aren't fearless - they're disciplined with their emotions. What's triggering the stress? 🤔`
     }
     
     if (lowerMessage.includes('big win') || lowerMessage.includes('massive win') || lowerMessage.includes('crushing it')) {
@@ -264,17 +305,20 @@ Want me to check specific coin prices for your analysis? Just ask "BTC price" or
 
     // Greetings
     if (lowerMessage.includes('hello') || lowerMessage.includes('hi') || lowerMessage.includes('hey')) {
-      return "Hey! 👋 I'm your Kinsfolk Assistant - part customer service, part trading mentor. I can help with KRTJ navigation, check live crypto prices via CoinGecko, and guide you through trading challenges. What's on your mind?"
+      return "Hey! 👋 I'm your Kinsfolk Assistant. I can help with KRTJ navigation, check live crypto prices, and guide you through trading challenges. What's on your mind?"
     }
     
     // Default response
-    return "I'm here to help with KRTJ navigation, live crypto prices (via CoinGecko), trading guidance, and platform questions. Try asking 'Bitcoin price', 'how to use the journal', 'analytics help', or share what's happening with your trades. What do you need? 🤔"
+    return "I'm here to help with KRTJ navigation, live crypto prices, trading guidance, and platform questions. Try asking 'Bitcoin price', 'how to use the journal', 'analytics help', or share what's happening with your trades. What do you need? 🤔"
   }
 
   useEffect(() => {
     if (isOpen && messages.length === 0 && !userInfo.hasProvidedInfo) {
-      // Show name prompt immediately when chat opens
-      setShowNamePrompt(true)
+      // Ask for name conversationally when chat opens
+      setConversationState('waiting_for_name')
+      setTimeout(() => {
+        addBotMessage("Before we dive into trading talk, what should I call you? Just type your name!")
+      }, 500)
     } else if (isOpen && messages.length === 0 && userInfo.hasProvidedInfo) {
       // Welcome back message if name is already provided
       addBotMessage(`Welcome back, ${userInfo.name}! 👋 Ready to tackle the markets together? What's on your trading mind today?`)
@@ -309,21 +353,12 @@ Want me to check specific coin prices for your analysis? Just ask "BTC price" or
     setMessages(prev => [...prev, newMessage])
   }
 
-  const handleNameSubmit = (name: string) => {
-    setUserInfo(prev => ({ ...prev, name, hasProvidedInfo: true }))
-    setShowNamePrompt(false)
-    addBotMessage(`Nice to meet you, ${name}! 🤝 I'm your Kinsfolk Assistant - part customer service, part trading mentor. I help with KRTJ navigation, live crypto prices, analytics questions, and trading mindset. Whether you're celebrating wins or dealing with losses, I'm here to help. What's on your trading mind today?`)
-  }
 
-  const handleEmailSubmit = (email: string) => {
-    setUserInfo(prev => ({ ...prev, email }))
-    setShowEmailPrompt(false)
-    addBotMessage(`Perfect! 📧 I've saved your email (${email}) for conversation summaries. Now you can get a copy of our chat whenever you want!`)
-  }
 
   const requestEmailForConversation = () => {
     if (!userInfo.email) {
-      setShowEmailPrompt(true)
+      setConversationState('waiting_for_email')
+      addBotMessage(`I can send you a copy of our conversation! 📧 What's your email address? Just type it and I'll save it for you.`)
     } else {
       setShowConversationSender(true)
     }
@@ -373,7 +408,7 @@ Want me to check specific coin prices for your analysis? Just ask "BTC price" or
   }
 
   const formatPriceData = (priceData: any, coinName: string) => {
-    if (!priceData) return "Sorry, I couldn't fetch that price data right now. CoinGecko might be busy! 📊"
+    if (!priceData) return "Sorry, I couldn't fetch that price data right now. The market data service might be busy! 📊"
 
     const price = priceData.usd?.toLocaleString('en-US', { 
       style: 'currency', 
@@ -399,18 +434,50 @@ Want me to check specific coin prices for your analysis? Just ask "BTC price" or
 • **Market Cap**: ${marketCap}
 • **24h Volume**: ${volume24h}
 
-*Data from CoinGecko* 📈
-
 What's your take on this price action? Planning any moves?`
   }
 
   const handleSendMessage = async () => {
-    if (!inputMessage.trim() || !userInfo.hasProvidedInfo) return
+    if (!inputMessage.trim()) return
 
     addUserMessage(inputMessage)
-    const currentMessage = inputMessage
+    const currentMessage = inputMessage.trim()
     setInputMessage('')
     setIsTyping(true)
+
+    // Handle conversation states
+    if (conversationState === 'waiting_for_name') {
+      // User provided their name
+      setUserInfo(prev => ({ ...prev, name: currentMessage, hasProvidedInfo: true }))
+      setConversationState('normal')
+      setTimeout(() => {
+        addBotMessage(`Nice to meet you, ${currentMessage}! 🤝 I'm your Kinsfolk Assistant. I help with KRTJ navigation, live crypto prices, analytics questions, and trading mindset. Whether you're celebrating wins or dealing with losses, I'm here to help. What's on your trading mind today?`)
+        setIsTyping(false)
+      }, 1000)
+      return
+    }
+
+    if (conversationState === 'waiting_for_email') {
+      // User provided their email
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      if (emailRegex.test(currentMessage)) {
+        setUserInfo(prev => ({ ...prev, email: currentMessage }))
+        setConversationState('normal')
+        setTimeout(() => {
+          addBotMessage(`Perfect! 📧 I've saved your email (${currentMessage}) for conversation summaries. Now you can get a copy of our chat whenever you want! What else can I help you with?`)
+          setIsTyping(false)
+        }, 800)
+      } else {
+        setTimeout(() => {
+          addBotMessage(`Hmm, that doesn't look like a valid email address. Could you try again? For example: yourname@email.com`)
+          setIsTyping(false)
+        }, 800)
+      }
+      return
+    }
+
+    // Normal conversation - only proceed if user has provided name
+    if (!userInfo.hasProvidedInfo) return
 
     // Handle async responses (like price data)
     try {
@@ -469,7 +536,7 @@ What's your take on this price action? Planning any moves?`
               <Bot className="w-5 h-5" />
               <div>
                 <h3 className="font-bold text-sm">Kinsfolk AI Assistant</h3>
-                <p className="text-xs opacity-80">Trading mentor & platform guide</p>
+                <p className="text-xs opacity-80">Platform guide</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -570,13 +637,18 @@ What's your take on this price action? Planning any moves?`
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder={userInfo.hasProvidedInfo ? "Ask about trading, prices, or KRTJ features..." : "Please introduce yourself first"}
+                placeholder={
+                  conversationState === 'waiting_for_name' ? "Type your name..." :
+                  conversationState === 'waiting_for_email' ? "Type your email address..." :
+                  userInfo.hasProvidedInfo ? "Ask about trading, prices, or KRTJ features..." : 
+                  "Please introduce yourself first"
+                }
                 className="flex-1 bg-krgray text-krtext px-3 py-2 rounded-lg text-sm border border-krborder focus:border-krgold focus:outline-none disabled:opacity-50"
-                disabled={isTyping || !userInfo.hasProvidedInfo}
+                disabled={isTyping}
               />
               <button
                 onClick={handleSendMessage}
-                disabled={!inputMessage.trim() || isTyping || !userInfo.hasProvidedInfo}
+                disabled={!inputMessage.trim() || isTyping}
                 className="bg-krgold text-krblack p-2 rounded-lg hover:bg-kryellow transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Send className="w-4 h-4" />
@@ -589,87 +661,7 @@ What's your take on this price action? Planning any moves?`
         </div>
       )}
 
-      {/* Name Prompt Modal */}
-      {showNamePrompt && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60]">
-          <div className="bg-krcard border border-krborder rounded-xl p-6 max-w-md w-full mx-4">
-            <div className="flex items-center gap-2 mb-4">
-              <Bot className="w-5 h-5 text-krgold" />
-              <h3 className="font-bold text-krtext">Welcome to Kinsfolk Assistant!</h3>
-            </div>
-            <p className="text-krmuted text-sm mb-4">
-              Hey there! 👋 I'm your trading mentor and KRTJ guide. What should I call you?
-            </p>
-            <input
-              type="text"
-              placeholder="Your name"
-              className="w-full bg-krgray text-krtext px-3 py-2 rounded-lg text-sm border border-krborder focus:border-krgold focus:outline-none mb-4"
-              onChange={(e) => setUserInfo(prev => ({ ...prev, name: e.target.value }))}
-              onKeyPress={(e) => {
-                if (e.key === 'Enter' && userInfo.name.trim()) {
-                  handleNameSubmit(userInfo.name.trim())
-                }
-              }}
-              autoFocus
-            />
-            <button
-              onClick={() => handleNameSubmit(userInfo.name.trim())}
-              disabled={!userInfo.name.trim()}
-              className="w-full px-4 py-2 text-sm bg-krgold text-krblack rounded-lg hover:bg-kryellow transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Let's Start Trading! 🚀
-            </button>
-          </div>
-        </div>
-      )}
 
-      {/* Email Prompt Modal */}
-      {showEmailPrompt && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60]">
-          <div className="bg-krcard border border-krborder rounded-xl p-6 max-w-md w-full mx-4">
-            <div className="flex items-center gap-2 mb-4">
-              <Mail className="w-5 h-5 text-krgold" />
-              <h3 className="font-bold text-krtext">Save Our Conversation</h3>
-            </div>
-            <p className="text-krmuted text-sm mb-4">
-              Want to save our conversation? I can email you a copy! Just provide your email address:
-            </p>
-            <input
-              type="email"
-              placeholder="Your email address"
-              className="w-full bg-krgray text-krtext px-3 py-2 rounded-lg text-sm border border-krborder focus:border-krgold focus:outline-none mb-4"
-              onChange={(e) => setUserInfo(prev => ({ ...prev, email: e.target.value }))}
-              onKeyPress={(e) => {
-                if (e.key === 'Enter' && userInfo.email.trim()) {
-                  handleEmailSubmit(userInfo.email.trim())
-                  setShowConversationSender(true)
-                }
-              }}
-              autoFocus
-            />
-            <div className="flex gap-2">
-              <button
-                onClick={() => setShowEmailPrompt(false)}
-                className="flex-1 px-4 py-2 text-sm text-krmuted border border-krborder rounded-lg hover:border-krgold/50 transition-colors"
-              >
-                Not Now
-              </button>
-              <button
-                onClick={() => {
-                  if (userInfo.email.trim()) {
-                    handleEmailSubmit(userInfo.email.trim())
-                    setShowConversationSender(true)
-                  }
-                }}
-                disabled={!userInfo.email.trim()}
-                className="flex-1 px-4 py-2 text-sm bg-krgold text-krblack rounded-lg hover:bg-kryellow transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Save & Send
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Conversation Sender Modal */}
       {showConversationSender && (
