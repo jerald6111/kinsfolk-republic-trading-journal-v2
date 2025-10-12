@@ -10,6 +10,7 @@ interface NewsItem {
   category: 'crypto' | 'stocks' | 'forex' | 'world'
   summary?: string
   url?: string
+  image?: string
 }
 
 export default function News() {
@@ -43,7 +44,8 @@ export default function News() {
                 publishedAt: item.pubDate,
                 category: 'crypto',
                 summary: item.description?.replace(/<[^>]*>/g, '').substring(0, 200) + '...' || 'Breaking cryptocurrency news and market updates.',
-                url: item.link
+                url: item.link,
+                image: item.enclosure?.link || item.thumbnail || 'https://images.unsplash.com/photo-1518546305927-5a555bb7020d?w=400&h=250&fit=crop'
               })
             })
           }
@@ -64,7 +66,8 @@ export default function News() {
               publishedAt: new Date().toISOString(),
               category: 'stocks' as const,
               summary: 'Major technology companies led the market surge today, with artificial intelligence and semiconductor stocks showing particularly strong performance amid positive earnings reports.',
-              url: 'https://www.marketwatch.com/investing/index/spx'
+              url: 'https://www.marketwatch.com/investing/index/spx',
+              image: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=250&fit=crop&q=80'
             },
             {
               id: 'stocks-2', 
@@ -73,7 +76,8 @@ export default function News() {
               publishedAt: new Date().toISOString(),
               category: 'stocks' as const,
               summary: 'Fed officials hint at more accommodative monetary policy next year as inflation shows signs of cooling and labor market conditions normalize.',
-              url: 'https://www.bloomberg.com/markets/rates-bonds'
+              url: 'https://www.bloomberg.com/markets/rates-bonds',
+              image: 'https://images.unsplash.com/photo-1541354329998-f4d9a9f9297f?w=400&h=250&fit=crop&q=80'
             },
             {
               id: 'stocks-3',
@@ -174,7 +178,8 @@ export default function News() {
               publishedAt: new Date().toISOString(),
               category: 'forex' as const,
               summary: 'USD/EUR pair climbs to 3-week highs as European Central Bank maintains cautious stance while U.S. economic data continues to show resilience.',
-              url: 'https://www.forexlive.com/news/eurusd/'
+              url: 'https://www.forexlive.com/news/eurusd/',
+              image: 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=400&h=250&fit=crop&q=80'
             },
             {
               id: 'forex-2', 
@@ -302,7 +307,8 @@ export default function News() {
               publishedAt: new Date().toISOString(),
               category: 'world' as const,
               summary: 'Philippine GDP growth remains robust despite global headwinds, driven by strong domestic consumption and infrastructure development projects.',
-              url: 'https://www.gmanetwork.com/news/money/'
+              url: 'https://www.gmanetwork.com/news/money/',
+              image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=250&fit=crop&q=80'
             },
             {
               id: 'world-4',
@@ -401,7 +407,8 @@ export default function News() {
               publishedAt: new Date().toISOString(), 
               category: 'crypto',
               summary: 'Major financial institutions continue to add Bitcoin to their portfolios, driving price momentum and market confidence across traditional finance sectors.',
-              url: 'https://cointelegraph.com/bitcoin-price-index'
+              url: 'https://cointelegraph.com/bitcoin-price-index',
+              image: 'https://images.unsplash.com/photo-1518546305927-5a555bb7020d?w=400&h=250&fit=crop&q=80'
             },
             { 
               id: 'crypto-fallback-2', 
@@ -667,26 +674,42 @@ export default function News() {
               {featuredNews.map((article) => (
                 <div
                   key={article.id}
-                  className="bg-gradient-to-br from-orange-500/10 to-yellow-500/10 border border-orange-500/30 rounded-xl p-6 hover:scale-[1.02] transition-all cursor-pointer"
+                  className="bg-gradient-to-br from-orange-500/10 to-yellow-500/10 border border-orange-500/30 rounded-xl overflow-hidden hover:scale-[1.02] transition-all cursor-pointer"
                   onClick={() => setSelectedArticle(article)}
                 >
-                  <div className="flex items-start gap-3 mb-3">
-                    <Bitcoin className="text-orange-400 flex-shrink-0 mt-1" size={20} />
-                    <div>
-                      <h3 className="font-semibold text-lg mb-2 line-clamp-2 text-krtext">
-                        {article.title}
-                      </h3>
+                  {/* Featured Article Image */}
+                  {article.image && (
+                    <div className="w-full h-40 overflow-hidden">
+                      <img 
+                        src={article.image} 
+                        alt={article.title}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.src = 'https://images.unsplash.com/photo-1518546305927-5a555bb7020d?w=400&h=250&fit=crop&q=80'
+                        }}
+                      />
                     </div>
-                  </div>
-                  <p className="text-krmuted text-sm mb-4 line-clamp-2">
-                    {article.summary}
-                  </p>
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-orange-400 font-medium">{article.source}</span>
-                    <span className="text-krmuted flex items-center gap-1">
-                      <Clock size={12} />
-                      {new Date(article.publishedAt).toLocaleDateString()}
-                    </span>
+                  )}
+                  
+                  <div className="p-6">
+                    <div className="flex items-start gap-3 mb-3">
+                      <Bitcoin className="text-orange-400 flex-shrink-0 mt-1" size={20} />
+                      <div>
+                        <h3 className="font-semibold text-lg mb-2 line-clamp-2 text-krtext">
+                          {article.title}
+                        </h3>
+                      </div>
+                    </div>
+                    <p className="text-krmuted text-sm mb-4 line-clamp-2">
+                      {article.summary}
+                    </p>
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-orange-400 font-medium">{article.source}</span>
+                      <span className="text-krmuted flex items-center gap-1">
+                        <Clock size={12} />
+                        {new Date(article.publishedAt).toLocaleDateString()}
+                      </span>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -723,17 +746,39 @@ export default function News() {
             ) : filteredNews.map((article) => (
               <div
                 key={`${activeCategory}-${article.id}`}
-                className={`bg-gradient-to-br ${categoryColors[article.category]} border rounded-xl p-6 hover:scale-[1.02] transition-all cursor-pointer backdrop-blur-sm`}
+                className={`bg-gradient-to-br ${categoryColors[article.category]} border rounded-xl overflow-hidden hover:scale-[1.02] transition-all cursor-pointer backdrop-blur-sm`}
                 onClick={() => setSelectedArticle(article)}
               >
-                <div className="flex items-start gap-3 mb-3">
-                  {categoryIcons[article.category]}
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-lg mb-2 line-clamp-2 text-krtext">
-                      {article.title}
-                    </h3>
+                {/* Article Image */}
+                {article.image && (
+                  <div className="w-full h-48 overflow-hidden">
+                    <img 
+                      src={article.image} 
+                      alt={article.title}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        // Fallback image based on category
+                        const fallbackImages = {
+                          crypto: 'https://images.unsplash.com/photo-1518546305927-5a555bb7020d?w=400&h=250&fit=crop&q=80',
+                          stocks: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=250&fit=crop&q=80',
+                          forex: 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=400&h=250&fit=crop&q=80',
+                          world: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=250&fit=crop&q=80'
+                        }
+                        e.currentTarget.src = fallbackImages[article.category]
+                      }}
+                    />
                   </div>
-                </div>
+                )}
+                
+                <div className="p-6">
+                  <div className="flex items-start gap-3 mb-3">
+                    {categoryIcons[article.category]}
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-lg mb-2 line-clamp-2 text-krtext">
+                        {article.title}
+                      </h3>
+                    </div>
+                  </div>
                 {article.summary && (
                   <p className="text-krmuted text-sm mb-4 line-clamp-3">
                     {article.summary}
@@ -746,9 +791,10 @@ export default function News() {
                     {new Date(article.publishedAt).toLocaleDateString()}
                   </span>
                 </div>
-                <div className="mt-3 flex items-center text-xs text-krmuted">
-                  <ExternalLink size={12} className="mr-1" />
-                  Click to read more
+                  <div className="mt-3 flex items-center text-xs text-krmuted">
+                    <ExternalLink size={12} className="mr-1" />
+                    Click to read more
+                  </div>
                 </div>
               </div>
             ))}
