@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 import { Zap, Globe, DollarSign, Bitcoin, BarChart3, TrendingUp, Clock, ExternalLink } from 'lucide-react'
 
 // News item interface with categories
@@ -18,6 +18,7 @@ export default function News() {
   const [activeCategory, setActiveCategory] = useState<'crypto' | 'stocks' | 'forex' | 'world'>('crypto')
   const [featuredNews, setFeaturedNews] = useState<NewsItem[]>([])
   const [selectedArticle, setSelectedArticle] = useState<NewsItem | null>(null)
+  const [categoryLoading, setCategoryLoading] = useState(false)
 
   // Fetch comprehensive news data from multiple APIs
   useEffect(() => {
@@ -563,16 +564,32 @@ export default function News() {
     return () => clearInterval(interval)
   }, [])
 
-  // Get news filtered by category with crypto as main focus
-  const filteredNews = newsItems.filter(item => item.category === activeCategory)
+  // Get news filtered by category with crypto as main focus - memoized to prevent stale state
+  const filteredNews = useMemo(() => {
+    return newsItems.filter(item => item.category === activeCategory)
+  }, [newsItems, activeCategory])
   
-  // Get ticker news prioritizing crypto
-  const tickerNews = [
+  // Get ticker news prioritizing crypto - memoized to prevent state contamination
+  const tickerNews = useMemo(() => [
     ...newsItems.filter(item => item.category === 'crypto').slice(0, 4),
     ...newsItems.filter(item => item.category === 'stocks').slice(0, 2),
     ...newsItems.filter(item => item.category === 'forex').slice(0, 1),
     ...newsItems.filter(item => item.category === 'world').slice(0, 1)
-  ]
+  ], [newsItems])
+
+  // Handle category changes with proper state cleanup
+  const handleCategoryChange = (category: 'crypto' | 'stocks' | 'forex' | 'world') => {
+    if (category === activeCategory) return
+    
+    setCategoryLoading(true)
+    setSelectedArticle(null) // Clear any open modal
+    
+    // Small delay to ensure clean state transition
+    setTimeout(() => {
+      setActiveCategory(category)
+      setCategoryLoading(false)
+    }, 100)
+  }
 
   const categoryIcons = {
     crypto: <Bitcoin className="w-5 h-5" />,
@@ -682,7 +699,7 @@ export default function News() {
               {(['crypto', 'stocks', 'forex', 'world'] as const).map((category) => (
                 <button
                   key={category}
-                  onClick={() => setActiveCategory(category)}
+                  onClick={() => handleCategoryChange(category)}
                   className={`px-4 py-3 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 ${
                     activeCategory === category
                       ? 'bg-krgold text-krblack shadow-lg'
@@ -697,10 +714,15 @@ export default function News() {
           </div>
 
           {/* News Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredNews.map((article) => (
+          <div key={`news-grid-${activeCategory}`} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {categoryLoading ? (
+              <div className="col-span-full flex items-center justify-center py-12">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-krgold"></div>
+                <span className="ml-3 text-krmuted">Switching category...</span>
+              </div>
+            ) : filteredNews.map((article) => (
               <div
-                key={article.id}
+                key={`${activeCategory}-${article.id}`}
                 className={`bg-gradient-to-br ${categoryColors[article.category]} border rounded-xl p-6 hover:scale-[1.02] transition-all cursor-pointer backdrop-blur-sm`}
                 onClick={() => setSelectedArticle(article)}
               >
