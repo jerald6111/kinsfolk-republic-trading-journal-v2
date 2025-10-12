@@ -21,32 +21,32 @@ export default function News() {
 
   // Generate contextual image for news articles
   const generateNewsImage = (title: string, category: string): string => {
-    const baseUrl = 'https://source.unsplash.com/400x250/?'
-    
-    const keywords: Record<string, string[]> = {
-      crypto: ['bitcoin', 'cryptocurrency', 'blockchain', 'digital currency', 'ethereum'],
-      stocks: ['stock market', 'trading', 'business', 'finance', 'wall street'],
-      forex: ['currency', 'exchange', 'money', 'global finance', 'international trade'],
-      world: ['global news', 'international', 'world', 'politics', 'economy']
+    // Use specific Unsplash photo IDs for different categories to ensure reliability
+    const categoryImages: Record<string, string[]> = {
+      crypto: [
+        'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=400&h=250&fit=crop&auto=format&q=80', // Bitcoin
+        'https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=400&h=250&fit=crop&auto=format&q=80', // Crypto
+        'https://images.unsplash.com/photo-1518183214770-9cffbec72538?w=400&h=250&fit=crop&auto=format&q=80'  // Digital
+      ],
+      stocks: [
+        'https://images.unsplash.com/photo-1590736969955-71cc94901144?w=400&h=250&fit=crop&auto=format&q=80', // Trading
+        'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=250&fit=crop&auto=format&q=80', // Finance
+        'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=250&fit=crop&auto=format&q=80'  // Business
+      ],
+      forex: [
+        'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=400&h=250&fit=crop&auto=format&q=80', // Currency
+        'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=400&h=250&fit=crop&auto=format&q=80', // Money
+        'https://images.unsplash.com/photo-1580519542036-c47de6196ba5?w=400&h=250&fit=crop&auto=format&q=80'  // Exchange
+      ],
+      world: [
+        'https://images.unsplash.com/photo-1569025690938-a00729c9e2d5?w=400&h=250&fit=crop&auto=format&q=80', // Global
+        'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=400&h=250&fit=crop&auto=format&q=80', // News
+        'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400&h=250&fit=crop&auto=format&q=80'  // World
+      ]
     }
     
-    // Extract key terms from title for more contextual images
-    const titleWords = title.toLowerCase()
-    let contextualKeywords = keywords[category as keyof typeof keywords] || ['news', 'business']
-    
-    // Add specific keywords based on title content
-    if (titleWords.includes('oil') || titleWords.includes('energy')) {
-      contextualKeywords = ['oil', 'energy', 'petroleum']
-    } else if (titleWords.includes('gold') || titleWords.includes('precious')) {
-      contextualKeywords = ['gold', 'precious metals', 'investment']
-    } else if (titleWords.includes('tech') || titleWords.includes('ai') || titleWords.includes('nvidia')) {
-      contextualKeywords = ['technology', 'computer', 'innovation']
-    } else if (titleWords.includes('bank') || titleWords.includes('federal')) {
-      contextualKeywords = ['banking', 'federal reserve', 'finance']
-    }
-    
-    const randomKeyword = contextualKeywords[Math.floor(Math.random() * contextualKeywords.length)]
-    return `${baseUrl}${encodeURIComponent(randomKeyword)}`
+    const images = categoryImages[category as keyof typeof categoryImages] || categoryImages.world
+    return images[Math.floor(Math.random() * images.length)]
   }
 
   // Fetch live news from RSS feeds
@@ -180,16 +180,16 @@ export default function News() {
     ...newsItems.filter(item => item.category === 'world').slice(0, 1)
   ], [newsItems])
 
-  // Category display configuration  
+  // Category display configuration - Using proper Kinsfolk Republic theme colors
   const categories = [
-    { id: 'crypto' as const, label: 'Crypto', color: 'text-orange-400', icon: '🔥' },
-    { id: 'stocks' as const, label: 'Stocks', color: 'text-blue-400', icon: '📈' },
-    { id: 'forex' as const, label: 'Forex', color: 'text-green-400', icon: '💱' },
-    { id: 'world' as const, label: 'Global', color: 'text-purple-400', icon: '🌍' }
+    { id: 'crypto' as const, label: 'Crypto', color: 'text-krgold', icon: '🔥' },
+    { id: 'stocks' as const, label: 'Stocks', color: 'text-krsuccess', icon: '📈' },
+    { id: 'forex' as const, label: 'Forex', color: 'text-kryellow', icon: '💱' },
+    { id: 'world' as const, label: 'Global', color: 'text-krwhite', icon: '🌍' }
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
+    <div className="min-h-screen bg-krbg text-krtext">
       {/* News Ticker */}
       <div className="bg-black/50 backdrop-blur-sm border-b border-krgold/30 py-2">
         <div className="news-ticker-wrapper">
@@ -217,15 +217,15 @@ export default function News() {
 
         {/* Category Navigation */}
         <div className="flex justify-center mb-8">
-          <div className="flex space-x-1 bg-gray-800/50 backdrop-blur-sm rounded-xl p-1">
+          <div className="flex space-x-1 bg-krgray/20 backdrop-blur-sm rounded-xl p-1 border border-krgold/20">
             {categories.map((category) => (
               <button
                 key={category.id}
                 onClick={() => setActiveCategory(category.id)}
                 className={`px-6 py-3 rounded-lg font-medium transition-all duration-200 flex items-center space-x-2 ${
                   activeCategory === category.id
-                    ? 'bg-krgold text-black shadow-lg'
-                    : 'text-gray-300 hover:text-white hover:bg-gray-700'
+                    ? 'bg-krgold text-krblack shadow-lg shadow-krgold/20'
+                    : 'text-krmuted hover:text-krgold hover:bg-krgray/30'
                 }`}
               >
                 <span>{category.icon}</span>
@@ -243,28 +243,38 @@ export default function News() {
           </div>
         )}
 
-        {/* Featured News Section */}
-        {!loading && featuredNews.length > 0 && (
+        {/* Featured News Section - Only show for crypto category */}
+        {!loading && activeCategory === 'crypto' && featuredNews.length > 0 && (
           <div className="mb-12">
-            <h2 className="text-2xl font-bold mb-6 text-krgold">Featured Stories</h2>
+            <h2 className="text-2xl font-bold mb-6 text-krgold">Featured Crypto Stories</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {featuredNews.map((article) => (
                 <div
                   key={article.id}
-                  className="bg-gradient-to-br from-gray-800/80 to-gray-900/80 backdrop-blur-sm rounded-xl border border-krgold/20 overflow-hidden hover:border-krgold/40 transition-all duration-300 cursor-pointer"
+                  className="bg-krgray/10 backdrop-blur-sm rounded-xl border border-krgold/30 overflow-hidden hover:border-krgold/60 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-300 cursor-pointer group"
                   onClick={() => setSelectedArticle(article)}
                 >
-                  {article.image && (
-                    <img
-                      src={article.image}
-                      alt={article.title}
-                      className="w-full h-48 object-cover"
-                      onError={(e) => {
-                        const img = e.target as HTMLImageElement;
-                        img.src = generateNewsImage(article.title, article.category);
-                      }}
-                    />
-                  )}
+                  <div className="relative h-48 bg-gradient-to-r from-krgold/20 to-krgold/10 flex items-center justify-center">
+                    {article.image ? (
+                      <img
+                        src={article.image}
+                        alt={article.title}
+                        className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                        onError={(e) => {
+                          const img = e.target as HTMLImageElement;
+                          img.style.display = 'none';
+                          const parent = img.parentElement;
+                          if (parent) {
+                            parent.innerHTML = `<div class="flex items-center justify-center h-48 text-krgold"><span class="text-4xl">${categories.find(c => c.id === article.category)?.icon || '📰'}</span></div>`;
+                          }
+                        }}
+                      />
+                    ) : (
+                      <div className="flex items-center justify-center h-48 text-krgold">
+                        <span className="text-4xl">{categories.find(c => c.id === article.category)?.icon || '📰'}</span>
+                      </div>
+                    )}
+                  </div>
                   <div className="p-6">
                     <h3 className="font-semibold text-lg mb-2 line-clamp-2 text-white">
                       {article.title}
@@ -292,22 +302,32 @@ export default function News() {
             {filteredNews.map((article) => (
               <div
                 key={article.id}
-                className="bg-gradient-to-br from-gray-800/80 to-gray-900/80 backdrop-blur-sm rounded-xl border border-gray-700/50 overflow-hidden hover:border-krgold/50 transition-all duration-300 cursor-pointer"
+                className="bg-krgray/10 backdrop-blur-sm rounded-xl border border-krgray/30 overflow-hidden hover:border-krgold/50 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-300 cursor-pointer group"
                 onClick={() => setSelectedArticle(article)}
               >
-                {article.image && (
-                  <img
-                    src={article.image}
-                    alt={article.title}
-                    className="w-full h-48 object-cover"
-                    onError={(e) => {
-                      const img = e.target as HTMLImageElement;
-                      img.src = generateNewsImage(article.title, article.category);
-                    }}
-                  />
-                )}
+                <div className="relative h-48 bg-gradient-to-r from-krgold/20 to-krgold/10 flex items-center justify-center">
+                  {article.image ? (
+                    <img
+                      src={article.image}
+                      alt={article.title}
+                      className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                      onError={(e) => {
+                        const img = e.target as HTMLImageElement;
+                        img.style.display = 'none';
+                        const parent = img.parentElement;
+                        if (parent) {
+                          parent.innerHTML = `<div class="flex items-center justify-center h-48 text-krgold"><span class="text-4xl">${categories.find(c => c.id === article.category)?.icon || '📰'}</span></div>`;
+                        }
+                      }}
+                    />
+                  ) : (
+                    <div className="flex items-center justify-center h-48 text-krgold">
+                      <span className="text-4xl">{categories.find(c => c.id === article.category)?.icon || '📰'}</span>
+                    </div>
+                  )}
+                </div>
                 <div className="p-6">
-                  <h3 className="font-semibold text-lg mb-2 line-clamp-2 text-white">
+                  <h3 className="font-semibold text-lg mb-2 line-clamp-2 text-white group-hover:text-krgold transition-colors duration-200">
                     {article.title}
                   </h3>
                   <p className="text-krmuted text-sm mb-3 line-clamp-3">
@@ -316,7 +336,7 @@ export default function News() {
                   <div className="flex justify-between items-center text-xs text-krmuted">
                     <span className="text-krgold font-medium">{article.source}</span>
                     <div className="flex items-center space-x-1">
-                      <Calendar className="w-3 h-3" />
+                      <Calendar className="w-3 h-3 text-krgold" />
                       <span>{new Date(article.publishedAt).toLocaleDateString()}</span>
                     </div>
                   </div>
@@ -337,23 +357,23 @@ export default function News() {
 
         {/* Article Modal */}
         {selectedArticle && (
-          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-            <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto border border-krgold/30">
-              <div className="sticky top-0 bg-gradient-to-r from-gray-800 to-gray-900 p-6 border-b border-gray-700/50 backdrop-blur-sm">
+          <div className="fixed inset-0 bg-krblack/90 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+            <div className="bg-krgray/20 backdrop-blur-md rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto border border-krgold/40 shadow-2xl shadow-krgold/20">
+              <div className="sticky top-0 bg-krgray/30 backdrop-blur-md p-6 border-b border-krgold/30">
                 <div className="flex justify-between items-start">
                   <div>
                     <h2 className="text-2xl font-bold text-white mb-2">{selectedArticle.title}</h2>
                     <div className="flex items-center space-x-4 text-sm text-krmuted">
                       <span className="text-krgold font-medium">{selectedArticle.source}</span>
                       <div className="flex items-center space-x-1">
-                        <Calendar className="w-4 h-4" />
+                        <Calendar className="w-4 h-4 text-krgold" />
                         <span>{new Date(selectedArticle.publishedAt).toLocaleDateString()}</span>
                       </div>
                     </div>
                   </div>
                   <button
                     onClick={() => setSelectedArticle(null)}
-                    className="text-gray-400 hover:text-white transition-colors text-2xl"
+                    className="text-krmuted hover:text-krgold transition-colors text-2xl font-bold"
                   >
                     ×
                   </button>
@@ -361,19 +381,29 @@ export default function News() {
               </div>
               
               <div className="p-6">
-                {selectedArticle.image && (
-                  <img
-                    src={selectedArticle.image}
-                    alt={selectedArticle.title}
-                    className="w-full h-64 object-cover rounded-lg mb-6"
-                    onError={(e) => {
-                      const img = e.target as HTMLImageElement;
-                      img.src = generateNewsImage(selectedArticle.title, selectedArticle.category);
-                    }}
-                  />
-                )}
+                <div className="relative h-64 bg-gradient-to-r from-krgold/20 to-krgold/10 rounded-lg mb-6 flex items-center justify-center">
+                  {selectedArticle.image ? (
+                    <img
+                      src={selectedArticle.image}
+                      alt={selectedArticle.title}
+                      className="w-full h-64 object-cover rounded-lg"
+                      onError={(e) => {
+                        const img = e.target as HTMLImageElement;
+                        img.style.display = 'none';
+                        const parent = img.parentElement;
+                        if (parent) {
+                          parent.innerHTML = `<div class="flex items-center justify-center h-64 text-krgold"><span class="text-6xl">${categories.find(c => c.id === selectedArticle.category)?.icon || '📰'}</span></div>`;
+                        }
+                      }}
+                    />
+                  ) : (
+                    <div className="flex items-center justify-center h-64 text-krgold">
+                      <span className="text-6xl">{categories.find(c => c.id === selectedArticle.category)?.icon || '📰'}</span>
+                    </div>
+                  )}
+                </div>
                 <div className="prose prose-invert max-w-none">
-                  <p className="text-gray-300 leading-relaxed text-lg">
+                  <p className="text-white leading-relaxed text-lg">
                     {selectedArticle.summary}
                   </p>
                 </div>
@@ -386,11 +416,11 @@ export default function News() {
         <div className="mt-8 bg-krgold/10 backdrop-blur-sm rounded-xl border border-krgold/30 p-4">
           <p className="text-sm text-center text-krmuted">
             <span className="text-krgold font-semibold">Multi-Market News Coverage:</span> 
-            <span className="text-orange-400 mx-2">🔥 Crypto</span> • 
-            <span className="text-blue-400 mx-2">📈 Stocks</span> • 
-            <span className="text-green-400 mx-2">💱 Forex</span> • 
-            <span className="text-purple-400 mx-2">🌍 Global</span> • 
-            LIVE updates every 1 minute from RSS feeds
+            <span className="text-krgold mx-2">🔥 Crypto</span> • 
+            <span className="text-krsuccess mx-2">📈 Stocks</span> • 
+            <span className="text-kryellow mx-2">💱 Forex</span> • 
+            <span className="text-krwhite mx-2">🌍 Global</span> • 
+            <span className="text-krgold">LIVE updates every 1 minute from RSS feeds</span>
           </p>
         </div>
       </div>
