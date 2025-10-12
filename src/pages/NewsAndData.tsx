@@ -71,7 +71,7 @@ export default function NewsAndData() {
     const fetchCryptoData = async () => {
       setCryptoLoading(true)
       try {
-        // Using CoinGecko API for accurate market data
+        // Fetching real-time crypto market data
         const response = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&price_change_percentage=1h,24h,7d')
         const data = await response.json()
         
@@ -321,64 +321,201 @@ export default function NewsAndData() {
             </div>
           </div>
 
-          {/* News Categories Section */}
+          {/* Featured News Section */}
           <div className="mb-6 bg-krcard/90 backdrop-blur-md rounded-2xl shadow-2xl border border-krborder/50 p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-2xl font-bold text-krtext">Market News</h2>
-              <div className="flex bg-krblack/40 rounded-lg p-1 gap-1">
-                {(['crypto', 'stocks', 'forex', 'world'] as const).map((category) => (
-                  <button
-                    key={category}
-                    onClick={() => setActiveNewsCategory(category)}
-                    className={`px-3 py-2 rounded-md text-xs font-semibold transition-all flex items-center gap-2 ${
-                      activeNewsCategory === category
-                        ? 'bg-krgold text-krblack'
-                        : 'text-krmuted hover:text-krtext'
-                    }`}
-                  >
-                    {categoryIcons[category]}
-                    {category.charAt(0).toUpperCase() + category.slice(1)}
-                  </button>
-                ))}
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-3 bg-gradient-to-r from-krgold/20 to-kryellow/20 rounded-xl">
+                <Zap className="text-krgold animate-pulse" size={24} />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold bg-gradient-to-r from-krgold to-kryellow bg-clip-text text-transparent">Featured News</h2>
+                <p className="text-xs text-krmuted">Multi-market highlights from premium sources</p>
               </div>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[400px] overflow-y-auto crypto-list-scroll">
-              {filteredNews.slice(0, 12).map((item) => (
-                <div
-                  key={item.id}
-                  onClick={() => setSelectedArticle(item)}
-                  className={`p-4 rounded-xl border transition-all hover:scale-[1.02] cursor-pointer ${categoryColors[item.category]}`}
-                >
-                  <div className="flex items-start gap-3">
-                    {categoryIcons[item.category]}
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-sm mb-2 line-clamp-2">{item.title}</h3>
-                      <div className="flex items-center justify-between text-xs text-krmuted">
-                        <span>{item.source}</span>
-                        <span>{new Date(item.publishedAt).toLocaleDateString()}</span>
+            {/* Moving News Bulletin */}
+            <div className="bg-krblack/40 rounded-xl p-4 mb-6 overflow-hidden">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-2 h-2 bg-krgold rounded-full animate-pulse"></div>
+                <span className="text-xs font-bold text-krgold uppercase">Breaking Headlines</span>
+              </div>
+              <div className="news-bulletin-wrapper">
+                <div className="news-bulletin">
+                  {/* Get 2 from each category for the bulletin */}
+                  {[
+                    ...newsItems.filter(item => item.category === 'crypto').slice(0, 2),
+                    ...newsItems.filter(item => item.category === 'stocks').slice(0, 2),
+                    ...newsItems.filter(item => item.category === 'forex').slice(0, 2),
+                    ...newsItems.filter(item => item.category === 'world').slice(0, 2)
+                  ].map((item, idx) => (
+                    <div key={`bulletin-${item.id}`} className="news-bulletin-item">
+                      <div className="flex items-center gap-3">
+                        <div className={`p-1.5 rounded-md ${categoryColors[item.category]}`}>
+                          {categoryIcons[item.category]}
+                        </div>
+                        <span className="text-krtext font-medium">{item.title}</span>
+                        <span className="text-krmuted text-xs">({item.source})</span>
                       </div>
+                      <span className="text-krmuted mx-6">•</span>
+                    </div>
+                  ))}
+                  {/* Duplicate for seamless loop */}
+                  {[
+                    ...newsItems.filter(item => item.category === 'crypto').slice(0, 2),
+                    ...newsItems.filter(item => item.category === 'stocks').slice(0, 2),
+                    ...newsItems.filter(item => item.category === 'forex').slice(0, 2),
+                    ...newsItems.filter(item => item.category === 'world').slice(0, 2)
+                  ].map((item, idx) => (
+                    <div key={`bulletin-dup-${item.id}`} className="news-bulletin-item">
+                      <div className="flex items-center gap-3">
+                        <div className={`p-1.5 rounded-md ${categoryColors[item.category]}`}>
+                          {categoryIcons[item.category]}
+                        </div>
+                        <span className="text-krtext font-medium">{item.title}</span>
+                        <span className="text-krmuted text-xs">({item.source})</span>
+                      </div>
+                      <span className="text-krmuted mx-6">•</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Featured Articles Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Crypto Section */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 mb-3">
+                  <Bitcoin className="text-orange-400" size={18} />
+                  <h3 className="text-sm font-bold text-orange-400 uppercase">Crypto</h3>
+                </div>
+                {newsItems.filter(item => item.category === 'crypto').slice(0, 2).map((item) => (
+                  <div
+                    key={item.id}
+                    onClick={() => setSelectedArticle(item)}
+                    className="group p-4 rounded-xl border border-orange-500/20 bg-orange-500/5 hover:bg-orange-500/10 transition-all cursor-pointer"
+                  >
+                    <div className="aspect-video bg-gradient-to-br from-orange-500/20 to-orange-600/10 rounded-lg mb-3 flex items-center justify-center">
+                      <Bitcoin className="text-orange-400 opacity-60" size={32} />
+                    </div>
+                    <h4 className="font-medium text-sm mb-2 line-clamp-2 group-hover:text-orange-400 transition-colors">{item.title}</h4>
+                    <div className="flex items-center justify-between text-xs text-krmuted">
+                      <span>{item.source}</span>
+                      <span>{new Date(item.publishedAt).toLocaleDateString()}</span>
                     </div>
                   </div>
+                ))}
+              </div>
+
+              {/* Stocks Section */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 mb-3">
+                  <BarChart3 className="text-blue-400" size={18} />
+                  <h3 className="text-sm font-bold text-blue-400 uppercase">Stocks</h3>
                 </div>
-              ))}
+                {newsItems.filter(item => item.category === 'stocks').slice(0, 2).map((item) => (
+                  <div
+                    key={item.id}
+                    onClick={() => setSelectedArticle(item)}
+                    className="group p-4 rounded-xl border border-blue-500/20 bg-blue-500/5 hover:bg-blue-500/10 transition-all cursor-pointer"
+                  >
+                    <div className="aspect-video bg-gradient-to-br from-blue-500/20 to-blue-600/10 rounded-lg mb-3 flex items-center justify-center">
+                      <BarChart3 className="text-blue-400 opacity-60" size={32} />
+                    </div>
+                    <h4 className="font-medium text-sm mb-2 line-clamp-2 group-hover:text-blue-400 transition-colors">{item.title}</h4>
+                    <div className="flex items-center justify-between text-xs text-krmuted">
+                      <span>{item.source}</span>
+                      <span>{new Date(item.publishedAt).toLocaleDateString()}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Forex Section */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 mb-3">
+                  <DollarSign className="text-green-400" size={18} />
+                  <h3 className="text-sm font-bold text-green-400 uppercase">Forex</h3>
+                </div>
+                {newsItems.filter(item => item.category === 'forex').slice(0, 2).map((item) => (
+                  <div
+                    key={item.id}
+                    onClick={() => setSelectedArticle(item)}
+                    className="group p-4 rounded-xl border border-green-500/20 bg-green-500/5 hover:bg-green-500/10 transition-all cursor-pointer"
+                  >
+                    <div className="aspect-video bg-gradient-to-br from-green-500/20 to-green-600/10 rounded-lg mb-3 flex items-center justify-center">
+                      <DollarSign className="text-green-400 opacity-60" size={32} />
+                    </div>
+                    <h4 className="font-medium text-sm mb-2 line-clamp-2 group-hover:text-green-400 transition-colors">{item.title}</h4>
+                    <div className="flex items-center justify-between text-xs text-krmuted">
+                      <span>{item.source}</span>
+                      <span>{new Date(item.publishedAt).toLocaleDateString()}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Global Section */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 mb-3">
+                  <Globe className="text-purple-400" size={18} />
+                  <h3 className="text-sm font-bold text-purple-400 uppercase">Global</h3>
+                </div>
+                {newsItems.filter(item => item.category === 'world').slice(0, 2).map((item) => (
+                  <div
+                    key={item.id}
+                    onClick={() => setSelectedArticle(item)}
+                    className="group p-4 rounded-xl border border-purple-500/20 bg-purple-500/5 hover:bg-purple-500/10 transition-all cursor-pointer"
+                  >
+                    <div className="aspect-video bg-gradient-to-br from-purple-500/20 to-purple-600/10 rounded-lg mb-3 flex items-center justify-center">
+                      <Globe className="text-purple-400 opacity-60" size={32} />
+                    </div>
+                    <h4 className="font-medium text-sm mb-2 line-clamp-2 group-hover:text-purple-400 transition-colors">{item.title}</h4>
+                    <div className="flex items-center justify-between text-xs text-krmuted">
+                      <span>{item.source}</span>
+                      <span>{new Date(item.publishedAt).toLocaleDateString()}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 
           {/* Main Data Grid */}
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-            {/* Economic Calendar - Left Column */}
+            {/* Economic Calendar - Featured Left Column */}
             <div className="xl:col-span-1">
-              <div className="bg-krcard/90 backdrop-blur-md rounded-2xl shadow-2xl border border-krborder/50 p-6 h-full">
-                <div className="flex items-center gap-2 mb-4">
-                  <Calendar className="text-krgold" size={28} />
-                  <div>
-                    <h2 className="text-2xl font-bold text-krtext">Economic Calendar</h2>
-                    <p className="text-xs text-krmuted">Key financial events</p>
+              <div className="bg-gradient-to-br from-krcard/95 to-krcard/80 backdrop-blur-md rounded-2xl shadow-2xl border-2 border-krgold/30 p-6 h-full relative overflow-hidden">
+                {/* Enhanced background accent */}
+                <div className="absolute inset-0 bg-gradient-to-br from-krgold/5 via-transparent to-kryellow/5 pointer-events-none"></div>
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-krgold/10 to-transparent rounded-full blur-2xl pointer-events-none"></div>
+                
+                <div className="relative z-10">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="p-3 bg-gradient-to-br from-krgold/20 to-kryellow/20 rounded-xl">
+                      <Calendar className="text-krgold" size={28} />
+                    </div>
+                    <div>
+                      <h2 className="text-2xl font-bold bg-gradient-to-r from-krgold to-kryellow bg-clip-text text-transparent">Economic Calendar</h2>
+                      <p className="text-sm text-krmuted flex items-center gap-2">
+                        <Clock size={12} />
+                        Live market-moving events
+                      </p>
+                    </div>
                   </div>
-                </div>
-                <div className="tradingview-widget-container h-[calc(100%-80px)]">
-                  <div ref={calendarRef} className="tradingview-widget-container__widget h-full"></div>
+                  
+                  {/* Featured indicator */}
+                  <div className="bg-krgold/10 border border-krgold/20 rounded-lg p-3 mb-4">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-krgold rounded-full animate-pulse"></div>
+                      <span className="text-xs font-bold text-krgold uppercase">Today's Key Events</span>
+                    </div>
+                    <p className="text-xs text-krmuted mt-1">Track high-impact economic releases and central bank decisions</p>
+                  </div>
+
+                  <div className="tradingview-widget-container h-[calc(100%-180px)] rounded-xl overflow-hidden border border-krgold/20">
+                    <div ref={calendarRef} className="tradingview-widget-container__widget h-full"></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -448,7 +585,7 @@ export default function NewsAndData() {
                 </div>
                 <div className="mt-4 pt-4 border-t border-krborder/30">
                   <p className="text-xs text-krmuted text-center">
-                    <span className="text-green-400 font-semibold">🚀 Crypto Trending Up</span> • Live data from CoinGecko
+                    <span className="text-green-400 font-semibold">🚀 Crypto Trending Up</span> • Live market data
                   </p>
                 </div>
               </div>
@@ -516,7 +653,7 @@ export default function NewsAndData() {
                 </div>
                 <div className="mt-4 pt-4 border-t border-krborder/30">
                   <p className="text-xs text-krmuted text-center">
-                    <span className="text-red-400 font-semibold">📉 Crypto Trending Down</span> • Live data from CoinGecko
+                    <span className="text-red-400 font-semibold">📉 Crypto Trending Down</span> • Live market data
                   </p>
                 </div>
               </div>
@@ -719,6 +856,34 @@ export default function NewsAndData() {
           -webkit-line-clamp: 2;
           -webkit-box-orient: vertical;
           overflow: hidden;
+        }
+        
+        /* News Bulletin Animation */
+        .news-bulletin-wrapper {
+          width: 100%;
+          overflow: hidden;
+          position: relative;
+        }
+        .news-bulletin {
+          display: flex;
+          animation: scroll-bulletin 60s linear infinite;
+          white-space: nowrap;
+        }
+        .news-bulletin-item {
+          display: inline-flex;
+          align-items: center;
+          flex-shrink: 0;
+        }
+        @keyframes scroll-bulletin {
+          0% {
+            transform: translateX(100%);
+          }
+          100% {
+            transform: translateX(-100%);
+          }
+        }
+        .news-bulletin:hover {
+          animation-play-state: paused;
         }
       `}</style>
     </div>

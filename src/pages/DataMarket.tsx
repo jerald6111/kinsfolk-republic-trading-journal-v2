@@ -40,6 +40,7 @@ export default function DataMarket() {
     title: string
     data: any[]
   } | null>(null)
+  const [modalTimeframe, setModalTimeframe] = useState<'1h' | '24h' | '7d'>('24h')
 
   // Fetch crypto data from CoinGecko (faster updates)
   useEffect(() => {
@@ -144,8 +145,44 @@ export default function DataMarket() {
     }
   }
 
+  // Get filtered data based on timeframe for modal
+  const getFilteredModalData = (data: CryptoItem[], type: string, timeframe: string) => {
+    if (type !== 'gainers' && type !== 'losers') {
+      return data
+    }
+
+    // Get the appropriate price change field for the timeframe
+    const getChangeField = (tf: string) => {
+      switch (tf) {
+        case '1h': return 'price_change_percentage_1h_in_currency'
+        case '24h': return 'price_change_percentage_24h' 
+        case '7d': return 'price_change_percentage_7d_in_currency'
+        default: return 'price_change_percentage_24h'
+      }
+    }
+
+    const changeField = getChangeField(timeframe)
+    
+    // Create new data with the appropriate timeframe values
+    const processedData = data.map(coin => ({
+      ...coin,
+      price_change_percentage_24h: (coin as any)[changeField] || coin.price_change_percentage_24h || 0
+    }))
+
+    if (type === 'gainers') {
+      return processedData
+        .filter(coin => coin.price_change_percentage_24h > 0)
+        .sort((a, b) => (b.price_change_percentage_24h || 0) - (a.price_change_percentage_24h || 0))
+    } else {
+      return processedData
+        .filter(coin => coin.price_change_percentage_24h < 0)
+        .sort((a, b) => (a.price_change_percentage_24h || 0) - (b.price_change_percentage_24h || 0))
+    }
+  }
+
   const openModal = (type: string, title: string, data: any[]) => {
     setSelectedModal({ type, title, data })
+    setModalTimeframe('24h') // Reset to 24h when opening modal
   }
 
   // Crypto Widget Component
@@ -327,7 +364,31 @@ export default function DataMarket() {
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-krcard border border-krborder rounded-xl max-w-4xl w-full max-h-[80vh] overflow-hidden">
             <div className="flex items-center justify-between p-6 border-b border-krborder">
-              <h2 className="text-xl font-semibold text-krtext">{selectedModal.title}</h2>
+              <div className="flex items-center gap-4">
+                <h2 className="text-xl font-semibold text-krtext">{selectedModal.title}</h2>
+                
+                {/* Timeframe Selector for Gainers and Losers */}
+                {(selectedModal.type === 'gainers' || selectedModal.type === 'losers') && (
+                  <div className="flex bg-krblack/40 rounded-lg p-1">
+                    {(['1h', '24h', '7d'] as const).map((timeframe) => (
+                      <button
+                        key={timeframe}
+                        onClick={() => setModalTimeframe(timeframe)}
+                        className={`px-3 py-1 rounded text-xs font-semibold transition-all ${
+                          modalTimeframe === timeframe
+                            ? selectedModal.type === 'gainers' 
+                              ? 'bg-green-500 text-krblack'
+                              : 'bg-red-500 text-krblack'
+                            : 'text-krmuted hover:text-krtext'
+                        }`}
+                      >
+                        {timeframe}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              
               <button
                 onClick={() => setSelectedModal(null)}
                 className="text-krmuted hover:text-krtext transition-colors text-2xl"
@@ -337,7 +398,13 @@ export default function DataMarket() {
             </div>
             <div className="p-6 overflow-y-auto crypto-list-scroll max-h-[60vh]">
               <div className="space-y-3">
-                {selectedModal.data.map((item: any, index: number) => {
+                {(() => {
+                  // Get filtered data based on timeframe for gainers and losers
+                  const displayData = (selectedModal.type === 'gainers' || selectedModal.type === 'losers') 
+                    ? getFilteredModalData(selectedModal.data, selectedModal.type, modalTimeframe)
+                    : selectedModal.data
+                  
+                  return displayData.map((item: any, index: number) => {
                   const coin = selectedModal.type === 'trending' ? item.item : item
                   
                   // Handle regular crypto coins (trending, gainers, losers, volume)
@@ -363,6 +430,9 @@ export default function DataMarket() {
                         {coin.price_change_percentage_24h !== undefined && (
                           <div className={`text-sm ${coin.price_change_percentage_24h >= 0 ? 'text-green-400' : 'text-red-400'}`}>
                             {coin.price_change_percentage_24h >= 0 ? '+' : ''}{coin.price_change_percentage_24h.toFixed(2)}%
+                            {(selectedModal.type === 'gainers' || selectedModal.type === 'losers') && (
+                              <span className="text-krmuted ml-1">({modalTimeframe})</span>
+                            )}
                           </div>
                         )}
                         {coin.total_volume && (
@@ -378,7 +448,8 @@ export default function DataMarket() {
                       </div>
                     </div>
                   )
-                })}
+                  })
+                })()}
               </div>
             </div>
           </div>
