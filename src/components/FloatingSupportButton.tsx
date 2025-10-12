@@ -53,7 +53,7 @@ export default function FloatingSupportButton() {
       {/* Floating Support Button */}
       <button
         onClick={() => setShowDonateModal(true)}
-        className={`fixed bottom-6 right-6 bg-gradient-to-r from-krgold to-kryellow text-krblack px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl hover:shadow-krgold/50 transition-all flex items-center gap-2 z-40 ${
+        className={`fixed bottom-6 left-6 bg-gradient-to-r from-krgold to-kryellow text-krblack px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl hover:shadow-krgold/50 transition-all flex items-center gap-2 z-40 ${
           showButton ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20 pointer-events-none'
         }`}
         style={{ transition: 'all 0.3s ease-in-out' }}

@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect } from 'react'
-import { MessageCircle, X, Send, Bot, User, Shield, Navigation, HelpCircle } from 'lucide-react'
+import { MessageCircle, X, Send, Bot, User, Shield, Navigation, HelpCircle, TrendingUp, Mail } from 'lucide-react'
 
 interface Message {
   id: string
-  type: 'user' | 'bot'
+  type: 'user' | 'bot' | 'system'
   content: string
   timestamp: Date
 }
@@ -15,103 +15,179 @@ interface QuickAction {
   response: string
 }
 
+interface UserInfo {
+  name: string
+  email: string
+  hasProvidedInfo: boolean
+}
+
 export default function AIChatbot() {
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([])
   const [inputMessage, setInputMessage] = useState('')
   const [isTyping, setIsTyping] = useState(false)
+  const [userInfo, setUserInfo] = useState<UserInfo>({ name: '', email: '', hasProvidedInfo: false })
+  const [showEmailPrompt, setShowEmailPrompt] = useState(false)
+  const [showConversationSender, setShowConversationSender] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const quickActions: QuickAction[] = [
     {
-      id: 'security',
-      label: 'Security Features',
+      id: 'platform_overview',
+      label: 'What is KRTJ?',
       icon: <Shield className="w-4 h-4" />,
-      response: `🔒 **Kinsfolk Republic Security Features:**
+      response: `🎯 **Kinsfolk Republic Trading Journal (KRTJ)**
 
-• **Client-Side Only**: All data processing happens in your browser - no server storage
-• **No Personal Data Collection**: We don't store your trading data or personal information
-• **Open Source**: Full transparency - you can review our code on GitHub
-• **RSS Feed Integration**: News comes directly from trusted sources (CoinTelegraph, MarketWatch, BBC)
-• **No Login Required**: Use all features without creating accounts or sharing personal details
-• **HTTPS Encryption**: All connections are secure and encrypted
-• **No Third-Party Tracking**: We don't use analytics or tracking cookies
+Hey! I'm your Kinsfolk Assistant - part customer service, part trading mentor. KRTJ is a web-based trading journal and analytics dashboard that helps you log, analyze, and improve your trading performance across crypto, stocks, and forex.
 
-Your privacy and security are our top priorities! 🛡️`
+**Core Sections:**
+• **Vision Board**: Motivation hub for goals and affirmations
+• **Dashboard**: PNL, Win Rate, ROI overview  
+• **Journal**: Log every trade with reasoning and screenshots
+• **Strategies**: Store your playbooks and setups
+• **Snapshots**: Visual gallery of trades and patterns
+• **Wallets**: Track deposits/withdrawals (ROI only updates from trading results)
+
+Built for traders who want clarity, discipline, and data-driven results! �`
     },
     {
-      id: 'navigation',
-      label: 'How to Navigate',
-      icon: <Navigation className="w-4 h-4" />,
-      response: `🧭 **How to Navigate Kinsfolk Republic:**
+      id: 'analytics',
+      label: 'Analytics Guide',
+      icon: <TrendingUp className="w-4 h-4" />,
+      response: `📊 **Analytics Breakdown - Let's decode your numbers:**
 
-**📈 Trading Journal:**
-• Track your trades with detailed entry/exit records
-• Analyze performance with profit/loss calculations
-• View trading statistics and insights
+• **Win Rate**: (Wins ÷ Total Trades) × 100 - Aim for consistency over perfection
+• **Profit Factor**: Gross Profit ÷ Gross Loss - Above 1.5 shows solid edge
+• **ROI**: (Current Balance - Deposits) ÷ Deposits × 100 - Withdrawals from profit don't affect this
+• **Risk/Reward**: Average Win ÷ Average Loss - Healthy systems maintain 1.5:1+
+• **PNL Calendar**: Visual timeline of your trading journey
+• **Top 5 Pairs**: Your best performers ranked by total PNL
 
-**📰 News & Data Hub:**
-• Access live market news from multiple sources
-• Filter by Crypto, Stocks, Forex, or World news
-• News updates every minute automatically
-
-**💹 Data Market:**
-• View market data and financial insights
-• Access trading tools and analysis
-
-**🎯 Quick Tips:**
-• Use the top navigation menu to switch between sections
-• All features work offline after initial load
-• No account needed - start using immediately!
-
-Navigate like a pro! 🚀`
+Remember: Focus on process over profits. Your Journal is your mirror! 🪞`
     },
     {
-      id: 'features',
-      label: 'Key Features',
+      id: 'trading_help',
+      label: 'Trading Guidance',
       icon: <HelpCircle className="w-4 h-4" />,
-      response: `✨ **Kinsfolk Republic Key Features:**
+      response: `🎯 **Trading Wisdom - Keep it simple:**
 
-**🔥 Trading Journal:**
-• Record buy/sell trades with automatic P&L calculation
-• Track portfolio performance over time
-• Export data for tax reporting
-• Completely private - stored locally in your browser
+**Risk Management:**
+• Never risk more than 1-2% per trade
+• Tighten stop losses, loosen your ego
+• Capital protection first, profits second
 
-**📈 Live Market News:**
-• Real-time RSS feeds from CoinTelegraph, MarketWatch, ForexLive, BBC
-• Updates every 60 seconds automatically
-• Thumbnail images for better visual experience
-• Pagination for easy browsing through news history
+**Psychology:**
+• Trading is 80% mindset - your Journal is your therapist
+• When emotions rise, position size should fall
+• FOMO entries feel good short-term, but they're emotionally expensive
 
-**🎨 Professional Design:**
-• Custom Kinsfolk Republic theme with gold accents
-• Mobile-responsive design works on all devices
-• Dark theme optimized for trading environments
-• Glass morphism UI effects for modern appeal
+**Discipline Beats Signals:**
+• You don't need more setups - you need more patience
+• Focus on execution, not outcome
+• Sometimes the best trade is no trade
 
-**🔒 Privacy-First:**
-• No data leaves your browser
-• No account registration required
-• Open source and transparent
-
-Ready to dominate the markets? 💪`
+What's your biggest trading challenge right now? 🤔`
     }
   ]
 
-  const botResponses: Record<string, string> = {
-    'hello': 'Hello! 👋 Welcome to Kinsfolk Republic Trading Journal! I\'m here to help you navigate our platform and answer any questions about security and features.',
-    'help': 'I can help you with:\n• Understanding our security features 🔒\n• Learning how to navigate the website 🧭\n• Exploring key features ✨\n\nWhat would you like to know?',
-    'trading': '📈 The Trading Journal lets you track your trades, calculate P&L automatically, and analyze your performance. All data is stored locally in your browser for maximum privacy!',
-    'news': '📰 Our News section provides live updates from CoinTelegraph, MarketWatch, ForexLive, and BBC News. Updates happen every minute with new articles stacking on top!',
-    'privacy': '🔒 Your privacy is paramount! All data processing happens client-side, we don\'t collect personal information, and everything is open source for transparency.',
-    'safe': '✅ Absolutely! Our platform is completely client-side, meaning your data never leaves your browser. No servers, no data collection, no tracking!',
-    'default': 'I\'m here to help with questions about navigation, security, and features of Kinsfolk Republic Trading Journal. Try asking about "security", "navigation", or "features"!'
+  const getSmartResponse = (message: string): string => {
+    const lowerMessage = message.toLowerCase().trim()
+    
+    // Emotional responses for trading situations
+    if (lowerMessage.includes('liquidated') || lowerMessage.includes('rekt') || lowerMessage.includes('account wiped')) {
+      return "Ouch 😬 liquidation stings. Happens to all of us. Reset, refocus, and rebuild smarter. Was it overleverage or no stop-loss? Let's check that trade in your Journal - the lesson is usually hiding there."
+    }
+    
+    if (lowerMessage.includes('stop loss') || lowerMessage.includes('sl hit') || lowerMessage.includes('stopped out')) {
+      return "SL hit - and that's okay. That's risk management doing its job. You followed the plan. Losses within plan are wins in discipline. 📉"
+    }
+    
+    if (lowerMessage.includes('fomo') || lowerMessage.includes('chased') || lowerMessage.includes('entered late')) {
+      return "FOMO's sneaky huh? 😂 Missing one trade won't ruin your month, forcing one will. FOMO entries feel good short-term, but they're emotionally expensive. Did you have an alert set or just reacted?"
+    }
+    
+    if (lowerMessage.includes('revenge trade') || lowerMessage.includes('emotional entry') || lowerMessage.includes('angry')) {
+      return "That's your emotions talking. Walk away before your account becomes collateral. Revenge trades feel justified, but they're just losses in disguise. Take a 15-minute break before touching another trade."
+    }
+    
+    if (lowerMessage.includes('losing streak') || lowerMessage.includes('drawdown') || lowerMessage.includes('red week')) {
+      return "Drawdowns test character. Focus on process, not PNL. Red weeks happen - the goal is to limit damage, not avoid it. Cut size, stay calm, journal every trade until the storm passes."
+    }
+    
+    if (lowerMessage.includes('overtrading') || lowerMessage.includes('too many trades')) {
+      return "If you're clicking nonstop, you're not trading - you're gambling. Overtrading is usually boredom in disguise. Sometimes the best trade is no trade. Chill mode = profit mode."
+    }
+    
+    if (lowerMessage.includes('big win') || lowerMessage.includes('massive win') || lowerMessage.includes('crushing it')) {
+      return "Nice one! 🎯 Don't let euphoria take over though. Celebrate it, then log it and review what went right so you can repeat it, not chase it. Stick to the same risk per trade even when winning."
+    }
+    
+    // Platform-specific questions
+    if (lowerMessage.includes('roi not updating') || lowerMessage.includes('roi not changing')) {
+      return "Withdrawals from profit don't affect ROI. ROI only changes with trading performance, not balance withdrawals. That's normal - ROI is based on deposits and trade results. 📊"
+    }
+    
+    if (lowerMessage.includes('trade missing') || lowerMessage.includes('trade didn\'t save')) {
+      return "Make sure you hit 'Save Trade'. Try refreshing - sometimes the sheet or local data just needs to reload. Could be a temporary cache issue. Save again and check your Journal tab."
+    }
+    
+    if (lowerMessage.includes('hyperlink') || lowerMessage.includes('link disappeared')) {
+      return "Hyperlinks can't be saved directly due to a script limitation. Add them as plain text or image references. You can paste links as text - the clickable link won't stick yet due to spreadsheet restrictions."
+    }
+    
+    // Trading guidance
+    if (lowerMessage.includes('improve win rate') || lowerMessage.includes('better win rate')) {
+      return "Review your losing trades weekly and identify if losses are from poor setups or emotions. Filter out impulsive entries. Focus on execution, not outcome. Your Journal doesn't lie - it shows who you are as a trader."
+    }
+    
+    if (lowerMessage.includes('good roi') || lowerMessage.includes('what roi')) {
+      return "A consistent 5-10% monthly ROI with proper risk management is already excellent. Focus on consistency over speed. Don't chase big numbers - chase sustainable processes."
+    }
+    
+    if (lowerMessage.includes('profit factor') || lowerMessage.includes('low profit factor')) {
+      return "Profit Factor < 1 means your losses outweigh your wins. Check if you're cutting losses late or letting winners run too short. Above 1.5 shows you have a solid edge."
+    }
+    
+    // Platform navigation
+    if (lowerMessage.includes('how to use') || lowerMessage.includes('navigate') || lowerMessage.includes('getting started')) {
+      return `🧭 **Getting Started with KRTJ:**
+
+**Dashboard**: Your bird's-eye view showing Total Trades, Win Rate, PNL, ROI, Profit Factor
+**Journal**: Log every trade - entry, exit, setup, reasoning, screenshots
+**Vision Board**: Add charts, affirmations, goals to keep your vision clear  
+**Strategies**: Store your playbooks and trading systems
+**Snapshots**: Visual gallery for quick trade review
+**Wallets**: Track deposits/withdrawals (ROI only updates from trading results)
+
+All features work offline after initial load. No account needed - start journaling immediately! 🚀`
+    }
+    
+    // Security questions
+    if (lowerMessage.includes('secure') || lowerMessage.includes('privacy') || lowerMessage.includes('safe')) {
+      return `🔒 **Security & Privacy:**
+
+• **Client-Side Only**: All processing in your browser - no server storage
+• **No Data Collection**: We don't store your trading data or personal info
+• **Open Source**: Full transparency - check our GitHub
+• **No Login Required**: Use all features without accounts
+• **Local Storage**: Your data stays on your device
+• **HTTPS Encrypted**: All connections secure
+
+Your data never leaves your browser. Privacy-first design! 🛡️`
+    }
+    
+    // Greetings
+    if (lowerMessage.includes('hello') || lowerMessage.includes('hi') || lowerMessage.includes('hey')) {
+      return "Hey! 👋 I'm your Kinsfolk Assistant - part customer service, part trading mentor. I'm here to help you navigate KRTJ and level up your trading game. What's on your mind?"
+    }
+    
+    // Default response
+    return "I'm here to help with KRTJ navigation, trading guidance, and platform questions. Try asking about 'how to use the journal', 'analytics help', or share what's happening with your trades. What's your biggest challenge right now? 🤔"
   }
 
   useEffect(() => {
     if (isOpen && messages.length === 0) {
-      addBotMessage("👋 Hello! I'm your Kinsfolk Republic assistant. I'm here to help you navigate our trading platform and answer security questions. How can I help you today?")
+      addBotMessage("Hey! 👋 I'm your Kinsfolk Assistant - part customer service, part trading mentor. I help with KRTJ navigation, analytics questions, and trading mindset. Whether you're celebrating wins or dealing with losses, I'm here to help. What's on your trading mind today?")
     }
   }, [isOpen, messages.length])
 
@@ -143,39 +219,49 @@ Ready to dominate the markets? 💪`
     setMessages(prev => [...prev, newMessage])
   }
 
-  const processMessage = (message: string) => {
-    const lowerMessage = message.toLowerCase().trim()
-    
-    // Check for keywords and provide appropriate responses
-    let response = botResponses.default
-    
-    if (lowerMessage.includes('hello') || lowerMessage.includes('hi') || lowerMessage.includes('hey')) {
-      response = botResponses.hello
-    } else if (lowerMessage.includes('help') || lowerMessage.includes('what can you do')) {
-      response = botResponses.help
-    } else if (lowerMessage.includes('trading') || lowerMessage.includes('journal') || lowerMessage.includes('trade')) {
-      response = botResponses.trading
-    } else if (lowerMessage.includes('news') || lowerMessage.includes('market') || lowerMessage.includes('rss')) {
-      response = botResponses.news
-    } else if (lowerMessage.includes('privacy') || lowerMessage.includes('data') || lowerMessage.includes('personal')) {
-      response = botResponses.privacy
-    } else if (lowerMessage.includes('safe') || lowerMessage.includes('secure') || lowerMessage.includes('security')) {
-      response = botResponses.safe
+  const requestUserInfo = () => {
+    if (!userInfo.hasProvidedInfo) {
+      setShowEmailPrompt(true)
     }
+  }
+
+  const handleUserInfoSubmit = (name: string, email: string) => {
+    setUserInfo({ name, email, hasProvidedInfo: true })
+    setShowEmailPrompt(false)
+    addBotMessage(`Nice to meet you, ${name}! 🤝 I've got your email (${email}) saved for our conversation summary. Now, how can I help you dominate the markets today?`)
+  }
+
+  const sendConversationEmail = async () => {
+    if (!userInfo.email) return
     
-    return response
+    const conversationText = messages
+      .map(msg => `${msg.type.toUpperCase()} (${msg.timestamp.toLocaleString()}): ${msg.content}`)
+      .join('\n\n')
+    
+    // This would integrate with your email service
+    console.log('Sending conversation to:', userInfo.email)
+    console.log('Conversation:', conversationText)
+    
+    addBotMessage(`📧 Conversation summary sent to ${userInfo.email}! Check your inbox for the full chat transcript. Keep crushing those trades! 🚀`)
+    setShowConversationSender(false)
   }
 
   const handleSendMessage = () => {
     if (!inputMessage.trim()) return
 
+    // Request user info after a few messages if not provided
+    if (messages.length > 3 && !userInfo.hasProvidedInfo) {
+      setTimeout(() => requestUserInfo(), 2000)
+    }
+
     addUserMessage(inputMessage)
+    const currentMessage = inputMessage
     setInputMessage('')
     setIsTyping(true)
 
     // Simulate bot typing delay
     setTimeout(() => {
-      const response = processMessage(inputMessage)
+      const response = getSmartResponse(currentMessage)
       addBotMessage(response)
       setIsTyping(false)
     }, 1000 + Math.random() * 1000) // Random delay between 1-2 seconds
@@ -201,7 +287,7 @@ Ready to dominate the markets? 💪`
   return (
     <>
       {/* Floating Chat Button */}
-      <div className="fixed bottom-6 left-6 z-50">
+      <div className="fixed bottom-6 right-6 z-50">
         <button
           onClick={() => setIsOpen(true)}
           className="bg-gradient-to-r from-krgold to-kryellow text-krblack p-4 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center gap-2 group"
@@ -216,22 +302,33 @@ Ready to dominate the markets? 💪`
 
       {/* Chat Window */}
       {isOpen && (
-        <div className="fixed bottom-24 left-6 w-96 h-[500px] bg-krcard border border-krborder rounded-xl shadow-2xl z-50 flex flex-col overflow-hidden">
+        <div className="fixed bottom-24 right-6 w-96 h-[500px] bg-krcard border border-krborder rounded-xl shadow-2xl z-50 flex flex-col overflow-hidden">
           {/* Header */}
           <div className="bg-gradient-to-r from-krgold to-kryellow text-krblack p-4 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Bot className="w-5 h-5" />
               <div>
                 <h3 className="font-bold text-sm">Kinsfolk AI Assistant</h3>
-                <p className="text-xs opacity-80">Here to help you navigate</p>
+                <p className="text-xs opacity-80">Trading mentor & platform guide</p>
               </div>
             </div>
-            <button
-              onClick={() => setIsOpen(false)}
-              className="hover:bg-black/10 p-1 rounded transition-colors"
-            >
-              <X className="w-4 h-4" />
-            </button>
+            <div className="flex items-center gap-2">
+              {messages.length > 3 && userInfo.hasProvidedInfo && (
+                <button
+                  onClick={() => setShowConversationSender(true)}
+                  className="hover:bg-black/10 p-1 rounded transition-colors"
+                  title="Send conversation to email"
+                >
+                  <Mail className="w-4 h-4" />
+                </button>
+              )}
+              <button
+                onClick={() => setIsOpen(false)}
+                className="hover:bg-black/10 p-1 rounded transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
           </div>
 
           {/* Quick Actions */}
@@ -325,6 +422,79 @@ Ready to dominate the markets? 💪`
             <p className="text-xs text-krmuted mt-1">
               AI assistant for navigation and security questions
             </p>
+          </div>
+        </div>
+      )}
+
+      {/* Email Prompt Modal */}
+      {showEmailPrompt && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60]">
+          <div className="bg-krcard border border-krborder rounded-xl p-6 max-w-md w-full mx-4">
+            <div className="flex items-center gap-2 mb-4">
+              <Mail className="w-5 h-5 text-krgold" />
+              <h3 className="font-bold text-krtext">Quick Info</h3>
+            </div>
+            <p className="text-krmuted text-sm mb-4">
+              I can send you a copy of our conversation when we're done! Just need your name and email:
+            </p>
+            <div className="space-y-3">
+              <input
+                type="text"
+                placeholder="Your name"
+                className="w-full bg-krgray text-krtext px-3 py-2 rounded-lg text-sm border border-krborder focus:border-krgold focus:outline-none"
+                onChange={(e) => setUserInfo(prev => ({ ...prev, name: e.target.value }))}
+              />
+              <input
+                type="email"
+                placeholder="Your email"
+                className="w-full bg-krgray text-krtext px-3 py-2 rounded-lg text-sm border border-krborder focus:border-krgold focus:outline-none"
+                onChange={(e) => setUserInfo(prev => ({ ...prev, email: e.target.value }))}
+              />
+            </div>
+            <div className="flex gap-2 mt-4">
+              <button
+                onClick={() => setShowEmailPrompt(false)}
+                className="flex-1 px-4 py-2 text-sm text-krmuted border border-krborder rounded-lg hover:border-krgold/50 transition-colors"
+              >
+                Skip
+              </button>
+              <button
+                onClick={() => handleUserInfoSubmit(userInfo.name, userInfo.email)}
+                disabled={!userInfo.name || !userInfo.email}
+                className="flex-1 px-4 py-2 text-sm bg-krgold text-krblack rounded-lg hover:bg-kryellow transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Continue
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Conversation Sender Modal */}
+      {showConversationSender && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60]">
+          <div className="bg-krcard border border-krborder rounded-xl p-6 max-w-md w-full mx-4">
+            <div className="flex items-center gap-2 mb-4">
+              <Mail className="w-5 h-5 text-krgold" />
+              <h3 className="font-bold text-krtext">Send Conversation</h3>
+            </div>
+            <p className="text-krmuted text-sm mb-4">
+              Want a copy of our conversation sent to <span className="text-krgold">{userInfo.email}</span>?
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setShowConversationSender(false)}
+                className="flex-1 px-4 py-2 text-sm text-krmuted border border-krborder rounded-lg hover:border-krgold/50 transition-colors"
+              >
+                No thanks
+              </button>
+              <button
+                onClick={sendConversationEmail}
+                className="flex-1 px-4 py-2 text-sm bg-krgold text-krblack rounded-lg hover:bg-kryellow transition-colors"
+              >
+                Send Email
+              </button>
+            </div>
           </div>
         </div>
       )}
