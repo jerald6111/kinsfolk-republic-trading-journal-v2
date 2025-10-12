@@ -29,16 +29,16 @@ export default function DataMarket() {
     gainers: CryptoItem[]
     losers: CryptoItem[]
     highVolume: CryptoItem[]
-    upcomingCoins: any[]
-    upcomingCoins2: any[]
+    tokenUnlocks: any[]
+    tokenUnlocks2: any[]
     loading: boolean
   }>({
     trending: [],
     gainers: [],
     losers: [],
     highVolume: [],
-    upcomingCoins: [],
-    upcomingCoins2: [],
+    tokenUnlocks: [],
+    tokenUnlocks2: [],
     loading: true
   })
   const [selectedModal, setSelectedModal] = useState<{
@@ -76,28 +76,28 @@ export default function DataMarket() {
 
 
 
-        // Fetch upcoming coins (simulated - would need dedicated API)
-        const upcomingCoins = [
-          { name: "LayerZero", symbol: "ZRO", launch_date: "2024-10-20", category: "Interoperability", status: "Mainnet Launch" },
-          { name: "EigenLayer", symbol: "EIGEN", launch_date: "2024-10-25", category: "Restaking", status: "Token Generation" },
-          { name: "Berachain", symbol: "BERA", launch_date: "2024-11-01", category: "DeFi", status: "Mainnet Beta" },
-          { name: "Monad", symbol: "MON", launch_date: "2024-11-10", category: "Layer 1", status: "Testnet Phase 3" },
-          { name: "Fuel Network", symbol: "FUEL", launch_date: "2024-11-15", category: "Modular Execution", status: "Public Launch" },
-          { name: "Hyperliquid", symbol: "HYPE", launch_date: "2024-11-20", category: "DEX", status: "Token Launch" },
-          { name: "Babylon", symbol: "BBN", launch_date: "2024-12-01", category: "Bitcoin Staking", status: "Mainnet" },
-          { name: "Story Protocol", symbol: "STORY", launch_date: "2024-12-05", category: "IP Licensing", status: "Alpha Launch" },
-          { name: "Movement Labs", symbol: "MOVE", launch_date: "2024-12-15", category: "Move VM", status: "Mainnet Launch" },
-          { name: "Initia", symbol: "INIT", launch_date: "2024-12-20", category: "Appchain Infrastructure", status: "Genesis" },
-          { name: "Scroll", symbol: "SCR", launch_date: "2024-10-22", category: "Layer 2", status: "Public Token Launch" },
-          { name: "Taiko", symbol: "TAIKO", launch_date: "2024-10-28", category: "ZK-Rollup", status: "Mainnet Alpha" },
-          { name: "Linea", symbol: "LINEA", launch_date: "2024-11-05", category: "ZK-EVM", status: "Token Generation Event" },
-          { name: "Base Ecosystem", symbol: "BASE", launch_date: "2024-11-12", category: "Layer 2", status: "Ecosystem Token" },
-          { name: "Blast", symbol: "BLAST", launch_date: "2024-11-18", category: "Yield Layer 2", status: "Public Launch" },
-          { name: "Mode Network", symbol: "MODE", launch_date: "2024-11-25", category: "Modular DeFi", status: "Beta Launch" },
-          { name: "Mantle LSP", symbol: "METH", launch_date: "2024-12-02", category: "Liquid Staking", status: "Protocol Launch" },
-          { name: "Privy", symbol: "PRIVY", launch_date: "2024-12-08", category: "Auth Infrastructure", status: "Token Launch" },
-          { name: "Parallel", symbol: "PRIME", launch_date: "2024-12-12", category: "AI Gaming", status: "Expansion Launch" },
-          { name: "Wormhole", symbol: "W", launch_date: "2024-12-18", category: "Cross-Chain", status: "Ecosystem Expansion" }
+        // Fetch incoming token unlocks (based on CoinGecko data)
+        const tokenUnlocks = [
+          { name: "Aethir", symbol: "ATH", unlock_date: "0 Days", amount: "1.3B ATH", value: "$52.05M", percentage: "8.85%" },
+          { name: "World Mobile Token", symbol: "WMTX", unlock_date: "0 Days 14 Hrs", amount: "830K WMTX", value: "$146.67K", percentage: "0.11%" },
+          { name: "Cheelee", symbol: "CHEEL", unlock_date: "0 Days 14 Hrs", amount: "21M CHEEL", value: "$22.31M", percentage: "-" },
+          { name: "BlueMove", symbol: "MOVE", unlock_date: "0 Days 14 Hrs", amount: "6.1M MOVE", value: "$4.66K", percentage: "2.79%" },
+          { name: "Gods Unchained", symbol: "GODS", unlock_date: "0 Days 14 Hrs", amount: "2.6M GODS", value: "$258.56K", percentage: "0.66%" },
+          { name: "Slash Vision Labs", symbol: "SVL", unlock_date: "1 Days 14 Hrs", amount: "4.8M SVL", value: "$209.70K", percentage: "0.1%" },
+          { name: "Puffer", symbol: "PUFFER", unlock_date: "1 Days 14 Hrs", amount: "19M PUFFER", value: "$1.9M", percentage: "9.4%" },
+          { name: "Fusionist", symbol: "ACE", unlock_date: "1 Days 14 Hrs", amount: "1.8M ACE", value: "$538.58K", percentage: "2.31%" },
+          { name: "CYBER", symbol: "CYBER", unlock_date: "1 Days 22 Hrs", amount: "890K CYBER", value: "$871.33K", percentage: "1.8%" },
+          { name: "Starknet", symbol: "STRK", unlock_date: "2 Days 14 Hrs", amount: "130M STRK", value: "$14.43M", percentage: "2.94%" },
+          { name: "Onyxcoin", symbol: "XCN", unlock_date: "2 Days 14 Hrs", amount: "300M XCN", value: "$2.83M", percentage: "0.84%" },
+          { name: "IOTA", symbol: "IOTA", unlock_date: "2 Days 14 Hrs", amount: "12M IOTA", value: "$1.75M", percentage: "0.3%" },
+          { name: "Sei", symbol: "SEI", unlock_date: "3 Days 02 Hrs", amount: "56M SEI", value: "$11.38M", percentage: "0.91%" },
+          { name: "Arbitrum", symbol: "ARB", unlock_date: "4 Days 03 Hrs", amount: "93M ARB", value: "$28.34M", percentage: "1.71%" },
+          { name: "deBridge", symbol: "DBR", unlock_date: "4 Days 14 Hrs", amount: "620M DBR", value: "$16.97M", percentage: "17.59%" },
+          { name: "Astar", symbol: "ASTR", unlock_date: "4 Days 14 Hrs", amount: "9.7M ASTR", value: "$181.43K", percentage: "0.12%" },
+          { name: "ZKsync", symbol: "ZK", unlock_date: "4 Days 22 Hrs", amount: "170M ZK", value: "$6.70M", percentage: "2.39%" },
+          { name: "Wormhole", symbol: "W", unlock_date: "5 Days 01 Hrs", amount: "50M W", value: "$3.60M", percentage: "1.06%" },
+          { name: "ApeCoin", symbol: "APE", unlock_date: "5 Days 02 Hrs", amount: "16M APE", value: "$5.97M", percentage: "1.72%" },
+          { name: "LayerZero", symbol: "ZRO", unlock_date: "8 Days 01 Hrs", amount: "26M ZRO", value: "$45.11M", percentage: "23.13%" }
         ]
 
         setCryptoData({
@@ -105,8 +105,8 @@ export default function DataMarket() {
           gainers,
           losers,
           highVolume,
-          upcomingCoins: upcomingCoins.slice(0, 10), // First 10 for first widget
-          upcomingCoins2: upcomingCoins.slice(10, 20), // Next 10 for second widget
+          tokenUnlocks: tokenUnlocks.slice(0, 10), // First 10 for first widget
+          tokenUnlocks2: tokenUnlocks.slice(10, 20), // Next 10 for second widget
           loading: false
         })
       } catch (error) {
@@ -335,53 +335,53 @@ export default function DataMarket() {
               )}
             />
 
-            {/* Upcoming Coins (2) */}
+            {/* Incoming Token Unlocks (2) */}
             <CryptoWidget
-              title="Upcoming Coins"
-              emoji="�"
-              data={cryptoData.upcomingCoins2}
-              type="upcoming2"
-              renderItem={(coin: any, index: number) => (
+              title="Incoming Token Unlocks"
+              emoji="🔓"
+              data={cryptoData.tokenUnlocks2}
+              type="unlocks2"
+              renderItem={(unlock: any, index: number) => (
                 <div key={index} className="flex items-center justify-between p-3 bg-krblack/40 rounded-lg hover:bg-krblack/60 transition-all">
                   <div className="flex items-center gap-3">
                     <span className="text-xs text-krgold font-bold w-6">#{index + 1}</span>
-                    <div className="w-6 h-6 bg-purple-500/20 rounded-full flex items-center justify-center">
-                      <span className="text-xs font-bold text-purple-400">�</span>
+                    <div className="w-6 h-6 bg-orange-500/20 rounded-full flex items-center justify-center">
+                      <span className="text-xs font-bold text-orange-400">🔓</span>
                     </div>
                     <div>
-                      <div className="font-medium text-sm">{coin.name}</div>
-                      <div className="text-xs text-krmuted uppercase">{coin.symbol}</div>
+                      <div className="font-medium text-sm">{unlock.name}</div>
+                      <div className="text-xs text-krmuted uppercase">{unlock.symbol}</div>
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="text-xs text-purple-400">{coin.status}</div>
-                    <div className="text-xs text-krmuted">{coin.launch_date}</div>
+                    <div className="text-xs text-orange-400">{unlock.amount}</div>
+                    <div className="text-xs text-krmuted">{unlock.unlock_date}</div>
                   </div>
                 </div>
               )}
             />
 
-            {/* Upcoming Coins */}
+            {/* Incoming Token Unlocks */}
             <CryptoWidget
-              title="Upcoming Coins"
-              emoji="📅"
-              data={cryptoData.upcomingCoins}
-              type="upcoming"
-              renderItem={(coin: any, index: number) => (
+              title="Incoming Token Unlocks"
+              emoji="�"
+              data={cryptoData.tokenUnlocks}
+              type="unlocks"
+              renderItem={(unlock: any, index: number) => (
                 <div key={index} className="flex items-center justify-between p-3 bg-krblack/40 rounded-lg hover:bg-krblack/60 transition-all">
                   <div className="flex items-center gap-3">
                     <span className="text-xs text-krgold font-bold w-6">#{index + 1}</span>
-                    <div className="w-6 h-6 bg-blue-500/20 rounded-full flex items-center justify-center">
-                      <span className="text-xs font-bold text-blue-400">📅</span>
+                    <div className="w-6 h-6 bg-orange-500/20 rounded-full flex items-center justify-center">
+                      <span className="text-xs font-bold text-orange-400">�</span>
                     </div>
                     <div>
-                      <div className="font-medium text-sm">{coin.name}</div>
-                      <div className="text-xs text-krmuted uppercase">{coin.symbol}</div>
+                      <div className="font-medium text-sm">{unlock.name}</div>
+                      <div className="text-xs text-krmuted uppercase">{unlock.symbol}</div>
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="text-xs text-blue-400">{coin.status}</div>
-                    <div className="text-xs text-krmuted">{coin.launch_date}</div>
+                    <div className="text-xs text-orange-400">{unlock.amount}</div>
+                    <div className="text-xs text-krmuted">{unlock.unlock_date}</div>
                   </div>
                 </div>
               )}
@@ -455,24 +455,24 @@ export default function DataMarket() {
                 {selectedModal.data.map((item: any, index: number) => {
                   const coin = selectedModal.type === 'trending' ? item.item : item
                   
-                  // Handle Upcoming Coins display
-                  if (selectedModal.type === 'upcoming' || selectedModal.type === 'upcoming2') {
+                  // Handle Token Unlocks display
+                  if (selectedModal.type === 'unlocks' || selectedModal.type === 'unlocks2') {
                     return (
                       <div key={index} className="flex items-center justify-between p-4 bg-krblack/40 rounded-lg hover:bg-krblack/60 transition-all">
                         <div className="flex items-center gap-4">
                           <span className="text-sm text-krgold font-bold w-8">#{index + 1}</span>
-                          <div className="w-8 h-8 bg-blue-500/20 rounded-full flex items-center justify-center">
-                            <span className="text-sm font-bold text-blue-400">📅</span>
+                          <div className="w-8 h-8 bg-orange-500/20 rounded-full flex items-center justify-center">
+                            <span className="text-sm font-bold text-orange-400">�</span>
                           </div>
                           <div>
                             <div className="font-medium">{coin.name}</div>
                             <div className="text-sm text-krmuted uppercase">{coin.symbol}</div>
-                            <div className="text-xs text-krmuted">{coin.category}</div>
                           </div>
                         </div>
                         <div className="text-right">
-                          <div className="font-medium text-blue-400">{coin.status}</div>
-                          <div className="text-sm text-krmuted">{coin.launch_date}</div>
+                          <div className="font-medium text-orange-400">{coin.amount}</div>
+                          <div className="text-sm text-krmuted">{coin.unlock_date}</div>
+                          <div className="text-sm text-kryellow">{coin.value}</div>
                         </div>
                       </div>
                     )
