@@ -10,6 +10,7 @@ interface CryptoData {
   price_change_percentage_24h: number
   market_cap: number
   image: string
+  market_cap_rank: number
 }
 
 // News item for ticker
@@ -22,12 +23,11 @@ interface NewsItem {
 
 export default function News() {
   const calendarRef = useRef<HTMLDivElement>(null)
-  const topGainersRef = useRef<HTMLDivElement>(null)
-  const topLosersRef = useRef<HTMLDivElement>(null)
   const [topGainers, setTopGainers] = useState<CryptoData[]>([])
   const [topLosers, setTopLosers] = useState<CryptoData[]>([])
   const [newsItems, setNewsItems] = useState<NewsItem[]>([])
   const [loading, setLoading] = useState(true)
+  const [cryptoLoading, setCryptoLoading] = useState(true)
 
   // Economic Calendar Widget
   useEffect(() => {
@@ -59,93 +59,58 @@ export default function News() {
     }
   }, [])
 
-  // Crypto Top Gainers Widget
+  // Fetch crypto market data from CoinGecko API
   useEffect(() => {
-    if (!topGainersRef.current) return
-
-    const container = topGainersRef.current
-    container.innerHTML = ''
-
-    const script = document.createElement('script')
-    script.type = 'text/javascript'
-    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-hotlists.js'
-    script.async = true
-    script.innerHTML = JSON.stringify({
-      colorTheme: 'dark',
-      dateRange: '1D',
-      exchange: 'BINANCE',
-      showChart: false,
-      locale: 'en',
-      largeChartUrl: '',
-      isTransparent: true,
-      showSymbolLogo: true,
-      showFloatingTooltip: false,
-      width: '100%',
-      height: '100%',
-      plotLineColorGrowing: 'rgba(212, 175, 55, 1)',
-      plotLineColorFalling: 'rgba(212, 175, 55, 1)',
-      gridLineColor: 'rgba(42, 46, 57, 0)',
-      scaleFontColor: 'rgba(209, 212, 220, 1)',
-      belowLineFillColorGrowing: 'rgba(34, 197, 94, 0.12)',
-      belowLineFillColorFalling: 'rgba(34, 197, 94, 0.12)',
-      belowLineFillColorGrowingBottom: 'rgba(34, 197, 94, 0)',
-      belowLineFillColorFallingBottom: 'rgba(34, 197, 94, 0)',
-      symbolActiveColor: 'rgba(212, 175, 55, 0.12)',
-      hotListType: 'gainers'
-    })
-
-    container.appendChild(script)
-
-    return () => {
-      if (container) {
-        container.innerHTML = ''
+    const fetchCryptoData = async () => {
+      setCryptoLoading(true)
+      try {
+        const response = await fetch(
+          'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false&price_change_percentage=24h'
+        )
+        const data: CryptoData[] = await response.json()
+        
+        // Sort by 24h percentage change to get gainers and losers
+        const sortedByChange = [...data].sort((a, b) => b.price_change_percentage_24h - a.price_change_percentage_24h)
+        
+        // Get top 10 gainers (positive change)
+        const gainers = sortedByChange.filter(coin => coin.price_change_percentage_24h > 0).slice(0, 10)
+        setTopGainers(gainers)
+        
+        // Get top 10 losers (negative change)  
+        const losers = sortedByChange.filter(coin => coin.price_change_percentage_24h < 0).slice(-10).reverse()
+        setTopLosers(losers)
+        
+      } catch (error) {
+        console.error('Error fetching crypto data:', error)
+        
+        // Fallback sample data
+        const sampleGainers: CryptoData[] = [
+          { id: 'bitcoin', symbol: 'btc', name: 'Bitcoin', current_price: 45280, price_change_percentage_24h: 8.5, market_cap: 885000000000, image: '🟠', market_cap_rank: 1 },
+          { id: 'ethereum', symbol: 'eth', name: 'Ethereum', current_price: 3150, price_change_percentage_24h: 6.2, market_cap: 378000000000, image: '🔷', market_cap_rank: 2 },
+          { id: 'binancecoin', symbol: 'bnb', name: 'BNB', current_price: 315, price_change_percentage_24h: 5.8, market_cap: 48500000000, image: '🟡', market_cap_rank: 4 },
+        ]
+        
+        const sampleLosers: CryptoData[] = [
+          { id: 'cardano', symbol: 'ada', name: 'Cardano', current_price: 0.45, price_change_percentage_24h: -4.2, market_cap: 15800000000, image: '🔵', market_cap_rank: 8 },
+          { id: 'solana', symbol: 'sol', name: 'Solana', current_price: 85, price_change_percentage_24h: -3.8, market_cap: 38200000000, image: '🟣', market_cap_rank: 5 },
+          { id: 'polkadot', symbol: 'dot', name: 'Polkadot', current_price: 5.2, price_change_percentage_24h: -2.9, market_cap: 7100000000, image: '⚫', market_cap_rank: 12 },
+        ]
+        
+        setTopGainers(sampleGainers)
+        setTopLosers(sampleLosers)
+      } finally {
+        setCryptoLoading(false)
       }
     }
+
+    fetchCryptoData()
+    // Refresh every 2 minutes
+    const interval = setInterval(fetchCryptoData, 2 * 60 * 1000)
+    
+    return () => clearInterval(interval)
   }, [])
 
-  // Crypto Top Losers Widget
-  useEffect(() => {
-    if (!topLosersRef.current) return
 
-    const container = topLosersRef.current
-    container.innerHTML = ''
-
-    const script = document.createElement('script')
-    script.type = 'text/javascript'
-    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-hotlists.js'
-    script.async = true
-    script.innerHTML = JSON.stringify({
-      colorTheme: 'dark',
-      dateRange: '1D',
-      exchange: 'BINANCE',
-      showChart: false,
-      locale: 'en',
-      largeChartUrl: '',
-      isTransparent: true,
-      showSymbolLogo: true,
-      showFloatingTooltip: false,
-      width: '100%',
-      height: '100%',
-      plotLineColorGrowing: 'rgba(212, 175, 55, 1)',
-      plotLineColorFalling: 'rgba(212, 175, 55, 1)',
-      gridLineColor: 'rgba(42, 46, 57, 0)',
-      scaleFontColor: 'rgba(209, 212, 220, 1)',
-      belowLineFillColorGrowing: 'rgba(239, 68, 68, 0.12)',
-      belowLineFillColorFalling: 'rgba(239, 68, 68, 0.12)',
-      belowLineFillColorGrowingBottom: 'rgba(239, 68, 68, 0)',
-      belowLineFillColorFallingBottom: 'rgba(239, 68, 68, 0)',
-      symbolActiveColor: 'rgba(212, 175, 55, 0.12)',
-      hotListType: 'losers'
-    })
-
-    container.appendChild(script)
-
-    return () => {
-      if (container) {
-        container.innerHTML = ''
-      }
-    }
-  }, [])
 
   // Fetch news headlines for ticker
   useEffect(() => {
@@ -276,12 +241,40 @@ export default function News() {
                 <p className="text-xs text-krmuted">24h crypto performance leaders</p>
               </div>
             </div>
-            <div className="tradingview-widget-container h-[500px]">
-              <div ref={topGainersRef} className="tradingview-widget-container__widget h-full"></div>
+            <div className="h-[500px] overflow-y-auto">
+              {cryptoLoading ? (
+                <div className="flex items-center justify-center h-full">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-krgold"></div>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {topGainers.map((coin, index) => (
+                    <div key={coin.id} className="flex items-center justify-between p-3 bg-krblack/40 rounded-lg hover:bg-krblack/60 transition-all">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-krgold/20 rounded-full flex items-center justify-center text-sm font-bold">
+                          #{index + 1}
+                        </div>
+                        <div>
+                          <div className="font-semibold text-krtext text-sm">{coin.name}</div>
+                          <div className="text-xs text-krmuted uppercase">{coin.symbol}</div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-sm font-semibold text-krtext">
+                          ${coin.current_price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 })}
+                        </div>
+                        <div className="text-sm font-bold text-green-400">
+                          +{coin.price_change_percentage_24h.toFixed(2)}%
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
             <div className="mt-4 pt-4 border-t border-krborder/30">
               <p className="text-xs text-krmuted text-center">
-                <span className="text-green-400 font-semibold">🚀 Crypto Trending Up</span> • Live data from Binance
+                <span className="text-green-400 font-semibold">🚀 Crypto Trending Up</span> • Live data from CoinGecko
               </p>
             </div>
           </div>
@@ -297,12 +290,40 @@ export default function News() {
                 <p className="text-xs text-krmuted">24h crypto performance decliners</p>
               </div>
             </div>
-            <div className="tradingview-widget-container h-[500px]">
-              <div ref={topLosersRef} className="tradingview-widget-container__widget h-full"></div>
+            <div className="h-[500px] overflow-y-auto">
+              {cryptoLoading ? (
+                <div className="flex items-center justify-center h-full">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-krgold"></div>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {topLosers.map((coin, index) => (
+                    <div key={coin.id} className="flex items-center justify-between p-3 bg-krblack/40 rounded-lg hover:bg-krblack/60 transition-all">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-krgold/20 rounded-full flex items-center justify-center text-sm font-bold">
+                          #{index + 1}
+                        </div>
+                        <div>
+                          <div className="font-semibold text-krtext text-sm">{coin.name}</div>
+                          <div className="text-xs text-krmuted uppercase">{coin.symbol}</div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-sm font-semibold text-krtext">
+                          ${coin.current_price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 })}
+                        </div>
+                        <div className="text-sm font-bold text-red-400">
+                          {coin.price_change_percentage_24h.toFixed(2)}%
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
             <div className="mt-4 pt-4 border-t border-krborder/30">
               <p className="text-xs text-krmuted text-center">
-                <span className="text-red-400 font-semibold">📉 Crypto Trending Down</span> • Live data from Binance
+                <span className="text-red-400 font-semibold">📉 Crypto Trending Down</span> • Live data from CoinGecko
               </p>
             </div>
           </div>
