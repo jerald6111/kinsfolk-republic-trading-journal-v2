@@ -1,30 +1,32 @@
 {
-  "version": "1.2.1",
+  "version": "1.3.0",
   "releaseDate": "2025-01-15",
   "downloadUrl": "/downloads/KRTJ-Desktop-Setup.exe",
   "releaseNotes": {
-    "title": "KRTJ Desktop v1.2.1 - System Connectivity Fix! 🔧",
+    "title": "KRTJ Desktop v1.3.0 - Enhanced News & Data Hub! �",
     "features": [
-      "Updated website integration with latest UI improvements",
-      "Enhanced desktop app with synchronized content",
-      "Improved system reliability and stability"
+      "NEW: Featured News bulletin with moving ticker across all markets",
+      "NEW: Enhanced Economic Calendar with premium styling and indicators",
+      "NEW: Timeframe selection for Market Data modals (1h, 24h, 7d)",
+      "NEW: Interactive news cards with category-specific themes and images"
     ],
     "improvements": [
-      "Fixed update notification system connectivity",
-      "Enhanced error handling for network requests",
-      "Better domain resolution and URL handling",
-      "Improved user experience during updates"
+      "Completely redesigned News & Data section for better usability",
+      "Enhanced visual hierarchy with gradient accents and animations",
+      "Improved responsive design across all data components",
+      "Better data filtering and presentation in modal views",
+      "Cleaner interface with removed data source references"
     ],
     "bugFixes": [
-      "Fixed update check URL configuration error",
-      "Resolved domain connectivity issues preventing notifications",
-      "Corrected automatic update detection system",
-      "Fixed JSON parsing errors in update responses"
+      "Fixed news category filtering and display issues",
+      "Improved modal data loading and timeframe calculations",
+      "Enhanced animation performance for news ticker",
+      "Corrected market data refresh intervals"
     ],
-    "notes": "This critical update fixes the update notification system connectivity issues. Your app will now properly check for updates and show notifications when new versions are available! 🚀"
+    "notes": "Major UI overhaul with enhanced news feeds, improved Economic Calendar, and advanced data filtering! Experience premium financial data presentation with smooth animations and intuitive navigation. 🎯"
   },
   "minimumVersion": "1.0.0",
   "isRequired": false,
-  "fileSize": "92.1 MB",
+  "fileSize": "92.8 MB",
   "checksum": ""
 }
