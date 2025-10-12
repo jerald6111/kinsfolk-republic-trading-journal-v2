@@ -11,7 +11,7 @@ import {
   Clock,
   CheckCircle,
   ArrowRight,
-  Windows
+  Laptop
 } from 'lucide-react'
 
 export default function Download() {
@@ -71,7 +71,7 @@ export default function Download() {
           <div className="container mx-auto px-6">
             <div className="max-w-4xl mx-auto text-center">
               <div className="inline-flex items-center gap-2 bg-krgold/10 border border-krgold/20 rounded-full px-4 py-2 mb-6">
-                <Windows className="text-krgold" size={16} />
+                <Laptop className="text-krgold" size={16} />
                 <span className="text-sm text-krgold font-semibold">Windows Desktop Application</span>
               </div>
               
