@@ -1,16 +1,16 @@
 {
-  "version": "1.6.2",
+  "version": "1.6.3",
   "releaseDate": "2024-12-28",
-  "downloadUrl": "/downloads/KRTJ-Desktop-Setup-1.6.2.exe",
+  "downloadUrl": "/downloads/KRTJ-Desktop-Setup-1.6.3.exe",
   "releaseNotes": {
-    "title": "KRTJ Desktop v1.6.2 - TradingView Widgets Fixed & Auto-Restart Improved! 📊�",
+    "title": "KRTJ Desktop v1.6.3 - Update Detection Fixed & Economic Calendar Enhanced! �📈",
     "features": [
-      "FIXED: TradingView widgets (Economic Calendar & Crypto Screener) now load properly",
-      "FIXED: Web security settings optimized for external widget content",
-      "FIXED: Enhanced Content Security Policy (CSP) for TradingView integration", 
-      "FIXED: Improved update restart mechanism with better reliability",
-      "FIXED: Update success notifications after automatic restart",
-      "NEW: Post-update confirmation notifications for better user experience"
+      "FIXED: Auto-update detection now works reliably with cache-busting technology",
+      "FIXED: Economic Calendar layout updated to match main website format perfectly",
+      "IMPROVED: Economic Calendar now uses full height and width for better viewing",
+      "IMPROVED: Update check system bypasses browser cache for fresh version data", 
+      "ENHANCED: Economic Calendar widget configuration streamlined like web version",
+      "OPTIMIZED: Reduced loading complexity while maintaining reliability"
     ],
     "improvements": [
       "Completely rewritten tray menu system with reliable navigation",
@@ -21,17 +21,16 @@
       "Enhanced memory management with proper event listener cleanup"
     ],
     "bugFixes": [
-      "CRITICAL FIX: TradingView widgets (Economic Calendar & Crypto Screener) now load and display correctly",
-      "CRITICAL FIX: Update system restart mechanism completely overhauled for reliability",  
-      "FIXED: Web security settings disabled to allow external TradingView content",
-      "FIXED: Content Security Policy updated to whitelist TradingView domains",
-      "FIXED: Mixed content issues resolved for widget loading",
-      "FIXED: Update restart flag system with success notifications",
-      "FIXED: Installer execution improved with proper process handling",
-      "Enhanced error handling and fallback states for all external content",
-      "Improved app startup detection after updates"
+      "CRITICAL FIX: Auto-update detection not working - added timestamp cache-busting to version checks", 
+      "FIXED: Economic Calendar layout now matches main website format exactly",
+      "FIXED: Economic Calendar height and width optimized for full container usage",
+      "IMPROVED: Update check URL includes cache-busting parameter for reliable detection",
+      "ENHANCED: Simplified Economic Calendar widget initialization like web version",
+      "OPTIMIZED: Removed unnecessary loading states that could interfere with display",
+      "RESOLVED: Version comparison working correctly with fresh data retrieval",
+      "IMPROVED: Update notification system more responsive to new releases"
     ],
-    "notes": "Emergency fix for TradingView widget loading issues! This version resolves the 'Unable to load Crypto Screener/Economic Calendar' errors by updating web security settings and CSP policies. Also includes improved auto-restart after updates. 🎯"
+    "notes": "Fix for auto-update detection and Economic Calendar layout! This version ensures the app can reliably detect new updates and displays the Economic Calendar in the same format as the main website. 🔄📊"
   },
   "minimumVersion": "1.0.0",
   "isRequired": false,

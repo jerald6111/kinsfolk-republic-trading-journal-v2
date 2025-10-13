@@ -46,11 +46,13 @@ class KRTJDesktopApp {
 
     try {
       console.log('🔍 Checking for updates...')
-      console.log('📡 Update URL:', this.updateCheckUrl)
+      // Add cache-busting timestamp to ensure fresh data
+      const cacheBustUrl = `${this.updateCheckUrl}?t=${Date.now()}`
+      console.log('📡 Update URL:', cacheBustUrl)
       const https = require('https')
       
       const updateData = await new Promise((resolve, reject) => {
-        https.get(this.updateCheckUrl, (res) => {
+        https.get(cacheBustUrl, (res) => {
           console.log('📊 Response status:', res.statusCode)
           console.log('📋 Response headers:', res.headers)
           

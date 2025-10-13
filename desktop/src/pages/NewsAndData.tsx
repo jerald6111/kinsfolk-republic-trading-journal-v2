@@ -43,13 +43,6 @@ export default function NewsAndData() {
     if (!calendarRef.current) return
     const container = calendarRef.current
     container.innerHTML = ''
-    
-    // Add loading indicator
-    const loadingDiv = document.createElement('div')
-    loadingDiv.className = 'flex items-center justify-center h-96 text-krtext'
-    loadingDiv.innerHTML = '<div class="animate-spin rounded-full h-8 w-8 border-b-2 border-krgold"></div><span class="ml-3">Loading Economic Calendar...</span>'
-    container.appendChild(loadingDiv)
-    
     const script = document.createElement('script')
     script.type = 'text/javascript'
     script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-events.js'
@@ -58,25 +51,11 @@ export default function NewsAndData() {
       colorTheme: 'dark',
       isTransparent: true,
       width: '100%',
-      height: '500',
+      height: '100%',
       locale: 'en',
       importanceFilter: '0,1',
       countryFilter: 'us,eu,gb,jp,cn,au'
     })
-    
-    script.onload = () => {
-      // Remove loading indicator after widget loads
-      setTimeout(() => {
-        const loading = container.querySelector('.animate-spin')?.parentElement
-        if (loading) loading.remove()
-      }, 3000)
-    }
-    
-    script.onerror = () => {
-      console.error('Failed to load Economic Calendar')
-      container.innerHTML = '<div class="flex items-center justify-center h-96 text-red-400 bg-krcard rounded-lg border border-krborder"><div class="text-center"><div class="text-2xl mb-2">⚠️</div><div>Unable to load Economic Calendar</div><div class="text-sm text-krmuted mt-2">Please check your internet connection</div></div></div>'
-    }
-    
     container.appendChild(script)
     return () => { if (container) { container.innerHTML = '' } }
   }, [])
