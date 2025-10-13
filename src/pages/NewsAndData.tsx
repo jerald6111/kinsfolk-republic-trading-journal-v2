@@ -214,7 +214,7 @@ export default function NewsAndData() {
                   <span className="text-2xl">�</span>
                   <h2 className="text-xl font-semibold text-krtext">Economic Calendar</h2>
                 </div>
-                <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[600px]">
+                <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[800px]">
                   <div ref={calendarRef} className="h-full w-full"></div>
                 </div>
               </div>
