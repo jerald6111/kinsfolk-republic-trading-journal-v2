@@ -16,6 +16,7 @@ interface CryptoData {
 export default function MarketData() {
   const calendarRef = useRef<HTMLDivElement>(null)
   const heatmapRef = useRef<HTMLDivElement>(null)
+  const cryptoScreenerRef = useRef<HTMLDivElement>(null)
   const [topGainers, setTopGainers] = useState<CryptoData[]>([])
   const [topLosers, setTopLosers] = useState<CryptoData[]>([])
   const [cryptoLoading, setCryptoLoading] = useState(true)
@@ -71,6 +72,30 @@ export default function MarketData() {
     container.appendChild(script)
     return () => { if (container) { container.innerHTML = '' } }
   }, [heatmapMetric])
+
+  // Crypto Screener Widget (Data Analysis)
+  useEffect(() => {
+    if (!cryptoScreenerRef.current) return
+    const container = cryptoScreenerRef.current
+    container.innerHTML = ''
+    const script = document.createElement('script')
+    script.type = 'text/javascript'
+    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-screener.js'
+    script.async = true
+    script.innerHTML = JSON.stringify({
+      width: "100%",
+      height: "100%",
+      defaultColumn: "overview",
+      defaultScreen: "general",
+      market: "crypto",
+      showToolbar: true,
+      colorTheme: "dark",
+      locale: "en",
+      isTransparent: true
+    })
+    container.appendChild(script)
+    return () => { if (container) { container.innerHTML = '' } }
+  }, [])
 
   // Fetch crypto market data from CoinGecko API
   useEffect(() => {
@@ -172,6 +197,17 @@ export default function MarketData() {
                 </div>
                 <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[500px]">
                   <div ref={heatmapRef} className="h-full w-full"></div>
+                </div>
+              </div>
+
+              {/* Cryptocurrency Data Analysis */}
+              <div>
+                <div className="flex items-center gap-3 mb-6">
+                  <span className="text-2xl">📈</span>
+                  <h2 className="text-xl font-semibold text-krtext">Cryptocurrency Data Analysis</h2>
+                </div>
+                <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[600px]">
+                  <div ref={cryptoScreenerRef} className="h-full w-full"></div>
                 </div>
               </div>
             </div>
@@ -283,9 +319,9 @@ export default function MarketData() {
           {/* Data Sources Footer */}
           <div className="mt-8 pt-6 border-t border-krborder">
             <div className="text-xs text-krmuted text-center">
-              <span className="font-semibold">Data Sources:</span> Economic calendar & crypto heatmap powered by{' '}
-              <span className="text-krgold font-medium">TradingView</span> • Crypto market data from{' '}
-              <span className="text-krgold font-medium">CoinGecko</span> • Heatmap metrics: Change %, Volume, Open Interest • Updates every{' '}
+              <span className="font-semibold">Data Sources:</span> Economic calendar, crypto heatmap & screener powered by{' '}
+              <span className="text-krgold font-medium">TradingView</span> • Top gainers/losers from{' '}
+              <span className="text-krgold font-medium">CoinGecko</span> • Comprehensive crypto analysis with sortable metrics • Updates every{' '}
               <span className="text-green-400">1 minute</span>
             </div>
           </div>
