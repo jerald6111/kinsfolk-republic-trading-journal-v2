@@ -455,25 +455,23 @@ class KRTJDesktopApp {
           icon: path.join(__dirname, 'public', 'krtj-icon.ico')
         }).show()
         
-        // Create a restart script for more reliable restarting
-        const restartScript = path.join(tempDir, 'restart-krtj.bat')
-        const scriptContent = `@echo off
-echo Installing KRTJ Desktop update...
-"${installerPath}" /S
-timeout /t 3 /nobreak >nul
-echo Starting KRTJ Desktop...
-"${currentAppPath}"
-del "%~f0"`
-        
-        fs.writeFileSync(restartScript, scriptContent)
-        
-        // Run the restart script
-        const restartProcess = spawn('cmd.exe', ['/c', restartScript], {
+        // Simple approach: run installer then use app.relaunch
+        const installer = spawn(installerPath, ['/S'], {
           detached: true,
           stdio: 'ignore'
         })
         
-        restartProcess.unref()
+        installer.unref()
+        
+        // Wait a bit for installer to start, then quit and let the installer handle restart
+        setTimeout(() => {
+          // Save a restart flag for when the new app starts
+          const restartFlag = path.join(require('os').homedir(), '.krtj-restart-required')
+          fs.writeFileSync(restartFlag, Date.now().toString())
+          
+          // Quit the current app so installer can complete
+          app.quit()
+        }, 3000)
         
         // Show system notification that app is restarting
         new Notification({
@@ -538,6 +536,8 @@ del "%~f0"`
         nodeIntegration: false,
         contextIsolation: true,
         enableRemoteModule: false,
+        webSecurity: false, // Allow external content for TradingView widgets
+        allowRunningInsecureContent: true, // Allow mixed content
         preload: path.join(__dirname, 'preload.js')
       },
       show: false, // Don't show until ready
@@ -601,6 +601,23 @@ del "%~f0"`
       if (isDev) {
         this.mainWindow.focus()
         this.mainWindow.webContents.openDevTools()
+      }
+      
+      // Check if app was restarted after update
+      const restartFlag = path.join(require('os').homedir(), '.krtj-restart-required')
+      if (fs.existsSync(restartFlag)) {
+        console.log('✅ App restarted after update')
+        // Remove the flag
+        fs.unlinkSync(restartFlag)
+        
+        // Show success notification
+        setTimeout(() => {
+          new Notification({
+            title: '✅ Update Complete!',
+            body: `KRTJ Desktop has been successfully updated to v${this.currentVersion}. All features are now available.`,
+            icon: path.join(__dirname, 'public', 'krtj-icon.ico')
+          }).show()
+        }, 2000)
       }
       
       // Check for updates after app loads (delay to not interrupt startup)

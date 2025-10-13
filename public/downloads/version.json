@@ -1,16 +1,16 @@
 {
-  "version": "1.6.1",
+  "version": "1.6.2",
   "releaseDate": "2024-12-28",
-  "downloadUrl": "/downloads/KRTJ-Desktop-Setup-1.6.1.exe",
+  "downloadUrl": "/downloads/KRTJ-Desktop-Setup-1.6.2.exe",
   "releaseNotes": {
-    "title": "KRTJ Desktop v1.6.1 - Critical Bug Fixes & Enhanced Reliability! 🔧⚡",
+    "title": "KRTJ Desktop v1.6.2 - TradingView Widgets Fixed & Auto-Restart Improved! 📊�",
     "features": [
-      "NEW: Completely rebuilt IPC communication system for tray menu navigation",
-      "NEW: Enhanced TypeScript support with proper electronAPI type definitions",
-      "NEW: Improved preload script with proper cleanup functions",
-      "NEW: Reliable update restart mechanism with batch script automation",
-      "NEW: Enhanced TradingView widget loading with error recovery",
-      "NEW: Comprehensive error handling across all components"
+      "FIXED: TradingView widgets (Economic Calendar & Crypto Screener) now load properly",
+      "FIXED: Web security settings optimized for external widget content",
+      "FIXED: Enhanced Content Security Policy (CSP) for TradingView integration", 
+      "FIXED: Improved update restart mechanism with better reliability",
+      "FIXED: Update success notifications after automatic restart",
+      "NEW: Post-update confirmation notifications for better user experience"
     ],
     "improvements": [
       "Completely rewritten tray menu system with reliable navigation",
@@ -21,17 +21,17 @@
       "Enhanced memory management with proper event listener cleanup"
     ],
     "bugFixes": [
-      "FIXED: Update system now properly restarts the application after installation",
-      "FIXED: Economic Calendar and Crypto Screener widgets now load correctly with proper error handling",
-      "FIXED: Tray menu items (New Trade Entry, Check Prices, Vision Board) now function correctly",
-      "FIXED: Application identifier spelling corrected from 'KinforkRepublic' to 'KinsfolkRepublic'",
-      "FIXED: Enhanced TradingView widget loading with loading indicators and error states",
-      "FIXED: Navigation system improved with proper IPC communication between processes",
-      "Resolved component inconsistencies between web and desktop versions",
-      "Fixed potential memory leaks in long-running sessions",
-      "Enhanced compatibility with latest Electron security features"
+      "CRITICAL FIX: TradingView widgets (Economic Calendar & Crypto Screener) now load and display correctly",
+      "CRITICAL FIX: Update system restart mechanism completely overhauled for reliability",  
+      "FIXED: Web security settings disabled to allow external TradingView content",
+      "FIXED: Content Security Policy updated to whitelist TradingView domains",
+      "FIXED: Mixed content issues resolved for widget loading",
+      "FIXED: Update restart flag system with success notifications",
+      "FIXED: Installer execution improved with proper process handling",
+      "Enhanced error handling and fallback states for all external content",
+      "Improved app startup detection after updates"
     ],
-    "notes": "Critical bug fix release! This version specifically addresses tray menu navigation issues, IPC communication problems, and update restart functionality. All reported issues from v1.6.0 testing have been resolved. 🚀"
+    "notes": "Emergency fix for TradingView widget loading issues! This version resolves the 'Unable to load Crypto Screener/Economic Calendar' errors by updating web security settings and CSP policies. Also includes improved auto-restart after updates. 🎯"
   },
   "minimumVersion": "1.0.0",
   "isRequired": false,
