@@ -1,7 +1,7 @@
 directories:
   output: electron-dist
   buildResources: build
-appId: com.kinsforkrepublic.tradingjournaldesktop
+appId: com.kinsfolkrepublic.tradingjournaldesktop
 productName: Kinsfolk Republic Trading Journal
 files:
   - filter:

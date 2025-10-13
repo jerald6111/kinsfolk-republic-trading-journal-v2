@@ -89,13 +89,19 @@ export default function DataMarket() {
     const container = screenerRef.current
     container.innerHTML = ''
 
+    // Add loading indicator
+    const loadingDiv = document.createElement('div')
+    loadingDiv.className = 'flex items-center justify-center h-96 text-krtext'
+    loadingDiv.innerHTML = '<div class="animate-spin rounded-full h-8 w-8 border-b-2 border-krgold"></div><span class="ml-3">Loading Crypto Screener...</span>'
+    container.appendChild(loadingDiv)
+
     const script = document.createElement('script')
     script.type = 'text/javascript'
     script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-screener.js'
     script.async = true
     script.innerHTML = JSON.stringify({
       "width": "100%",
-      "height": 800,
+      "height": "500",
       "defaultColumn": "overview",
       "screener_type": "crypto_mkt",
       "displayCurrency": "USD",
@@ -111,6 +117,19 @@ export default function DataMarket() {
         }
       ]
     })
+
+    script.onload = () => {
+      // Remove loading indicator after widget loads
+      setTimeout(() => {
+        const loading = container.querySelector('.animate-spin')?.parentElement
+        if (loading) loading.remove()
+      }, 3000)
+    }
+
+    script.onerror = () => {
+      console.error('Failed to load Crypto Screener')
+      container.innerHTML = '<div class="flex items-center justify-center h-96 text-red-400 bg-krcard rounded-lg border border-krborder"><div class="text-center"><div class="text-2xl mb-2">⚠️</div><div>Unable to load Crypto Screener</div><div class="text-sm text-krmuted mt-2">Please check your internet connection</div></div></div>'
+    }
 
     container.appendChild(script)
 

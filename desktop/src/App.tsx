@@ -1,5 +1,5 @@
-import React from 'react'
-import { Routes, Route } from 'react-router-dom'
+import React, { useEffect } from 'react'
+import { Routes, Route, useNavigate } from 'react-router-dom'
 import Home from './pages/Home'
 import VisionBoard from './pages/VisionBoard'
 import Journal from './pages/Journal'
@@ -21,6 +21,22 @@ import AIChatbot from './components/AIChatbot'
 import { CurrencyProvider } from './context/CurrencyContext'
 
 export default function App() {
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    // Listen for navigation messages from main process (tray menu clicks)
+    if ((window as any).electronAPI) {
+      const handleNavigation = (event: any, route: string) => {
+        console.log('Navigation requested:', route)
+        // Remove hash if present and navigate
+        const path = route.startsWith('#') ? route.substring(1) : route
+        navigate(path)
+      }
+
+      ;(window as any).electronAPI.onNavigate(handleNavigation)
+    }
+  }, [navigate])
+
   return (
     <CurrencyProvider>
       <div className="min-h-screen bg-gradient-to-b from-krblack to-krbg flex flex-col">

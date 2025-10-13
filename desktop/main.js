@@ -442,21 +442,50 @@ class KRTJDesktopApp {
       })
 
       if (installResponse.response === 0) {
-        // Run the installer with silent parameters
+        // Run the installer with parameters to restart the app
         console.log('🔄 Starting installation...')
         
-        // Close the current app and run installer
-        const installer = spawn(installerPath, ['/S'], {
+        // Get the current app executable path
+        const currentAppPath = process.execPath
+        
+        // Show installing notification
+        new Notification({
+          title: '🔄 Installing Update',
+          body: `Installing KRTJ Desktop v${updateData.version}... The app will restart automatically.`,
+          icon: path.join(__dirname, 'public', 'krtj-icon.ico')
+        }).show()
+        
+        // Create a restart script for more reliable restarting
+        const restartScript = path.join(tempDir, 'restart-krtj.bat')
+        const scriptContent = `@echo off
+echo Installing KRTJ Desktop update...
+"${installerPath}" /S
+timeout /t 3 /nobreak >nul
+echo Starting KRTJ Desktop...
+"${currentAppPath}"
+del "%~f0"`
+        
+        fs.writeFileSync(restartScript, scriptContent)
+        
+        // Run the restart script
+        const restartProcess = spawn('cmd.exe', ['/c', restartScript], {
           detached: true,
           stdio: 'ignore'
         })
         
-        installer.unref()
+        restartProcess.unref()
+        
+        // Show system notification that app is restarting
+        new Notification({
+          title: '✅ Update Installing',
+          body: 'KRTJ will restart automatically after installation completes.',
+          icon: path.join(__dirname, 'public', 'krtj-icon.ico')
+        }).show()
         
         // Close the app after a short delay
         setTimeout(() => {
           app.quit()
-        }, 1000)
+        }, 1500)
       } else {
         dialog.showMessageBox(this.mainWindow, {
           type: 'info',
@@ -488,7 +517,7 @@ class KRTJDesktopApp {
   createWindow() {
     // Force dark mode before creating window
     if (process.platform === 'win32') {
-      app.setAppUserModelId('KinsforkRepublic.TradingJournal')
+      app.setAppUserModelId('KinsfolkRepublic.TradingJournal')
       // Force Windows dark mode
       try {
         const { nativeTheme } = require('electron')
@@ -656,8 +685,8 @@ class KRTJDesktopApp {
         click: () => {
           this.mainWindow.show()
           this.mainWindow.focus()
-          // Navigate to Entries page
-          this.mainWindow.webContents.send('navigate-to', '#/entries')
+          // Navigate to Journal Entries page
+          this.mainWindow.webContents.send('navigate-to', '/journal/entries')
         }
       },
       { type: 'separator' },
@@ -667,7 +696,7 @@ class KRTJDesktopApp {
           this.mainWindow.show()
           this.mainWindow.focus()
           // Navigate to Data Market page
-          this.mainWindow.webContents.send('navigate-to', '#/data-market')
+          this.mainWindow.webContents.send('navigate-to', '/data-market')
         }
       },
       {
@@ -675,7 +704,7 @@ class KRTJDesktopApp {
         click: () => {
           this.mainWindow.show()
           this.mainWindow.focus()
-          this.mainWindow.webContents.send('navigate-to', '#/vision')
+          this.mainWindow.webContents.send('navigate-to', '/vision')
         }
       },
       { type: 'separator' },

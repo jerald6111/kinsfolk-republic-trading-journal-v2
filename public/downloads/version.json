@@ -1,7 +1,7 @@
 {
   "version": "1.6.0",
-  "releaseDate": "2025-10-14",
-  "downloadUrl": "/downloads/KRTJ-Desktop-Setup.exe",
+  "releaseDate": "2024-12-28",
+  "downloadUrl": "/downloads/KRTJ-Desktop-Setup-1.6.0.exe",
   "releaseNotes": {
     "title": "KRTJ Desktop v1.6.0 - Unified Architecture & Enhanced Performance! �⚡",
     "features": [
@@ -21,10 +21,14 @@
       "Enhanced developer experience with unified build tools"
     ],
     "bugFixes": [
+      "FIXED: Update system now properly restarts the application after installation",
+      "FIXED: Economic Calendar and Crypto Screener widgets now load correctly with proper error handling",
+      "FIXED: Tray menu items (New Trade Entry, Check Prices, Vision Board) now function correctly",
+      "FIXED: Application identifier spelling corrected from 'KinforkRepublic' to 'KinsfolkRepublic'",
+      "FIXED: Enhanced TradingView widget loading with loading indicators and error states",
+      "FIXED: Navigation system improved with proper IPC communication between processes",
       "Resolved component inconsistencies between web and desktop versions",
       "Fixed potential memory leaks in long-running sessions",
-      "Corrected asset loading issues in production builds",
-      "Improved error recovery and graceful degradation",
       "Enhanced compatibility with latest Electron security features"
     ],
     "notes": "Major architectural upgrade! This release unifies the codebase between web and desktop versions, ensuring consistent features and improved performance across all platforms. 🌟"

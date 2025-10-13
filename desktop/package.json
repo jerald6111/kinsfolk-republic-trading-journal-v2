@@ -16,7 +16,7 @@
     "build:electron": "npm run build && electron-builder"
   },
   "build": {
-    "appId": "com.kinsforkrepublic.tradingjournaldesktop",
+    "appId": "com.kinsfolkrepublic.tradingjournaldesktop",
     "productName": "Kinsfolk Republic Trading Journal",
     "directories": {
       "output": "electron-dist"
