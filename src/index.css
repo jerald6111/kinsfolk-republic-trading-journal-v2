@@ -120,7 +120,23 @@ body {
   }
 }
 
+.animate-ticker {
+  animation: ticker 60s linear infinite;
+}
+
 .news-ticker:hover {
   animation-play-state: paused;
+}
+
+.animate-ticker:hover {
+  animation-play-state: paused;
+}
+
+/* Line clamp utilities */
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 

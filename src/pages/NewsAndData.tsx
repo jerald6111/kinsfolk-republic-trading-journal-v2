@@ -270,94 +270,209 @@ export default function NewsAndData() {
   }
 
   return (
-    <div className="bg-gray-900 text-white min-h-screen p-4 sm:p-6 lg:p-8 font-sans">
-      {/* News Ticker */}
-      <div className="bg-gray-800 rounded-lg p-2 mb-6 overflow-hidden">
-        <div className="flex animate-ticker whitespace-nowrap">
-          {tickerNews.concat(tickerNews).map((item, index) => (
-            <span key={index} className="mx-4 text-sm flex items-center">
-              {categoryIcons[item.category]}
-              <span className={`ml-2 mr-1 font-bold ${sentimentColors[item.aiAnalysis?.sentiment || 'neutral']}`}>{item.aiAnalysis?.sentiment.toUpperCase()}:</span>
-              {item.title}
-            </span>
-          ))}
+    <div className="min-h-screen bg-gray-900 text-white">
+      <div className="container mx-auto px-4 py-6">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center mb-2">
+            <Zap className="w-6 h-6 text-yellow-500 mr-3" />
+            <h1 className="text-2xl font-bold text-yellow-500">News & Data Center</h1>
+          </div>
+          <p className="text-gray-400">Multi-market intelligence, economic events, and live trading insights</p>
+        </div>
+
+        {/* Live Feed Ticker */}
+        <div className="mb-6">
+          <div className="flex items-center mb-3">
+            <Activity className="w-5 h-5 text-blue-400 mr-2" />
+            <span className="text-sm font-semibold text-blue-400">LIVE FEED</span>
+          </div>
+          <div className="bg-gray-800/50 rounded-lg p-3 overflow-hidden border border-gray-700">
+            <div className="flex animate-ticker whitespace-nowrap">
+              {tickerNews.concat(tickerNews).map((item, index) => (
+                <span key={index} className="mx-6 text-sm flex items-center">
+                  <span className="text-gray-500 mr-2">•</span>
+                  <span className={`mr-2 font-medium ${sentimentColors[item.aiAnalysis?.sentiment || 'neutral']}`}>
+                    {item.aiAnalysis?.sentiment.toUpperCase()}:
+                  </span>
+                  <span className="text-white">{item.title}</span>
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+          {/* Left Column: Market News */}
+          <div className="xl:col-span-2">
+            <div className="mb-6">
+              <h2 className="text-xl font-bold mb-4 text-white">Market News</h2>
+              
+              {/* Category Filter Tabs */}
+              <div className="flex space-x-2 mb-4">
+                {(Object.keys(categoryIcons) as Array<keyof typeof categoryIcons>).map(cat => (
+                  <button
+                    key={cat}
+                    onClick={() => setActiveNewsCategory(cat)}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                      activeNewsCategory === cat 
+                        ? 'bg-yellow-500 text-gray-900' 
+                        : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                    }`}
+                  >
+                    <span className="flex items-center space-x-2">
+                      {categoryIcons[cat]}
+                      <span>{cat.charAt(0).toUpperCase() + cat.slice(1)}</span>
+                    </span>
+                  </button>
+                ))}
+              </div>
+
+              {/* News Cards Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {loading ? (
+                  <div className="col-span-full text-center py-8 text-gray-400">Loading news...</div>
+                ) : (
+                  filteredNews.slice(0, 9).map(item => (
+                    <div 
+                      key={item.id} 
+                      className="bg-gray-800 border border-gray-700 rounded-lg p-4 cursor-pointer hover:bg-gray-700/50 transition-all"
+                      onClick={() => setSelectedArticle(item)}
+                    >
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex items-center space-x-2">
+                          {categoryIcons[item.category]}
+                          <span className="text-xs text-gray-400 font-medium">
+                            {item.category.toUpperCase()}
+                          </span>
+                        </div>
+                        <div className={`text-xs px-2 py-1 rounded-full ${
+                          item.aiAnalysis?.sentiment === 'bullish' ? 'bg-green-500/20 text-green-400' :
+                          item.aiAnalysis?.sentiment === 'bearish' ? 'bg-red-500/20 text-red-400' :
+                          'bg-gray-500/20 text-gray-400'
+                        }`}>
+                          {item.aiAnalysis?.sentiment?.toUpperCase() || 'NEUTRAL'}
+                        </div>
+                      </div>
+                      
+                      <h3 className="font-semibold text-white text-sm mb-2 line-clamp-2">
+                        {item.title}
+                      </h3>
+                      
+                      <div className="flex items-center justify-between text-xs text-gray-500">
+                        <span>{item.source}</span>
+                        <span>{new Date(item.publishedAt).toLocaleDateString()}</span>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column: Economic Calendar & Crypto Data */}
+          <div className="xl:col-span-1 space-y-6">
+            {/* Economic Calendar */}
+            <div>
+              <div className="flex items-center mb-4">
+                <Calendar className="w-5 h-5 text-blue-400 mr-2" />
+                <h2 className="text-xl font-bold text-white">Economic Calendar</h2>
+              </div>
+              <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 h-80">
+                <div ref={calendarRef} className="h-full"></div>
+              </div>
+            </div>
+
+            {/* Top Crypto Gainers & Losers */}
+            <div className="grid grid-cols-1 gap-6">
+              {/* Top Gainers */}
+              <div>
+                <div className="flex items-center mb-3">
+                  <TrendingUp className="w-5 h-5 text-green-400 mr-2" />
+                  <h3 className="text-lg font-bold text-white">Top Crypto</h3>
+                  <span className="ml-2 text-sm text-green-400 font-medium">Gainers</span>
+                </div>
+                <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">
+                  {cryptoLoading ? (
+                    <div className="text-center py-4 text-gray-400">Loading...</div>
+                  ) : (
+                    <div className="space-y-3">
+                      {topGainers.slice(0, 5).map((coin, index) => (
+                        <div key={coin.id} className="flex items-center justify-between">
+                          <div className="flex items-center space-x-3">
+                            <span className="text-gray-500 text-sm">#{index + 1}</span>
+                            <img src={coin.image} alt={coin.name} className="w-6 h-6" />
+                            <div>
+                              <div className="text-white font-medium text-sm">{coin.name}</div>
+                              <div className="text-gray-400 text-xs">{coin.symbol.toUpperCase()}</div>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-white font-medium text-sm">
+                              ${coin.current_price.toLocaleString()}
+                            </div>
+                            <div className="text-green-400 text-xs font-medium">
+                              +{coin.price_change_percentage_24h.toFixed(2)}%
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Top Losers */}
+              <div>
+                <div className="flex items-center mb-3">
+                  <TrendingDown className="w-5 h-5 text-red-400 mr-2" />
+                  <h3 className="text-lg font-bold text-white">Top Crypto</h3>
+                  <span className="ml-2 text-sm text-red-400 font-medium">Losers</span>
+                </div>
+                <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">
+                  {cryptoLoading ? (
+                    <div className="text-center py-4 text-gray-400">Loading...</div>
+                  ) : (
+                    <div className="space-y-3">
+                      {topLosers.slice(0, 5).map((coin, index) => (
+                        <div key={coin.id} className="flex items-center justify-between">
+                          <div className="flex items-center space-x-3">
+                            <span className="text-gray-500 text-sm">#{index + 1}</span>
+                            <img src={coin.image} alt={coin.name} className="w-6 h-6" />
+                            <div>
+                              <div className="text-white font-medium text-sm">{coin.name}</div>
+                              <div className="text-gray-400 text-xs">{coin.symbol.toUpperCase()}</div>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-white font-medium text-sm">
+                              ${coin.current_price.toLocaleString()}
+                            </div>
+                            <div className="text-red-400 text-xs font-medium">
+                              {coin.price_change_percentage_24h.toFixed(2)}%
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        {/* Data Sources Footer */}
+        <div className="mt-8 pt-6 border-t border-gray-800">
+          <div className="text-xs text-gray-500 text-center">
+            <span className="font-semibold">Data Sources:</span> Economic calendar and crypto market data powered by{' '}
+            <span className="text-yellow-500 font-medium">TradingView</span> • Multi-market news aggregated from premium sources • Crypto data updates every{' '}
+            <span className="text-green-400">1 minute</span>
+          </div>
         </div>
       </div>
-
-      <main className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column: Economic Calendar & Crypto Data */}
-        <div className="lg:col-span-1 flex flex-col gap-6">
-          {/* Economic Calendar */}
-          <div className="bg-gray-800 p-4 rounded-lg h-96">
-            <h2 className="text-xl font-bold mb-4 flex items-center"><Calendar className="mr-2" /> Economic Calendar</h2>
-            <div ref={calendarRef} className="h-full"></div>
-          </div>
-
-          {/* Top Gainers */}
-          <div className="bg-gray-800 p-4 rounded-lg">
-            <h2 className="text-xl font-bold mb-4 flex items-center"><TrendingUp className="mr-2 text-green-500" /> Top Gainers</h2>
-            {cryptoLoading ? <p>Loading...</p> : topGainers.map(coin => (
-              <div key={coin.id} className="flex justify-between items-center mb-2">
-                <div className="flex items-center">
-                  <img src={coin.image} alt={coin.name} className="w-6 h-6 mr-2" />
-                  <span>{coin.name} ({coin.symbol.toUpperCase()})</span>
-                </div>
-                <span className="text-green-400">+{coin.price_change_percentage_24h.toFixed(2)}%</span>
-              </div>
-            ))}
-          </div>
-
-          {/* Top Losers */}
-          <div className="bg-gray-800 p-4 rounded-lg">
-            <h2 className="text-xl font-bold mb-4 flex items-center"><TrendingDown className="mr-2 text-red-500" /> Top Losers</h2>
-            {cryptoLoading ? <p>Loading...</p> : topLosers.map(coin => (
-              <div key={coin.id} className="flex justify-between items-center mb-2">
-                <div className="flex items-center">
-                  <img src={coin.image} alt={coin.name} className="w-6 h-6 mr-2" />
-                  <span>{coin.name} ({coin.symbol.toUpperCase()})</span>
-                </div>
-                <span className="text-red-400">{coin.price_change_percentage_24h.toFixed(2)}%</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Right Column: News Feed */}
-        <div className="lg:col-span-2 bg-gray-800 p-4 rounded-lg">
-          <h2 className="text-xl font-bold mb-4 flex items-center"><Activity className="mr-2" /> Market News & AI Analysis</h2>
-          {/* Category Tabs */}
-          <div className="flex space-x-2 border-b border-gray-700 mb-4">
-            {(Object.keys(categoryIcons) as Array<keyof typeof categoryIcons>).map(cat => (
-              <button
-                key={cat}
-                onClick={() => setActiveNewsCategory(cat)}
-                className={`flex items-center space-x-2 px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${activeNewsCategory === cat ? 'bg-gray-700 text-white' : 'text-gray-400 hover:bg-gray-700/50'}`}
-              >
-                {categoryIcons[cat]}
-                <span>{cat.charAt(0).toUpperCase() + cat.slice(1)}</span>
-              </button>
-            ))}
-          </div>
-
-          {/* News List */}
-          <div className="space-y-4 max-h-[80vh] overflow-y-auto">
-            {loading ? <p>Loading news...</p> : filteredNews.map(item => (
-              <div key={item.id} className="bg-gray-900/50 p-4 rounded-lg cursor-pointer hover:bg-gray-700/50" onClick={() => setSelectedArticle(item)}>
-                <h3 className="font-bold text-lg">{item.title}</h3>
-                <div className="flex items-center text-xs text-gray-400 mt-1">
-                  <span>{item.source}</span>
-                  <span className="mx-2">•</span>
-                  <Clock className="w-3 h-3 mr-1" />
-                  <span>{new Date(item.publishedAt).toLocaleString()}</span>
-                </div>
-                <div className={`mt-2 text-sm font-semibold ${sentimentColors[item.aiAnalysis?.sentiment || 'neutral']}`}>
-                  AI Sentiment: {item.aiAnalysis?.sentiment.toUpperCase()} (Confidence: {((item.aiAnalysis?.confidence || 0) * 100).toFixed(0)}%)
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </main>
       
       {/* Article Detail Modal */}
       {selectedArticle && (
