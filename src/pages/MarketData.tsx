@@ -117,7 +117,7 @@ export default function MarketData() {
     script.innerHTML = JSON.stringify({
       colorTheme: "dark",
       dateRange: "12M",
-      exchange: "US",
+      exchange: "BINANCE",
       showChart: true,
       locale: "en",
       largeChartUrl: "",
