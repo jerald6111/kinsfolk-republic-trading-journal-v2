@@ -15,11 +15,13 @@ interface CryptoData {
 
 export default function MarketData() {
   const calendarRef = useRef<HTMLDivElement>(null)
+  const heatmapRef = useRef<HTMLDivElement>(null)
   const [topGainers, setTopGainers] = useState<CryptoData[]>([])
   const [topLosers, setTopLosers] = useState<CryptoData[]>([])
   const [cryptoLoading, setCryptoLoading] = useState(true)
   const [gainersTimeframe, setGainersTimeframe] = useState<'1h' | '24h' | '7d'>('24h')
   const [losersTimeframe, setLosersTimeframe] = useState<'1h' | '24h' | '7d'>('24h')
+  const [heatmapMetric, setHeatmapMetric] = useState<'change' | 'volume' | 'open_interest'>('change')
 
   // Economic Calendar Widget
   useEffect(() => {
@@ -42,6 +44,33 @@ export default function MarketData() {
     container.appendChild(script)
     return () => { if (container) { container.innerHTML = '' } }
   }, [])
+
+  // Crypto Heatmap Widget
+  useEffect(() => {
+    if (!heatmapRef.current) return
+    const container = heatmapRef.current
+    container.innerHTML = ''
+    const script = document.createElement('script')
+    script.type = 'text/javascript'
+    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-crypto-coins-heatmap.js'
+    script.async = true
+    script.innerHTML = JSON.stringify({
+      dataSource: "Crypto",
+      blockSize: heatmapMetric,
+      blockColor: "change",
+      locale: "en",
+      symbolUrl: "",
+      colorTheme: "dark",
+      hasTopBar: false,
+      isDataSetEnabled: false,
+      isZoomEnabled: true,
+      hasSymbolTooltip: true,
+      width: "100%",
+      height: "100%"
+    })
+    container.appendChild(script)
+    return () => { if (container) { container.innerHTML = '' } }
+  }, [heatmapMetric])
 
   // Fetch crypto market data from CoinGecko API
   useEffect(() => {
@@ -111,15 +140,38 @@ export default function MarketData() {
 
           {/* Main Content Grid */}
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-            {/* Left Column: Economic Calendar (Expanded) */}
-            <div className="xl:col-span-2">
-              <div className="mb-6">
+            {/* Left Column: Economic Calendar & Heatmap */}
+            <div className="xl:col-span-2 space-y-6">
+              {/* Economic Calendar */}
+              <div>
                 <div className="flex items-center gap-3 mb-6">
                   <span className="text-2xl">📅</span>
                   <h2 className="text-xl font-semibold text-krtext">Economic Calendar</h2>
                 </div>
-                <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[calc(100vh-280px)]">
+                <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[500px]">
                   <div ref={calendarRef} className="h-full w-full"></div>
+                </div>
+              </div>
+
+              {/* Crypto Heatmap */}
+              <div>
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">�</span>
+                    <h2 className="text-xl font-semibold text-krtext">Crypto Market Heatmap</h2>
+                  </div>
+                  <select
+                    value={heatmapMetric}
+                    onChange={(e) => setHeatmapMetric(e.target.value as 'change' | 'volume' | 'open_interest')}
+                    className="bg-krcard border border-krborder rounded-lg px-3 py-2 text-sm text-krtext focus:outline-none focus:border-krgold"
+                  >
+                    <option value="change">Change %</option>
+                    <option value="volume">Volume</option>
+                    <option value="open_interest">Open Interest</option>
+                  </select>
+                </div>
+                <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[500px]">
+                  <div ref={heatmapRef} className="h-full w-full"></div>
                 </div>
               </div>
             </div>
@@ -231,9 +283,9 @@ export default function MarketData() {
           {/* Data Sources Footer */}
           <div className="mt-8 pt-6 border-t border-krborder">
             <div className="text-xs text-krmuted text-center">
-              <span className="font-semibold">Data Sources:</span> Economic calendar powered by{' '}
+              <span className="font-semibold">Data Sources:</span> Economic calendar & crypto heatmap powered by{' '}
               <span className="text-krgold font-medium">TradingView</span> • Crypto market data from{' '}
-              <span className="text-krgold font-medium">CoinGecko</span> • Updates every{' '}
+              <span className="text-krgold font-medium">CoinGecko</span> • Heatmap metrics: Change %, Volume, Open Interest • Updates every{' '}
               <span className="text-green-400">1 minute</span>
             </div>
           </div>
