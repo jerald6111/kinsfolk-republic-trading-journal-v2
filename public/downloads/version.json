@@ -1,34 +1,36 @@
 {
   "version": "1.5.0",
-  "releaseDate": "2025-01-15",
+  "releaseDate": "2025-10-13",
   "downloadUrl": "/downloads/KRTJ-Desktop-Setup-1.5.0.exe",
   "releaseNotes": {
-    "title": "KRTJ Desktop v1.5.0 - AI Market Intelligence! 🤖",
+    "title": "KRTJ Desktop v1.5.0 - Enhanced Security & Live Market Data! 🔒📊",
     "features": [
-      "NEW: AI-Powered Market Sentiment Analysis for all news articles",
-      "NEW: Real-time Bullish/Bearish/Neutral sentiment classification",
-      "NEW: Intelligent key points extraction with market context",
-      "NEW: Comprehensive market impact assessment with severity levels",
-      "NEW: Smart confidence scoring for sentiment reliability",
-      "NEW: Visual sentiment indicators in news feeds"
+      "NEW: Live RSS News Feeds from CoinTelegraph, MarketWatch, ForexLive & BBC News",
+      "NEW: Maximized Economic Calendar with full viewport utilization",
+      "NEW: Enhanced Security with Content Security Policy (CSP)",
+      "NEW: Consistent Dark Theme with proper Windows titlebar styling",
+      "NEW: Authentic Kinsfolk Republic Theme Integration",
+      "NEW: Real-time Live Feed with 30-second animation cycles"
     ],
     "improvements": [
-      "Enhanced news intelligence for better trading decisions",
-      "Advanced AI algorithms for accurate market sentiment detection",
-      "Better error handling and fallback options for updates",
-      "Optimized installer configuration for faster updates",
-      "Enhanced security with proper code signing and validation"
+      "Enhanced security with enterprise-grade CSP and webSecurity enabled",
+      "Improved dark mode consistency across Windows platform",
+      "Optimized Economic Calendar layout for better space utilization",
+      "Better error handling for RSS feed failures with fallback content",
+      "Enhanced icon configuration for proper desktop app branding",
+      "Strengthened renderer process security with contextIsolation"
     ],
     "bugFixes": [
-      "Fixed update system deleting user data during installation",
-      "Resolved manual download fallback when auto-update fails",
-      "Corrected installer permissions for seamless updates",
-      "Fixed progress tracking during background downloads"
+      "Fixed blue titlebar reverting when app is in use (proper dark theme)",
+      "Resolved Content Security Policy warnings in development",
+      "Corrected Economic Calendar sizing to fill entire viewport",
+      "Fixed hardcoded news content replaced with live RSS feeds",
+      "Resolved icon display issues in Windows taskbar and title bar"
     ],
-    "notes": "Revolutionary update experience! No more manual downloads - just click 'Update Now' and the app handles everything automatically while preserving all your data and settings. ⚡"
+    "notes": "Major security and UI enhancements! This update brings live market data, enhanced security protections, and consistent dark theming for the ultimate trading experience. 🚀"
   },
   "minimumVersion": "1.0.0",
   "isRequired": false,
-  "fileSize": "93.1 MB",
-  "checksum": ""
+  "fileSize": "74.2 MB",
+  "checksum": "F4010244D9603860C756800A72D51E30ABAD35630C13FD9DEFA79D7DC61204D8"
 }
