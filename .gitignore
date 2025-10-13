@@ -15,6 +15,10 @@ yarn-error.log*
 desktop/electron-dist/
 public/downloads/*.exe
 
+# Archive folder should be tracked (JSON files only)
+!public/downloads/archive/
+public/downloads/archive/*.exe
+
 # Large executable files
 *.exe
 *.dmg
