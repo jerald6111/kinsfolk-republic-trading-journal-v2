@@ -130,7 +130,7 @@ export default function NewsAndData() {
 
         // CRYPTO NEWS - CoinTelegraph RSS
         try {
-          const cryptoResponse = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=https://cointelegraph.com/rss&api_key=YOUR_API_KEY&count=20&_t=${cacheTimestamp}`)
+          const cryptoResponse = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=https://cointelegraph.com/rss&count=20&_t=${cacheTimestamp}`)
           const cryptoData = await cryptoResponse.json()
           
           if (cryptoData.items && cryptoData.items.length > 0) {
