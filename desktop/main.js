@@ -208,20 +208,20 @@ class KRTJDesktopApp {
       type: 'info',
       title: '🚀 KRTJ Update Available',
       message: `Version ${updateData.version} is now available!`,
-      detail: detailText,
-      buttons: ['Auto Download', 'Open Download Page', 'View Details', 'Remind Me Later'],
-      defaultId: 1,
+      detail: detailText + '\n\n💡 Tip: Use "Download from Website" for the most reliable download experience.',
+      buttons: ['Download from Website', 'Try Auto Download', 'View Details', 'Remind Me Later'],
+      defaultId: 0,
       cancelId: 3,
       noLink: true
     })
 
     if (response.response === 0) {
-      // Auto download and install
-      this.downloadAndInstallUpdate(updateData)
-    } else if (response.response === 1) {
-      // Open download page in browser
+      // Open download page in browser (most reliable)
       const { shell } = require('electron')
       shell.openExternal('https://kinsfolk-republic-trading-journal-v.vercel.app/download')
+    } else if (response.response === 1) {
+      // Try auto download and install
+      this.downloadAndInstallUpdate(updateData)
     } else if (response.response === 2) {
       // Show detailed changelog in a larger dialog
       this.showDetailedChangelog(updateData)
@@ -379,16 +379,29 @@ class KRTJDesktopApp {
         
         https.get(downloadUrl, (response) => {
           if (response.statusCode !== 200) {
-            reject(new Error(`Download failed: HTTP ${response.statusCode}`))
+            reject(new Error(`Download failed: HTTP ${response.statusCode} - Installer file not found on server`))
             return
           }
           
           // Check if we're getting HTML instead of executable
           const contentType = response.headers['content-type'] || ''
           if (contentType.includes('text/html')) {
-            reject(new Error('Server returned HTML page instead of installer file'))
+            reject(new Error('Server returned HTML page instead of installer file - Installer not uploaded to hosting'))
             return
           }
+          
+          // Check if response looks like an HTML page by checking first few bytes
+          let firstChunk = true
+          response.on('data', (chunk) => {
+            if (firstChunk) {
+              const chunkStr = chunk.toString().toLowerCase()
+              if (chunkStr.includes('<!doctype') || chunkStr.includes('<html')) {
+                reject(new Error('Received HTML page instead of installer - File not found on server'))
+                return
+              }
+              firstChunk = false
+            }
+          })
           
           const totalSize = parseInt(response.headers['content-length'], 10)
           let downloadedSize = 0
@@ -460,10 +473,10 @@ class KRTJDesktopApp {
       // Fallback to manual download
       dialog.showMessageBox(this.mainWindow, {
         type: 'warning',
-        title: '⚠️ Auto-Update Failed',
-        message: 'Automatic download failed. Opening manual download page.',
-        detail: `Error: ${error.message}\n\nWe'll open the download page in your browser instead.`,
-        buttons: ['Open Download Page', 'Cancel']
+        title: '⚠️ Auto-Download Not Available',
+        message: 'The installer file is not yet available for automatic download.',
+        detail: `${error.message}\n\nThis usually means:\n• The installer is still being uploaded to the server\n• The website deployment is in progress\n\nYou can download manually from the website instead.`,
+        buttons: ['Open Download Page', 'Try Again Later']
       }).then((response) => {
         if (response.response === 0) {
           shell.openExternal('https://kinsfolk-republic-trading-journal-v.vercel.app/download')
