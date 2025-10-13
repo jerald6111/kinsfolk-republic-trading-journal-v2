@@ -87,17 +87,18 @@ export default function MarketData() {
       width: "100%",
       height: "100%",
       defaultColumn: "overview",
-      defaultScreen: "general",
-      market: "crypto",
-      showToolbar: true,
+      screener_type: "crypto_mkt",
+      displayCurrency: "USD",
       colorTheme: "dark",
       locale: "en",
       isTransparent: true,
-      largeChartUrl: "",
-      screener_type: "crypto_mkt",
-      displayCurrency: "USD",
+      showToolbar: true,
       filter: [
-        { left: "exchange", operation: "in_range", right: ["BINANCE", "BYBIT", "OKX"] }
+        { 
+          left: "exchange", 
+          operation: "match", 
+          right: "BINANCE|BYBIT|OKX"
+        }
       ]
     })
     container.appendChild(script)
