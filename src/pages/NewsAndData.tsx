@@ -107,49 +107,103 @@ export default function NewsAndData() {
   // Fetch comprehensive news data
   useEffect(() => {
     const fetchNews = async () => {
-      setLoading(true)
       try {
+        setLoading(true)
         const allNews: NewsItem[] = []
-        try {
-          const cryptoRSS = 'https://cointelegraph.com/rss'
-          const cryptoAPI = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(cryptoRSS)}&count=15`
-          const cryptoResponse = await fetch(cryptoAPI)
-          const cryptoData = await cryptoResponse.json()
-          if (cryptoData.status === 'ok' && cryptoData.items) {
-            cryptoData.items.forEach((item: any, index: number) => {
-              allNews.push({ id: `crypto-${index}`, title: item.title, source: 'Cointelegraph', publishedAt: item.pubDate, category: 'crypto', url: item.link, summary: item.description })
-            })
-          }
-        } catch (error) { console.log('Crypto news API error:', error) }
 
-        const financialNews: NewsItem[] = [
-          { id: 'stocks-1', title: 'S&P 500 Hits Record High as Tech Stocks Rally', source: 'MarketWatch', publishedAt: new Date().toISOString(), category: 'stocks', summary: 'Major technology companies led the market surge today, with artificial intelligence and semiconductor stocks showing particularly strong performance amid positive earnings reports.', url: '#' },
-          { id: 'stocks-2', title: 'Federal Reserve Signals Potential Policy Shift Amid Economic Data', source: 'Bloomberg', publishedAt: new Date().toISOString(), category: 'stocks', summary: 'Central bank officials indicate flexibility in monetary policy approach as inflation metrics and employment data provide mixed signals for economic outlook.', url: '#' },
-          { id: 'stocks-3', title: 'Energy Sector Leads Market Gains as Oil Prices Surge', source: 'Reuters', publishedAt: new Date().toISOString(), category: 'stocks', summary: 'Crude oil futures hit multi-month highs driving energy stock performance while renewable energy investments continue to attract institutional capital.', url: '#' },
-          { id: 'stocks-4', title: 'Pharmaceutical Giants Report Strong Q4 Earnings', source: 'Financial Times', publishedAt: new Date().toISOString(), category: 'stocks', summary: 'Major pharmaceutical companies exceed earnings expectations with robust drug pipeline developments and expanding global market reach.', url: '#' },
-          { id: 'forex-1', title: 'USD Strengthens Against Major Currencies Following Economic Data', source: 'ForexLive', publishedAt: new Date().toISOString(), category: 'forex', summary: 'Dollar gains momentum across major currency pairs as economic indicators suggest resilient growth and potential monetary policy adjustments.', url: '#' },
-          { id: 'forex-2', title: 'ECB Policy Decision Impacts Euro Trading Across Global Markets', source: 'FX Street', publishedAt: new Date().toISOString(), category: 'forex', summary: 'European Central Bank monetary policy announcement creates volatility in EUR pairs as traders reassess regional economic prospects.', url: '#' },
-          { id: 'world-1', title: 'Global Supply Chain Recovery Shows Steady Progress', source: 'Financial Times', publishedAt: new Date().toISOString(), category: 'world', summary: 'International trade networks demonstrate improved efficiency and reduced bottlenecks as logistics infrastructure investments pay dividends globally.', url: '#' },
-          { id: 'world-2', title: 'Emerging Markets Attract Record Foreign Investment', source: 'Reuters', publishedAt: new Date().toISOString(), category: 'world', summary: 'Developing economies receive unprecedented capital inflows as investors seek growth opportunities and portfolio diversification.', url: '#' }
-        ]
-        allNews.push(...financialNews)
-        
-        if (allNews.filter(item => item.category === 'crypto').length < 12) {
-          const fallbackCrypto: NewsItem[] = [
-            { id: 'crypto-fallback-1', title: 'Bitcoin Surges Past $45,000 as Institutional Adoption Grows', source: 'Cointelegraph', publishedAt: new Date().toISOString(), category: 'crypto', summary: 'Major financial institutions continue to add Bitcoin to their portfolios, driving price momentum and market confidence across traditional finance sectors.', url: '#' },
-            { id: 'crypto-fallback-2', title: 'Ethereum Layer 2 Solutions See Massive Transaction Growth', source: 'CoinDesk', publishedAt: new Date().toISOString(), category: 'crypto', summary: 'Scaling solutions demonstrate remarkable adoption rates with transaction volumes increasing 400% as developers migrate to lower-cost alternatives.', url: '#' },
-            { id: 'crypto-fallback-3', title: 'Central Bank Digital Currencies Gain Global Momentum', source: 'Decrypt', publishedAt: new Date().toISOString(), category: 'crypto', summary: 'Multiple nations advance CBDC pilot programs while establishing regulatory frameworks for digital currency implementation and cross-border integration.', url: '#' },
-            { id: 'crypto-fallback-4', title: 'DeFi Protocol Launches Revolutionary Yield Farming Mechanism', source: 'The Block', publishedAt: new Date().toISOString(), category: 'crypto', summary: 'Innovative decentralized finance platform introduces novel staking rewards system with enhanced security features and improved capital efficiency.', url: '#' }
-          ]
-          allNews.push(...fallbackCrypto)
+        // CRYPTO NEWS - CoinTelegraph RSS
+        try {
+          const cryptoResponse = await fetch('https://api.rss2json.com/v1/api.json?rss_url=https://cointelegraph.com/rss')
+          const cryptoData = await cryptoResponse.json()
+          
+          if (cryptoData.items) {
+            const cryptoNews = cryptoData.items.map((item: any) => ({
+              id: `crypto-${Date.now()}-${Math.random()}`,
+              title: item.title,
+              source: 'CoinTelegraph',
+              publishedAt: item.pubDate,
+              category: 'crypto' as const,
+              summary: item.description?.replace(/<[^>]*>/g, '').substring(0, 200) + '...',
+              url: item.link
+            }))
+            allNews.push(...cryptoNews)
+          }
+        } catch (error) {
+          console.error('Failed to fetch crypto news:', error)
+        }
+
+        // STOCKS NEWS - MarketWatch RSS
+        try {
+          const stocksResponse = await fetch('https://api.rss2json.com/v1/api.json?rss_url=https://feeds.marketwatch.com/marketwatch/topstories/')
+          const stocksData = await stocksResponse.json()
+          
+          if (stocksData.items) {
+            const stocksNews = stocksData.items.map((item: any) => ({
+              id: `stocks-${Date.now()}-${Math.random()}`,
+              title: item.title,
+              source: 'MarketWatch',
+              publishedAt: item.pubDate,
+              category: 'stocks' as const,
+              summary: item.description?.replace(/<[^>]*>/g, '').substring(0, 200) + '...',
+              url: item.link
+            }))
+            allNews.push(...stocksNews)
+          }
+        } catch (error) {
+          console.error('Failed to fetch stocks news:', error)
+        }
+
+        // FOREX NEWS - ForexLive RSS  
+        try {
+          const forexResponse = await fetch('https://api.rss2json.com/v1/api.json?rss_url=https://www.forexlive.com/feed/')
+          const forexData = await forexResponse.json()
+          
+          if (forexData.items) {
+            const forexNews = forexData.items.map((item: any) => ({
+              id: `forex-${Date.now()}-${Math.random()}`,
+              title: item.title,
+              source: 'ForexLive',
+              publishedAt: item.pubDate,
+              category: 'forex' as const,
+              summary: item.description?.replace(/<[^>]*>/g, '').substring(0, 200) + '...',
+              url: item.link
+            }))
+            allNews.push(...forexNews)
+          }
+        } catch (error) {
+          console.error('Failed to fetch forex news:', error)
+        }
+
+        // WORLD NEWS - BBC World News RSS
+        try {
+          const worldResponse = await fetch('https://api.rss2json.com/v1/api.json?rss_url=http://feeds.bbci.co.uk/news/world/rss.xml')
+          const worldData = await worldResponse.json()
+          
+          if (worldData.items) {
+            const worldNews = worldData.items.map((item: any) => ({
+              id: `world-${Date.now()}-${Math.random()}`,
+              title: item.title,
+              source: 'BBC News',
+              publishedAt: item.pubDate,
+              category: 'world' as const,
+              summary: item.description?.replace(/<[^>]*>/g, '').substring(0, 200) + '...',
+              url: item.link
+            }))
+            allNews.push(...worldNews)
+          }
+        } catch (error) {
+          console.error('Failed to fetch world news:', error)
         }
         
         setNewsItems(allNews)
-      } catch (error) { console.error('Error fetching news:', error)
-      } finally { setLoading(false) }
+      } catch (error) {
+        console.error('Error fetching live news:', error)
+      } finally {
+        setLoading(false)
+      }
     }
-    fetchNews()
-    const interval = setInterval(fetchNews, 5 * 60 * 1000)
+    fetchNews() // Initial load
+    const interval = setInterval(fetchNews, 60 * 1000) // Refresh every 1 minute for truly LIVE updates
     return () => clearInterval(interval)
   }, [])
 
