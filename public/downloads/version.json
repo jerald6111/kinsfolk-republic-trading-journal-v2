@@ -1,16 +1,16 @@
 {
-  "version": "1.6.4",
+  "version": "1.6.5",
   "releaseDate": "2024-12-28",
-  "downloadUrl": "/downloads/KRTJ-Desktop-Setup-1.6.4.exe",
+  "downloadUrl": "/downloads/KRTJ-Desktop-Setup-1.6.5.exe",
   "releaseNotes": {
-    "title": "KRTJ Desktop v1.6.4 - Economic Calendar Height Fixed! 📊📈",
+    "title": "KRTJ Desktop v1.6.5 - Economic Calendar Viewport Fix & Data Refresh Enhanced! 📊⚡",
     "features": [
-      "CRITICAL FIX: Economic Calendar now displays at proper full height (600px minimum)",
-      "FIXED: TradingView widget height configuration set to explicit pixel values", 
-      "IMPROVED: Economic Calendar container styling with min-height enforcement",
-      "ENHANCED: Widget container now properly enforces height dimensions",
-      "OPTIMIZED: Calendar widget fills the entire allocated container space",
-      "RESOLVED: Small calendar display issue completely eliminated"
+      "CRITICAL FIX: Economic Calendar now fills entire viewport height without gaps",
+      "ENHANCED: Dynamic height calculation based on viewport (viewportHeight - 320px)",
+      "IMPROVED: Genuine per-minute data refresh with cache-busting timestamps",
+      "FIXED: Trending coins, gainers, and losers now update with fresh data every 60 seconds",
+      "ENHANCED: News API calls include cache-busting parameters for real-time updates", 
+      "OPTIMIZED: Both website and desktop app synchronized for consistent data freshness"
     ],
     "improvements": [
       "Completely rewritten tray menu system with reliable navigation",
@@ -21,16 +21,16 @@
       "Enhanced memory management with proper event listener cleanup"
     ],
     "bugFixes": [
-      "CRITICAL FIX: Economic Calendar size issue - widget now uses proper 600px minimum height",
-      "FIXED: TradingView widget configuration updated with explicit height: 600 pixels",
-      "FIXED: Container styling enhanced with min-height enforcement (650px container, 600px widget)",
-      "RESOLVED: Economic Calendar no longer displays as small compressed widget",
-      "IMPROVED: Widget container forces proper dimensions with inline styling",
-      "ENHANCED: Calendar display now matches expected full-size appearance",
-      "OPTIMIZED: Container CSS classes and inline styles work together for proper sizing",
-      "FIXED: Calendar widget properly utilizes allocated screen real estate"
+      "CRITICAL FIX: Economic Calendar gap below - now uses full viewport height calculation",
+      "FIXED: TradingView widget height dynamically calculated: Math.max(500, viewportHeight - 320px)",
+      "RESOLVED: Calendar container height changed from fixed pixels to viewport-based (h-[calc(100vh-240px)])",
+      "FIXED: Data refresh issues - added timestamp cache-busting (&_t=timestamp) to all API calls",
+      "ENHANCED: CoinGecko API calls now bypass cache for truly fresh crypto data every minute",
+      "IMPROVED: News RSS feeds include cache-busting for real-time updates as advertised",
+      "SYNCHRONIZED: Both website and desktop versions updated for consistent data freshness",
+      "RESOLVED: Wrong dates and stale data issues by forcing fresh API responses"
     ],
-    "notes": "Emergency fix for Economic Calendar height! The calendar widget was displaying too small - now forces proper 600px minimum height with container styling and explicit TradingView widget dimensions. 📊✨"
+    "notes": "Major data refresh and Economic Calendar viewport fixes! Calendar now fills entire screen properly, and all data (crypto + news) refreshes every minute with genuine fresh data via cache-busting. 🔄📊"
   },
   "minimumVersion": "1.0.0",
   "isRequired": false,

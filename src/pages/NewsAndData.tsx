@@ -65,7 +65,9 @@ export default function NewsAndData() {
     const fetchCryptoData = async () => {
       setCryptoLoading(true)
       try {
-        const response = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&price_change_percentage=1h,24h,7d')
+        // Add cache-busting timestamp for fresh data
+        const timestamp = Date.now()
+        const response = await fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&price_change_percentage=1h,24h,7d&_t=${timestamp}`)
         const data = await response.json()
         if (!Array.isArray(data)) { throw new Error('Invalid API response') }
         
@@ -110,10 +112,11 @@ export default function NewsAndData() {
       try {
         setLoading(true)
         const allNews: NewsItem[] = []
+        const timestamp = Date.now()
 
         // CRYPTO NEWS - CoinTelegraph RSS
         try {
-          const cryptoResponse = await fetch('https://api.rss2json.com/v1/api.json?rss_url=https://cointelegraph.com/rss')
+          const cryptoResponse = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=https://cointelegraph.com/rss&_t=${timestamp}`)
           const cryptoData = await cryptoResponse.json()
           
           if (cryptoData.items) {
@@ -134,7 +137,7 @@ export default function NewsAndData() {
 
         // STOCKS NEWS - MarketWatch RSS
         try {
-          const stocksResponse = await fetch('https://api.rss2json.com/v1/api.json?rss_url=https://feeds.marketwatch.com/marketwatch/topstories/')
+          const stocksResponse = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=https://feeds.marketwatch.com/marketwatch/topstories/&_t=${timestamp}`)
           const stocksData = await stocksResponse.json()
           
           if (stocksData.items) {
@@ -155,7 +158,7 @@ export default function NewsAndData() {
 
         // FOREX NEWS - ForexLive RSS  
         try {
-          const forexResponse = await fetch('https://api.rss2json.com/v1/api.json?rss_url=https://www.forexlive.com/feed/')
+          const forexResponse = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=https://www.forexlive.com/feed/&_t=${timestamp}`)
           const forexData = await forexResponse.json()
           
           if (forexData.items) {
@@ -176,7 +179,7 @@ export default function NewsAndData() {
 
         // WORLD NEWS - BBC World News RSS
         try {
-          const worldResponse = await fetch('https://api.rss2json.com/v1/api.json?rss_url=http://feeds.bbci.co.uk/news/world/rss.xml')
+          const worldResponse = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=http://feeds.bbci.co.uk/news/world/rss.xml&_t=${timestamp}`)
           const worldData = await worldResponse.json()
           
           if (worldData.items) {
