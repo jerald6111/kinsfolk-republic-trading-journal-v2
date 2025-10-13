@@ -1,0 +1,46 @@
+<svg width="256" height="256" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background rounded rectangle with golden gradient -->
+  <defs>
+    <linearGradient id="goldGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFD700;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#FFC107;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#DAA520;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Rounded rectangle background -->
+  <rect x="16" y="16" width="224" height="224" rx="32" ry="32" fill="url(#goldGradient)"/>
+  
+  <!-- KR Letters in black -->
+  <g>
+    <!-- K letter -->
+    <g>
+      <!-- K vertical line -->
+      <rect x="60" y="70" width="20" height="116" fill="#141414"/>
+      
+      <!-- K upper diagonal -->
+      <polygon points="80,128 80,108 120,70 140,70 100,108 100,128" fill="#141414"/>
+      
+      <!-- K lower diagonal -->
+      <polygon points="80,128 100,128 100,148 140,186 120,186 80,148" fill="#141414"/>
+    </g>
+    
+    <!-- R letter -->
+    <g>
+      <!-- R vertical line -->
+      <rect x="150" y="70" width="20" height="116" fill="#141414"/>
+      
+      <!-- R top horizontal -->
+      <rect x="150" y="70" width="50" height="15" fill="#141414"/>
+      
+      <!-- R middle horizontal -->
+      <rect x="150" y="120" width="40" height="16" fill="#141414"/>
+      
+      <!-- R top right vertical -->
+      <rect x="185" y="70" width="15" height="50" fill="#141414"/>
+      
+      <!-- R diagonal leg -->
+      <polygon points="170,136 190,136 220,186 200,186" fill="#141414"/>
+    </g>
+  </g>
+</svg>

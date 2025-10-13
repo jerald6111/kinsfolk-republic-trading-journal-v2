@@ -1,36 +1,36 @@
 {
-  "version": "1.5.0",
-  "releaseDate": "2025-10-13",
-  "downloadUrl": "/downloads/KRTJ-Desktop-Setup-1.5.0.exe",
+  "version": "1.6.0",
+  "releaseDate": "2025-10-14",
+  "downloadUrl": "/downloads/KRTJ-Desktop-Setup-1.6.0.exe",
   "releaseNotes": {
-    "title": "KRTJ Desktop v1.5.0 - Enhanced Security & Live Market Data! 🔒📊",
+    "title": "KRTJ Desktop v1.6.0 - Unified Architecture & Enhanced Performance! �⚡",
     "features": [
-      "NEW: Live RSS News Feeds from CoinTelegraph, MarketWatch, ForexLive & BBC News",
-      "NEW: Maximized Economic Calendar with full viewport utilization",
-      "NEW: Enhanced Security with Content Security Policy (CSP)",
-      "NEW: Consistent Dark Theme with proper Windows titlebar styling",
-      "NEW: Authentic Kinsfolk Republic Theme Integration",
-      "NEW: Real-time Live Feed with 30-second animation cycles"
+      "NEW: Unified codebase architecture between web and desktop applications",
+      "NEW: Enhanced component synchronization across platforms",
+      "NEW: Improved build process with optimized asset bundling",
+      "NEW: Advanced error handling and stability improvements",
+      "NEW: Modern TypeScript architecture with improved type safety",
+      "NEW: Streamlined deployment process with automated updates"
     ],
     "improvements": [
-      "Enhanced security with enterprise-grade CSP and webSecurity enabled",
-      "Improved dark mode consistency across Windows platform",
-      "Optimized Economic Calendar layout for better space utilization",
-      "Better error handling for RSS feed failures with fallback content",
-      "Enhanced icon configuration for proper desktop app branding",
-      "Strengthened renderer process security with contextIsolation"
+      "Unified component library ensuring consistent user experience",
+      "Enhanced performance with optimized asset loading and caching",
+      "Improved memory management and reduced resource consumption",
+      "Better cross-platform compatibility and feature parity",
+      "Streamlined update process with faster installation times",
+      "Enhanced developer experience with unified build tools"
     ],
     "bugFixes": [
-      "Fixed blue titlebar reverting when app is in use (proper dark theme)",
-      "Resolved Content Security Policy warnings in development",
-      "Corrected Economic Calendar sizing to fill entire viewport",
-      "Fixed hardcoded news content replaced with live RSS feeds",
-      "Resolved icon display issues in Windows taskbar and title bar"
+      "Resolved component inconsistencies between web and desktop versions",
+      "Fixed potential memory leaks in long-running sessions",
+      "Corrected asset loading issues in production builds",
+      "Improved error recovery and graceful degradation",
+      "Enhanced compatibility with latest Electron security features"
     ],
-    "notes": "Major security and UI enhancements! This update brings live market data, enhanced security protections, and consistent dark theming for the ultimate trading experience. 🚀"
+    "notes": "Major architectural upgrade! This release unifies the codebase between web and desktop versions, ensuring consistent features and improved performance across all platforms. 🌟"
   },
   "minimumVersion": "1.0.0",
   "isRequired": false,
-  "fileSize": "74.2 MB",
-  "checksum": "F4010244D9603860C756800A72D51E30ABAD35630C13FD9DEFA79D7DC61204D8"
+  "fileSize": "74.4 MB",
+  "checksum": "2E67BB99F2EB55256EBDF0855F5D6EB3A3D95725B18AFAEB823C2106D9C4C91F"
 }

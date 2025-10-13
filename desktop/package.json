@@ -1,0 +1,67 @@
+{
+  "name": "kinsfolk-republic-trading-journal-desktop",
+  "version": "1.6.0",
+  "description": "Kinsfolk Republic Trading Journal - Desktop Application",
+  "main": "main.js",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "electron": "electron .",
+    "electron-dev": "concurrently \"npm run dev\" \"wait-on http://localhost:5173 && electron .\"",
+    "electron-pack": "npm run build && electron-builder",
+    "preelectron-pack": "npm run build",
+    "dist": "npm run build && electron-builder --publish=never",
+    "build:electron": "npm run build && electron-builder"
+  },
+  "build": {
+    "appId": "com.kinsforkrepublic.tradingjournaldesktop",
+    "productName": "Kinsfolk Republic Trading Journal",
+    "directories": {
+      "output": "electron-dist"
+    },
+    "files": [
+      "dist/**/*",
+      "main.js",
+      "preload.js",
+      "package.json",
+      "public/krtj-icon.ico"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "public/krtj-icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon": "public/krtj-icon.ico",
+      "uninstallerIcon": "public/krtj-icon.ico",
+      "artifactName": "KRTJ-Desktop-Setup-${version}.exe"
+    }
+  },
+  "dependencies": {
+    "framer-motion": "^10.12.16",
+    "lucide-react": "^0.268.0",
+    "marked": "^5.1.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.20.2",
+    "resend": "^6.1.2",
+    "electron-updater": "^6.1.4"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.21",
+    "@types/react-dom": "^18.2.7",
+    "@vitejs/plugin-react": "^4.0.0",
+    "autoprefixer": "^10.4.14",
+    "postcss": "^8.4.24",
+    "tailwindcss": "^3.4.7",
+    "typescript": "^5.4.2",
+    "vite": "^5.1.0",
+    "electron": "^27.1.2",
+    "electron-builder": "^24.9.1",
+    "concurrently": "^8.2.2",
+    "wait-on": "^7.2.0"
+  }
+}

@@ -1,0 +1,583 @@
+import { useState, useRef, useEffect } from 'react'
+import { MessageCircle, X, Send, Bot, User, Shield, Navigation, HelpCircle, TrendingUp, Mail } from 'lucide-react'
+import llmService from '../services/llmService'
+
+interface Message {
+  id: string
+  type: 'user' | 'bot' | 'system'
+  content: string
+  timestamp: Date
+}
+
+interface QuickAction {
+  id: string
+  label: string
+  icon: JSX.Element
+  response: string
+}
+
+interface UserInfo {
+  name: string
+  email: string
+  hasProvidedInfo: boolean
+}
+
+type ConversationState = 'normal' | 'waiting_for_name' | 'waiting_for_email'
+
+export default function AIChatbot() {
+  const [isOpen, setIsOpen] = useState(false)
+  const [messages, setMessages] = useState<Message[]>([])
+  const [inputMessage, setInputMessage] = useState('')
+  const [isTyping, setIsTyping] = useState(false)
+  const [userInfo, setUserInfo] = useState<UserInfo>({ name: '', email: '', hasProvidedInfo: false })
+  const [conversationState, setConversationState] = useState<ConversationState>('normal')
+  const [showConversationSender, setShowConversationSender] = useState(false)
+  const [loadingPriceData, setLoadingPriceData] = useState(false)
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+
+  const quickActions: QuickAction[] = [
+    {
+      id: 'platform_overview',
+      label: 'What is KRTJ?',
+      icon: <Shield className="w-4 h-4" />,
+      response: `🎯 **Kinsfolk Republic Trading Journal (KRTJ)**
+
+Hey! I'm your Kinsfolk Assistant. KRTJ is a trading journal and analytics platform available both as a web app and Windows desktop application that helps you log, analyze, and improve your trading performance across crypto, stocks, and forex.
+
+**💻 NEW: Windows Desktop App Available!**
+Want enhanced security and offline access? Download our Windows desktop app for the ultimate trading journal experience!
+
+**Core Sections:**
+• **Vision Board**: Motivation hub for goals and affirmations
+• **Dashboard**: PNL, Win Rate, ROI overview  
+• **Journal**: Log every trade with reasoning and screenshots
+• **Strategies**: Store your playbooks and setups
+• **Snapshots**: Visual gallery of trades and patterns
+• **Wallets**: Track deposits/withdrawals (ROI only updates from trading results)
+
+Built for traders who want clarity, discipline, and data-driven results! �`
+    },
+    {
+      id: 'analytics',
+      label: 'Analytics Guide',
+      icon: <TrendingUp className="w-4 h-4" />,
+      response: `📊 **Analytics Breakdown - Let's decode your numbers:**
+
+• **Win Rate**: (Wins ÷ Total Trades) × 100 - Aim for consistency over perfection
+• **Profit Factor**: Gross Profit ÷ Gross Loss - Above 1.5 shows solid edge
+• **ROI**: (Current Balance - Deposits) ÷ Deposits × 100 - Withdrawals from profit don't affect this
+• **Risk/Reward**: Average Win ÷ Average Loss - Healthy systems maintain 1.5:1+
+• **PNL Calendar**: Visual timeline of your trading journey
+• **Top 5 Pairs**: Your best performers ranked by total PNL
+
+Remember: Focus on process over profits. Your Journal is your mirror! 🪞`
+    },
+    {
+      id: 'trading_help',
+      label: 'Trading Guidance',
+      icon: <HelpCircle className="w-4 h-4" />,
+      response: `🎯 **Trading Wisdom - Keep it simple:**
+
+**Risk Management:**
+• Never risk more than 1-2% per trade
+• Tighten stop losses, loosen your ego
+• Capital protection first, profits second
+
+**Psychology:**
+• Trading is 80% mindset - your Journal is your therapist
+• When emotions rise, position size should fall
+• FOMO entries feel good short-term, but they're emotionally expensive
+
+**Discipline Beats Signals:**
+• You don't need more setups - you need more patience
+• Focus on execution, not outcome
+• Sometimes the best trade is no trade
+
+What's your biggest trading challenge right now? 🤔`
+    },
+    {
+      id: 'market_data',
+      label: 'Check Prices',
+      icon: <TrendingUp className="w-4 h-4" />,
+      response: `💰 **Live Market Data Available!**
+
+I can check real-time prices for:
+• **Bitcoin (BTC)** - "What's BTC price?"
+• **Ethereum (ETH)** - "ETH price now"
+• **Solana (SOL)** - "How much is SOL?"
+• **And many more!** ADA, DOGE, BNB, XRP, AVAX, MATIC, DOT, LINK
+
+Just ask naturally like "Bitcoin price" or "How much is ETH?" and I'll pull live data with 24h changes, market cap, and volume!
+
+Which coin are you watching? 📊`
+    },
+    {
+      id: 'desktop_app',
+      label: 'Windows App',
+      icon: <Navigation className="w-4 h-4" />,
+      response: `💻 **KRTJ Windows Desktop App is Here!**
+
+**Why Go Desktop?**
+• **100% Offline** - No internet required once installed
+• **Enhanced Security** - Data never leaves your computer
+• **Lightning Performance** - Native desktop speed
+• **Dark Theme** - Optimized for trading environments
+
+**Perfect For:**
+• Traders wanting maximum privacy
+• Offline trading analysis
+• Enhanced performance over web version
+• Seamless system integration
+
+**Download Info:**
+• Free one-time download (~45MB)
+• Windows 10/11 compatible
+• Same features as web version
+
+Ready to upgrade your trading setup? Check out the download page! 🚀`
+    }
+  ]
+
+  const getSmartResponse = async (message: string): Promise<string> => {
+    const lowerMessage = message.toLowerCase().trim()
+    let priceData = null
+    
+    // Check if this is a price query and fetch live data if needed
+    if (llmService.isPriceQuery(message)) {
+      // Extract coin mentions for price data
+      const coinMap: Record<string, string> = {
+        'bitcoin': 'bitcoin', 'btc': 'bitcoin',
+        'ethereum': 'ethereum', 'eth': 'ethereum',
+        'solana': 'solana', 'sol': 'solana',
+        'cardano': 'cardano', 'ada': 'cardano',
+        'dogecoin': 'dogecoin', 'doge': 'dogecoin',
+        'bnb': 'binancecoin', 'binance': 'binancecoin',
+        'xrp': 'ripple', 'ripple': 'ripple',
+        'avax': 'avalanche-2', 'avalanche': 'avalanche-2',
+        'matic': 'matic-network', 'polygon': 'matic-network',
+        'dot': 'polkadot', 'polkadot': 'polkadot',
+        'link': 'chainlink', 'chainlink': 'chainlink'
+      }
+
+      for (const [keyword, coinId] of Object.entries(coinMap)) {
+        if (lowerMessage.includes(keyword)) {
+          try {
+            priceData = await fetchCoinPrice(coinId)
+            priceData.coinName = keyword.toUpperCase()
+            break
+          } catch (error) {
+            console.error('Error fetching price data:', error)
+          }
+        }
+      }
+    }
+
+    // Get conversation history for LLM context
+    const conversationHistory = llmService.formatConversationHistory(messages)
+    
+    // Generate intelligent response using LLM
+    try {
+      const response = await llmService.generateResponse(
+        message,
+        conversationHistory,
+        priceData,
+        userInfo.name
+      )
+      
+      return response
+      
+    } catch (error) {
+      console.error('LLM Service Error:', error)
+      
+      // Fallback to basic price response if it's a price query
+      if (priceData) {
+        return formatPriceData(priceData, priceData.coinName)
+      }
+      
+      // Generic fallback
+      return "I'm having a moment of digital confusion! 🤖 Could you rephrase that? I'm here to help with KRTJ navigation, crypto prices, and trading guidance!"
+    }
+  }
+
+  useEffect(() => {
+    if (isOpen && messages.length === 0 && !userInfo.hasProvidedInfo) {
+      // Ask for name conversationally when chat opens
+      setConversationState('waiting_for_name')
+      setTimeout(() => {
+        addBotMessage("Before we dive into trading talk, what should I call you? Just type your name!")
+      }, 500)
+    } else if (isOpen && messages.length === 0 && userInfo.hasProvidedInfo) {
+      // Welcome back message if name is already provided
+      addBotMessage(`Welcome back, ${userInfo.name}! 👋 Ready to tackle the markets together? What's on your trading mind today?`)
+    }
+  }, [isOpen, messages.length, userInfo.hasProvidedInfo])
+
+  useEffect(() => {
+    scrollToBottom()
+  }, [messages])
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }
+
+  const addBotMessage = (content: string) => {
+    const newMessage: Message = {
+      id: `bot-${Date.now()}`,
+      type: 'bot',
+      content,
+      timestamp: new Date()
+    }
+    setMessages(prev => [...prev, newMessage])
+  }
+
+  const addUserMessage = (content: string) => {
+    const newMessage: Message = {
+      id: `user-${Date.now()}`,
+      type: 'user',
+      content,
+      timestamp: new Date()
+    }
+    setMessages(prev => [...prev, newMessage])
+  }
+
+
+
+  const requestEmailForConversation = () => {
+    if (!userInfo.email) {
+      setConversationState('waiting_for_email')
+      addBotMessage(`I can send you a copy of our conversation! 📧 What's your email address? Just type it and I'll save it for you.`)
+    } else {
+      setShowConversationSender(true)
+    }
+  }
+
+  const sendConversationEmail = async () => {
+    if (!userInfo.email) return
+    
+    const conversationText = messages
+      .map(msg => `${msg.type.toUpperCase()} (${msg.timestamp.toLocaleString()}): ${msg.content}`)
+      .join('\n\n')
+    
+    // This would integrate with your email service
+    console.log('Sending conversation to:', userInfo.email)
+    console.log('Conversation:', conversationText)
+    
+    addBotMessage(`📧 Conversation summary sent to ${userInfo.email}! Check your inbox for the full chat transcript. Keep crushing those trades! 🚀`)
+    setShowConversationSender(false)
+  }
+
+  // CoinGecko API integration
+  const fetchCoinPrice = async (coinId: string) => {
+    try {
+      setLoadingPriceData(true)
+      const response = await fetch(
+        `https://api.coingecko.com/api/v3/simple/price?ids=${coinId}&vs_currencies=usd&include_24hr_change=true&include_market_cap=true&include_24hr_vol=true`
+      )
+      const data = await response.json()
+      return data[coinId]
+    } catch (error) {
+      console.error('CoinGecko API error:', error)
+      return null
+    } finally {
+      setLoadingPriceData(false)
+    }
+  }
+
+  const searchCoin = async (query: string) => {
+    try {
+      const response = await fetch(`https://api.coingecko.com/api/v3/search?query=${query}`)
+      const data = await response.json()
+      return data.coins?.slice(0, 5) || []
+    } catch (error) {
+      console.error('CoinGecko search error:', error)
+      return []
+    }
+  }
+
+  const formatPriceData = (priceData: any, coinName: string) => {
+    if (!priceData) return "Sorry, I couldn't fetch that price data right now. The market data service might be busy! 📊"
+
+    const price = priceData.usd?.toLocaleString('en-US', { 
+      style: 'currency', 
+      currency: 'USD',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 6 
+    })
+    
+    const change24h = priceData.usd_24h_change
+    const changeEmoji = change24h > 0 ? '🟢' : change24h < 0 ? '🔴' : '⚪'
+    const changeText = change24h > 0 ? `+${change24h.toFixed(2)}%` : `${change24h.toFixed(2)}%`
+    
+    const marketCap = priceData.usd_market_cap ? 
+      `$${(priceData.usd_market_cap / 1000000000).toFixed(2)}B` : 'N/A'
+    
+    const volume24h = priceData.usd_24h_vol ? 
+      `$${(priceData.usd_24h_vol / 1000000).toFixed(2)}M` : 'N/A'
+
+    return `💰 **${coinName.toUpperCase()} Price Update:**
+
+• **Price**: ${price}
+• **24h Change**: ${changeEmoji} ${changeText}
+• **Market Cap**: ${marketCap}
+• **24h Volume**: ${volume24h}
+
+What's your take on this price action? Planning any moves?`
+  }
+
+  const handleSendMessage = async () => {
+    if (!inputMessage.trim()) return
+
+    addUserMessage(inputMessage)
+    const currentMessage = inputMessage.trim()
+    setInputMessage('')
+    setIsTyping(true)
+
+    // Handle conversation states
+    if (conversationState === 'waiting_for_name') {
+      // User provided their name
+      setUserInfo(prev => ({ ...prev, name: currentMessage, hasProvidedInfo: true }))
+      setConversationState('normal')
+      setTimeout(() => {
+        addBotMessage(`Nice to meet you, ${currentMessage}! 🤝 I'm your Kinsfolk Assistant. I help with KRTJ navigation, live crypto prices, analytics questions, and trading mindset. Whether you're celebrating wins or dealing with losses, I'm here to help. What's on your trading mind today?`)
+        setIsTyping(false)
+      }, 1000)
+      return
+    }
+
+    if (conversationState === 'waiting_for_email') {
+      // User provided their email
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      if (emailRegex.test(currentMessage)) {
+        setUserInfo(prev => ({ ...prev, email: currentMessage }))
+        setConversationState('normal')
+        setTimeout(() => {
+          addBotMessage(`Perfect! 📧 I've saved your email (${currentMessage}) for conversation summaries. Now you can get a copy of our chat whenever you want! What else can I help you with?`)
+          setIsTyping(false)
+        }, 800)
+      } else {
+        setTimeout(() => {
+          addBotMessage(`Hmm, that doesn't look like a valid email address. Could you try again? For example: yourname@email.com`)
+          setIsTyping(false)
+        }, 800)
+      }
+      return
+    }
+
+    // Normal conversation - only proceed if user has provided name
+    if (!userInfo.hasProvidedInfo) return
+
+    // Handle async responses (like price data)
+    try {
+      const response = await getSmartResponse(currentMessage)
+      setTimeout(() => {
+        addBotMessage(response)
+        setIsTyping(false)
+      }, 800 + Math.random() * 800) // Delay for realism
+    } catch (error) {
+      setTimeout(() => {
+        addBotMessage("Oops! Something went wrong while fetching that info. Try asking again! 🤖")
+        setIsTyping(false)
+      }, 800)
+    }
+  }
+
+  const handleQuickAction = (action: QuickAction) => {
+    addUserMessage(action.label)
+    setIsTyping(true)
+
+    setTimeout(() => {
+      addBotMessage(action.response)
+      setIsTyping(false)
+    }, 800)
+  }
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      handleSendMessage()
+    }
+  }
+
+  return (
+    <>
+      {/* Floating Chat Button */}
+      <div className="fixed bottom-6 right-6 z-50">
+        <button
+          onClick={() => setIsOpen(true)}
+          className="bg-gradient-to-r from-krgold to-kryellow text-krblack p-4 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center gap-2 group"
+          aria-label="Open AI Chatbot"
+        >
+          <MessageCircle className="w-6 h-6" />
+          <span className="hidden group-hover:block text-sm font-medium whitespace-nowrap">
+            Need Help?
+          </span>
+        </button>
+      </div>
+
+      {/* Chat Window */}
+      {isOpen && (
+        <div className="fixed bottom-24 right-6 w-96 h-[500px] bg-krcard border border-krborder rounded-xl shadow-2xl z-50 flex flex-col overflow-hidden">
+          {/* Header */}
+          <div className="bg-gradient-to-r from-krgold to-kryellow text-krblack p-4 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Bot className="w-5 h-5" />
+              <div>
+                <h3 className="font-bold text-sm">Kinsfolk AI Assistant</h3>
+                <p className="text-xs opacity-80">Platform guide</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              {messages.length > 3 && userInfo.hasProvidedInfo && (
+                <button
+                  onClick={requestEmailForConversation}
+                  className="hover:bg-black/10 p-1 rounded transition-colors"
+                  title="Save conversation"
+                >
+                  <Mail className="w-4 h-4" />
+                </button>
+              )}
+              <button
+                onClick={() => setIsOpen(false)}
+                className="hover:bg-black/10 p-1 rounded transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          {/* Quick Actions */}
+          {messages.length <= 1 && userInfo.hasProvidedInfo && (
+            <div className="p-3 border-b border-krborder">
+              <p className="text-xs text-krmuted mb-2">Quick Actions:</p>
+              <div className="flex flex-wrap gap-2">
+                {quickActions.map((action) => (
+                  <button
+                    key={action.id}
+                    onClick={() => handleQuickAction(action)}
+                    className="flex items-center gap-1 px-2 py-1 text-xs bg-krgold/20 text-krgold border border-krgold/30 rounded-full hover:bg-krgold/30 transition-colors"
+                  >
+                    {action.icon}
+                    {action.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Messages */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-3">
+            {messages.map((message) => (
+              <div
+                key={message.id}
+                className={`flex items-start gap-2 ${
+                  message.type === 'user' ? 'flex-row-reverse' : ''
+                }`}
+              >
+                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs ${
+                  message.type === 'user' 
+                    ? 'bg-krgold text-krblack' 
+                    : 'bg-krgray text-krgold'
+                }`}>
+                  {message.type === 'user' ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
+                </div>
+                <div className={`max-w-[280px] p-3 rounded-lg text-sm ${
+                  message.type === 'user'
+                    ? 'bg-krgold text-krblack ml-auto'
+                    : 'bg-krgray text-krtext'
+                }`}>
+                  <div className="whitespace-pre-wrap">{message.content}</div>
+                  <div className={`text-xs mt-1 opacity-70 ${
+                    message.type === 'user' ? 'text-krblack/70' : 'text-krmuted'
+                  }`}>
+                    {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </div>
+                </div>
+              </div>
+            ))}
+            
+            {/* Typing Indicator */}
+            {isTyping && (
+              <div className="flex items-start gap-2">
+                <div className="w-7 h-7 rounded-full bg-krgray text-krgold flex items-center justify-center text-xs">
+                  <Bot className="w-4 h-4" />
+                </div>
+                <div className="bg-krgray text-krtext p-3 rounded-lg text-sm">
+                  <div className="flex items-center gap-1">
+                    <div className="w-2 h-2 bg-krgold rounded-full animate-bounce"></div>
+                    <div className="w-2 h-2 bg-krgold rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                    <div className="w-2 h-2 bg-krgold rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                    {loadingPriceData && (
+                      <span className="ml-2 text-xs text-krmuted">Fetching live data...</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* Input */}
+          <div className="p-3 border-t border-krborder">
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                value={inputMessage}
+                onChange={(e) => setInputMessage(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder={
+                  conversationState === 'waiting_for_name' ? "Type your name..." :
+                  conversationState === 'waiting_for_email' ? "Type your email address..." :
+                  userInfo.hasProvidedInfo ? "Ask about trading, prices, or KRTJ features..." : 
+                  "Please introduce yourself first"
+                }
+                className="flex-1 bg-krgray text-krtext px-3 py-2 rounded-lg text-sm border border-krborder focus:border-krgold focus:outline-none disabled:opacity-50"
+                disabled={isTyping}
+              />
+              <button
+                onClick={handleSendMessage}
+                disabled={!inputMessage.trim() || isTyping}
+                className="bg-krgold text-krblack p-2 rounded-lg hover:bg-kryellow transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Send className="w-4 h-4" />
+              </button>
+            </div>
+            <p className="text-xs text-krmuted mt-1">
+              AI assistant for navigation and security questions
+            </p>
+          </div>
+        </div>
+      )}
+
+
+
+      {/* Conversation Sender Modal */}
+      {showConversationSender && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60]">
+          <div className="bg-krcard border border-krborder rounded-xl p-6 max-w-md w-full mx-4">
+            <div className="flex items-center gap-2 mb-4">
+              <Mail className="w-5 h-5 text-krgold" />
+              <h3 className="font-bold text-krtext">Send Conversation</h3>
+            </div>
+            <p className="text-krmuted text-sm mb-4">
+              Want a copy of our conversation sent to <span className="text-krgold">{userInfo.email}</span>?
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setShowConversationSender(false)}
+                className="flex-1 px-4 py-2 text-sm text-krmuted border border-krborder rounded-lg hover:border-krgold/50 transition-colors"
+              >
+                No thanks
+              </button>
+              <button
+                onClick={sendConversationEmail}
+                className="flex-1 px-4 py-2 text-sm bg-krgold text-krblack rounded-lg hover:bg-kryellow transition-colors"
+              >
+                Send Email
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  )
+}

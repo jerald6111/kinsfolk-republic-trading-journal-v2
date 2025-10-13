@@ -1,0 +1,41 @@
+{
+  "name": "kinsfolk-republic-trading-journal-unified",
+  "version": "1.5.0",
+  "description": "Kinsfolk Republic Trading Journal - Unified Web & Desktop Application",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "desktop:install": "cd desktop && npm install",
+    "desktop:dev": "cd desktop && npm run dev",
+    "desktop:build": "cd desktop && npm run build",
+    "desktop:electron": "cd desktop && npm run electron",
+    "desktop:pack": "cd desktop && npm run electron-pack",
+    "desktop:dist": "cd desktop && npm run dist",
+    "sync:to-desktop": "robocopy src desktop/src /MIR /XD node_modules .git && robocopy public desktop/public /MIR",
+    "sync:from-desktop": "robocopy desktop/src src /MIR /XD node_modules .git && robocopy desktop/public public /MIR",
+    "build:all": "npm run build && npm run desktop:build",
+    "setup": "npm install && npm run desktop:install",
+    "update:desktop": "npm run sync:to-desktop && cd desktop && npm run build && npm run electron-pack"
+  },
+  "dependencies": {
+    "framer-motion": "^10.12.16",
+    "lucide-react": "^0.268.0",
+    "marked": "^5.1.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.20.2",
+    "resend": "^6.1.2"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.21",
+    "@types/react-dom": "^18.2.7",
+    "@vitejs/plugin-react": "^4.0.0",
+    "autoprefixer": "^10.4.14",
+    "postcss": "^8.4.24",
+    "tailwindcss": "^3.4.7",
+    "typescript": "^5.4.2",
+    "vite": "^5.1.0"
+  }
+}
