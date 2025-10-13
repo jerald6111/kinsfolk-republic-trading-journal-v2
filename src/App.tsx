@@ -9,9 +9,7 @@ import Playbook from './pages/Playbook'
 import Charts from './pages/Charts'
 import SnapshotsOverview from './pages/SnapshotsOverview'
 import Wallet from './pages/Wallet'
-import News from './pages/News'
-import NewsAndData from './pages/NewsAndData'
-import DataMarket from './pages/DataMarket'
+import MarketData from './pages/MarketData'
 import DataSettings from './pages/DataSettings'
 import Download from './pages/Download'
 import Navbar from './components/Navbar'
@@ -28,9 +26,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/vision" element={<VisionBoard />} />
-          <Route path="/news" element={<News />} />
-          <Route path="/news-and-data" element={<NewsAndData />} />
-          <Route path="/data-market" element={<DataMarket />} />
+          <Route path="/data-market" element={<MarketData />} />
           <Route path="/journal" element={<JournalOverview />} />
           <Route path="/journal/entries" element={<Journal />} />
           <Route path="/journal/analytics" element={<TradeAnalytics />} />

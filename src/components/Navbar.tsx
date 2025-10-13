@@ -4,14 +4,7 @@ import { Menu, ChevronDown, Settings, Download } from 'lucide-react'
 
 const nav = [
   { to: '/vision', label: 'Vision' },
-  { 
-    to: '/news-and-data', 
-    label: 'News & Data',
-    dropdown: [
-      { to: '/data-market', label: 'Data Market' },
-      { to: '/news', label: 'Market News' }
-    ]
-  },
+  { to: '/data-market', label: 'Market Data' },
   { 
     to: '/journal', 
     label: 'Journal',
