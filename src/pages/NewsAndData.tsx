@@ -13,7 +13,7 @@ interface CryptoData {
   market_cap_rank: number
 }
 
-// News item with AI sentiment analysis
+// News item interface
 interface NewsItem {
   id: string
   title: string
@@ -22,108 +22,9 @@ interface NewsItem {
   category: 'crypto' | 'stocks' | 'forex' | 'world'
   summary?: string
   url?: string
-  aiAnalysis?: {
-    sentiment: 'bullish' | 'bearish' | 'neutral'
-    confidence: number
-    keyPoints: string[]
-    marketImpact: {
-      severity: 'low' | 'medium' | 'high'
-      timeframe: 'short' | 'medium' | 'long'
-      affectedMarkets: string[]
-      description: string
-    }
-  }
 }
 
-// AI Market Sentiment Analyzer
-const analyzeMarketSentiment = (newsItem: NewsItem) => {
-  const title = newsItem.title.toLowerCase()
-  
-  // Bullish indicators
-  const bullishKeywords = ['surge', 'rally', 'gains', 'up', 'rise', 'soar', 'breakthrough', 'approval', 'adoption', 'positive', 'bullish', 'record high', 'milestone', 'growth', 'expansion']
-  
-  // Bearish indicators  
-  const bearishKeywords = ['crash', 'fall', 'drop', 'decline', 'bearish', 'concern', 'risk', 'regulation', 'ban', 'hack', 'volatility', 'uncertainty', 'downturn', 'loss']
-  
-  // Calculate sentiment score
-  const bullishScore = bullishKeywords.reduce((score, word) => title.includes(word) ? score + 1 : score, 0)
-  const bearishScore = bearishKeywords.reduce((score, word) => title.includes(word) ? score + 1 : score, 0)
-  
-  let sentiment: 'bullish' | 'bearish' | 'neutral'
-  let confidence: number
-  
-  if (bullishScore > bearishScore) {
-    sentiment = 'bullish'
-    confidence = Math.min(0.6 + (bullishScore * 0.1), 0.95)
-  } else if (bearishScore > bullishScore) {
-    sentiment = 'bearish'
-    confidence = Math.min(0.6 + (bearishScore * 0.1), 0.95)
-  } else {
-    sentiment = 'neutral'
-    confidence = 0.7
-  }
 
-  // Generate AI key points based on category and sentiment
-  const generateKeyPoints = (category: string, sentiment: string) => {
-    const points: { [key: string]: { [key: string]: string[] } } = {
-      crypto: {
-        bullish: ["Institutional adoption continues to drive long-term price stability and growth potential", "Technical indicators suggest strong momentum with potential for continued upward movement", "Market sentiment remains positive as regulatory clarity improves globally"],
-        bearish: ["Market volatility increases amid regulatory uncertainty and institutional concerns", "Technical analysis shows potential for further downward pressure in short term", "Risk sentiment deteriorates as market participants reassess crypto valuations"],
-        neutral: ["Market consolidation continues as investors await clearer directional signals", "Trading volumes remain stable with balanced buying and selling pressure", "Technical indicators suggest sideways movement until next major catalyst"]
-      },
-      stocks: {
-        bullish: ["Strong earnings performance supports continued equity market optimism and valuations", "Economic indicators point to sustained corporate growth and profitability trends", "Market technicals suggest potential for further upside in current bull cycle"],
-        bearish: ["Concerns over valuations and economic headwinds weigh on investor sentiment", "Technical indicators signal potential correction as market reaches overbought levels", "Macroeconomic uncertainties create challenges for sustained equity market gains"],
-        neutral: ["Markets digest mixed economic signals while maintaining cautious optimism", "Earnings season provides balanced results with sector-specific variations", "Investor sentiment remains measured as markets await policy developments"]
-      },
-      forex: {
-        bullish: ["Central bank policy support strengthens currency outlook amid improving fundamentals", "Economic data releases exceed expectations, supporting currency strength", "Technical momentum suggests continued appreciation against major trading partners"],
-        bearish: ["Policy uncertainties and economic headwinds create downward pressure on currency", "Central bank signals raise concerns about future monetary policy direction", "Technical breakdown suggests potential for further weakness in coming sessions"],
-        neutral: ["Currency pairs remain range-bound as markets assess competing policy influences", "Mixed economic signals create balanced trading environment with limited directional bias", "Technical consolidation continues as traders await clearer fundamental catalysts"]
-      },
-      world: {
-        bullish: ["Global economic indicators show resilience despite ongoing geopolitical challenges", "International cooperation strengthens trade relationships and economic stability", "Emerging markets demonstrate robust growth potential amid global uncertainties"],
-        bearish: ["Geopolitical tensions escalate, creating risks for global economic stability", "International trade disruptions threaten supply chains and economic growth", "Global economic slowdown concerns intensify amid policy uncertainties"],
-        neutral: ["Global markets remain cautious as investors assess mixed economic and political signals", "International developments create balanced risks and opportunities for global growth", "World economic outlook remains stable with region-specific variations in performance"]
-      }
-    }
-    return points[category]?.[sentiment] || points['world']['neutral']
-  }
-
-  // Generate market impact assessment
-  const generateMarketImpact = (category: string, sentiment: string, title: string) => {
-    const isHighImpact = title.includes('federal reserve') || title.includes('central bank') || title.includes('regulation') || title.includes('approval') || title.includes('ban') || title.includes('breakthrough')
-    const severity = isHighImpact ? 'high' : (sentiment === 'neutral' ? 'low' : 'medium')
-    const timeframe = isHighImpact ? 'long' : (sentiment === 'bullish' ? 'medium' : 'short')
-    
-    const affectedMarkets: { [key: string]: string[] } = {
-      crypto: ['Cryptocurrency', 'Blockchain Technology', 'Digital Assets'],
-      stocks: ['Equity Markets', 'Corporate Bonds', 'Market Indices'],
-      forex: ['Currency Markets', 'International Trade', 'Central Bank Policy'],
-      world: ['Global Markets', 'International Trade', 'Geopolitical Risk']
-    }
-    
-    const impactDescriptions: { [key: string]: string } = {
-      bullish: `Positive market sentiment expected to drive ${severity === 'high' ? 'significant' : 'moderate'} gains across related asset classes`,
-      bearish: `Market headwinds likely to create ${severity === 'high' ? 'substantial' : 'limited'} downward pressure on associated investments`,
-      neutral: `Balanced market conditions with ${severity === 'high' ? 'potential for volatility' : 'stable price action'} expected`
-    }
-    
-    return {
-      severity: severity as 'low' | 'medium' | 'high',
-      timeframe: timeframe as 'short' | 'medium' | 'long',
-      affectedMarkets: affectedMarkets[category] || affectedMarkets['world'],
-      description: impactDescriptions[sentiment]
-    }
-  }
-
-  return {
-    sentiment,
-    confidence,
-    keyPoints: generateKeyPoints(newsItem.category, sentiment),
-    marketImpact: generateMarketImpact(newsItem.category, sentiment, title)
-  }
-}
 
 export default function NewsAndData() {
   const calendarRef = useRef<HTMLDivElement>(null)
@@ -243,8 +144,7 @@ export default function NewsAndData() {
           allNews.push(...fallbackCrypto)
         }
         
-        const newsWithAI = allNews.map(item => ({...item, aiAnalysis: analyzeMarketSentiment(item) }))
-        setNewsItems(newsWithAI)
+        setNewsItems(allNews)
       } catch (error) { console.error('Error fetching news:', error)
       } finally { setLoading(false) }
     }
@@ -261,12 +161,6 @@ export default function NewsAndData() {
     stocks: <BarChart3 className="w-5 h-5" />,
     forex: <DollarSign className="w-5 h-5" />,
     world: <Globe className="w-5 h-5" />
-  }
-  
-  const sentimentColors = {
-    bullish: 'text-green-400',
-    bearish: 'text-red-400',
-    neutral: 'text-gray-400'
   }
 
   return (
@@ -298,14 +192,12 @@ export default function NewsAndData() {
             </div>
             <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 transition-all duration-200 p-4">
               <div className="overflow-hidden">
-                <div className="flex animate-ticker whitespace-nowrap">
-                  {tickerNews.concat(tickerNews).map((item, index) => (
-                    <span key={index} className="mx-8 text-sm flex items-center">
+                <div className="flex animate-ticker-fast whitespace-nowrap">
+                  {newsItems.concat(newsItems).map((item, index) => (
+                    <span key={index} className="mx-6 text-sm flex items-center">
                       <span className="text-krgold mr-2">•</span>
-                      <span className={`mr-3 font-semibold ${sentimentColors[item.aiAnalysis?.sentiment || 'neutral']}`}>
-                        {item.aiAnalysis?.sentiment.toUpperCase()}:
-                      </span>
                       <span className="text-krtext">{item.title}</span>
+                      <span className="text-krmuted ml-3 text-xs">- {item.source}</span>
                     </span>
                   ))}
                 </div>
@@ -315,27 +207,41 @@ export default function NewsAndData() {
 
           {/* Main Content Grid */}
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-            {/* Left Column: Market News */}
+            {/* Left Column: Economic Calendar (Expanded) */}
             <div className="xl:col-span-2">
               <div className="mb-6">
                 <div className="flex items-center gap-3 mb-6">
+                  <span className="text-2xl">�</span>
+                  <h2 className="text-xl font-semibold text-krtext">Economic Calendar</h2>
+                </div>
+                <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[600px]">
+                  <div ref={calendarRef} className="h-full w-full"></div>
+                </div>
+              </div>
+            </div>
+                
+            {/* Right Column: Market News & Crypto Data */}
+            <div className="xl:col-span-1 space-y-6">
+              {/* Market News */}
+              <div>
+                <div className="flex items-center gap-3 mb-4">
                   <span className="text-2xl">📰</span>
                   <h2 className="text-xl font-semibold text-krtext">Market News</h2>
                 </div>
                 
                 {/* Category Filter Tabs */}
-                <div className="flex space-x-2 mb-6">
+                <div className="flex flex-wrap gap-2 mb-4">
                   {(Object.keys(categoryIcons) as Array<keyof typeof categoryIcons>).map(cat => (
                     <button
                       key={cat}
                       onClick={() => setActiveNewsCategory(cat)}
-                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                      className={`px-3 py-1 rounded-lg text-xs font-medium transition-all ${
                         activeNewsCategory === cat 
                           ? 'bg-krgold text-krblack' 
                           : 'bg-krcard/60 text-krmuted hover:bg-krcard border border-krborder hover:border-krgold/50'
                       }`}
                     >
-                      <span className="flex items-center space-x-2">
+                      <span className="flex items-center space-x-1">
                         {categoryIcons[cat]}
                         <span>{cat.charAt(0).toUpperCase() + cat.slice(1)}</span>
                       </span>
@@ -343,60 +249,41 @@ export default function NewsAndData() {
                   ))}
                 </div>
 
-                {/* News Cards Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {loading ? (
-                    <div className="col-span-full flex items-center justify-center py-12">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-krgold"></div>
-                    </div>
-                  ) : (
-                    filteredNews.slice(0, 9).map(item => (
-                      <div 
-                        key={item.id} 
-                        className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-4 cursor-pointer"
-                        onClick={() => setSelectedArticle(item)}
-                      >
-                        <div className="flex items-start justify-between mb-3">
-                          <div className="flex items-center space-x-2">
-                            {categoryIcons[item.category]}
-                            <span className="text-xs text-krgold font-medium">
-                              {item.category.toUpperCase()}
-                            </span>
-                          </div>
-                          <div className={`text-xs px-2 py-1 rounded-full font-medium ${
-                            item.aiAnalysis?.sentiment === 'bullish' ? 'bg-green-500/20 text-green-400' :
-                            item.aiAnalysis?.sentiment === 'bearish' ? 'bg-red-500/20 text-red-400' :
-                            'bg-krmuted/20 text-krmuted'
-                          }`}>
-                            {item.aiAnalysis?.sentiment?.toUpperCase() || 'NEUTRAL'}
-                          </div>
-                        </div>
-                        
-                        <h3 className="font-semibold text-krtext text-sm mb-3 line-clamp-2">
-                          {item.title}
-                        </h3>
-                        
-                        <div className="flex items-center justify-between text-xs text-krmuted">
-                          <span>{item.source}</span>
-                          <span>{new Date(item.publishedAt).toLocaleDateString()}</span>
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
-            </div>
-          </div>
-
-            {/* Right Column: Economic Calendar & Crypto Data */}
-            <div className="xl:col-span-1 space-y-6">
-              {/* Economic Calendar */}
-              <div>
-                <div className="flex items-center gap-3 mb-4">
-                  <span className="text-2xl">📅</span>
-                  <h2 className="text-xl font-semibold text-krtext">Economic Calendar</h2>
-                </div>
+                {/* News List */}
                 <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-4 h-80">
-                  <div ref={calendarRef} className="h-full"></div>
+                  <div className="space-y-3 crypto-list-scroll max-h-full overflow-y-auto">
+                    {loading ? (
+                      <div className="flex items-center justify-center py-12">
+                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-krgold"></div>
+                      </div>
+                    ) : (
+                      filteredNews.slice(0, 10).map(item => (
+                        <div 
+                          key={item.id} 
+                          className="bg-krblack/40 rounded-lg hover:bg-krblack/60 transition-all p-3 cursor-pointer"
+                          onClick={() => setSelectedArticle(item)}
+                        >
+                          <div className="flex items-start justify-between mb-2">
+                            <div className="flex items-center space-x-2">
+                              {categoryIcons[item.category]}
+                              <span className="text-xs text-krgold font-medium">
+                                {item.category.toUpperCase()}
+                              </span>
+                            </div>
+                          </div>
+                          
+                          <h3 className="font-medium text-krtext text-sm mb-2 line-clamp-2">
+                            {item.title}
+                          </h3>
+                          
+                          <div className="flex items-center justify-between text-xs text-krmuted">
+                            <span>{item.source}</span>
+                            <span>{new Date(item.publishedAt).toLocaleDateString()}</span>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -503,18 +390,12 @@ export default function NewsAndData() {
                 <Clock className="w-3 h-3 mr-1" />
                 <span>{new Date(selectedArticle.publishedAt).toLocaleString()}</span>
               </div>
-              <p className="text-krtext mb-4">{selectedArticle.summary}</p>
-              
-              {selectedArticle.aiAnalysis && (
-                <div className="bg-krblack/50 p-4 rounded-lg border border-krborder">
+              {selectedArticle.summary && (
+                <div className="bg-krblack/50 p-4 rounded-lg border border-krborder mb-4">
                   <h3 className="font-bold text-lg mb-2 flex items-center text-krtext">
-                    <Zap className="w-5 h-5 mr-2 text-krgold" /> AI Market Analysis
+                    <Calendar className="w-5 h-5 mr-2 text-krgold" /> Article Summary
                   </h3>
-                  <p className="mb-2 text-krtext"><span className="font-semibold">Key Points:</span></p>
-                  <ul className="list-disc list-inside text-sm space-y-1 mb-3 text-krmuted">
-                    {selectedArticle.aiAnalysis.keyPoints.map((point, i) => <li key={i}>{point}</li>)}
-                  </ul>
-                  <p className="text-sm text-krtext"><span className="font-semibold">Impact:</span> {selectedArticle.aiAnalysis.marketImpact.description}</p>
+                  <p className="text-sm text-krtext">{selectedArticle.summary}</p>
                 </div>
               )}
               

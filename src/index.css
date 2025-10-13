@@ -124,11 +124,19 @@ body {
   animation: ticker 60s linear infinite;
 }
 
+.animate-ticker-fast {
+  animation: ticker 30s linear infinite;
+}
+
 .news-ticker:hover {
   animation-play-state: paused;
 }
 
 .animate-ticker:hover {
+  animation-play-state: paused;
+}
+
+.animate-ticker-fast:hover {
   animation-play-state: paused;
 }
 
