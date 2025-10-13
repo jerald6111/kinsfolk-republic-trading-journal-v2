@@ -105,36 +105,27 @@ export default function MarketData() {
     return () => { if (container) { container.innerHTML = '' } }
   }, [])
 
-  // Top Trending Coins Widget
+  // Top Trending Coins Widget - Crypto Specific
   useEffect(() => {
     if (!trendingRef.current) return
     const container = trendingRef.current
     container.innerHTML = ''
     const script = document.createElement('script')
     script.type = 'text/javascript'
-    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-hotlists.js'
+    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-screener.js'
     script.async = true
     script.innerHTML = JSON.stringify({
-      colorTheme: "dark",
-      dateRange: "12M",
-      exchange: "BINANCE",
-      showChart: true,
-      locale: "en",
-      largeChartUrl: "",
-      isTransparent: true,
-      showSymbolLogo: true,
-      showFloatingTooltip: false,
       width: "100%",
       height: "100%",
-      plotLineColorGrowing: "rgba(41, 98, 255, 1)",
-      plotLineColorFalling: "rgba(41, 98, 255, 1)",
-      gridLineColor: "rgba(42, 46, 57, 0)",
-      scaleFontColor: "rgba(120, 123, 134, 1)",
-      belowLineFillColorGrowing: "rgba(41, 98, 255, 0.12)",
-      belowLineFillColorFalling: "rgba(41, 98, 255, 0.12)",
-      belowLineFillColorGrowingBottom: "rgba(41, 98, 255, 0)",
-      belowLineFillColorFallingBottom: "rgba(41, 98, 255, 0)",
-      symbolActiveColor: "rgba(41, 98, 255, 0.12)"
+      defaultColumn: "overview",
+      defaultScreen: "most_capitalized",
+      market: "crypto",
+      showToolbar: false,
+      colorTheme: "dark",
+      locale: "en",
+      isTransparent: true,
+      screener_type: "crypto_mkt",
+      displayCurrency: "USD"
     })
     container.appendChild(script)
     return () => { if (container) { container.innerHTML = '' } }
