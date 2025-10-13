@@ -17,6 +17,7 @@ export default function MarketData() {
   const calendarRef = useRef<HTMLDivElement>(null)
   const heatmapRef = useRef<HTMLDivElement>(null)
   const cryptoScreenerRef = useRef<HTMLDivElement>(null)
+  const trendingRef = useRef<HTMLDivElement>(null)
   const [topGainers, setTopGainers] = useState<CryptoData[]>([])
   const [topLosers, setTopLosers] = useState<CryptoData[]>([])
   const [cryptoLoading, setCryptoLoading] = useState(true)
@@ -73,7 +74,7 @@ export default function MarketData() {
     return () => { if (container) { container.innerHTML = '' } }
   }, [heatmapMetric])
 
-  // Crypto Screener Widget (Data Analysis)
+  // Crypto Screener Widget (Data Analysis) - Filtered by Binance, Bybit, OKX
   useEffect(() => {
     if (!cryptoScreenerRef.current) return
     const container = cryptoScreenerRef.current
@@ -91,7 +92,48 @@ export default function MarketData() {
       showToolbar: true,
       colorTheme: "dark",
       locale: "en",
-      isTransparent: true
+      isTransparent: true,
+      largeChartUrl: "",
+      screener_type: "crypto_mkt",
+      displayCurrency: "USD",
+      filter: [
+        { left: "exchange", operation: "in_range", right: ["BINANCE", "BYBIT", "OKX"] }
+      ]
+    })
+    container.appendChild(script)
+    return () => { if (container) { container.innerHTML = '' } }
+  }, [])
+
+  // Top Trending Coins Widget
+  useEffect(() => {
+    if (!trendingRef.current) return
+    const container = trendingRef.current
+    container.innerHTML = ''
+    const script = document.createElement('script')
+    script.type = 'text/javascript'
+    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-hotlists.js'
+    script.async = true
+    script.innerHTML = JSON.stringify({
+      colorTheme: "dark",
+      dateRange: "12M",
+      exchange: "US",
+      showChart: true,
+      locale: "en",
+      largeChartUrl: "",
+      isTransparent: true,
+      showSymbolLogo: true,
+      showFloatingTooltip: false,
+      width: "100%",
+      height: "100%",
+      plotLineColorGrowing: "rgba(41, 98, 255, 1)",
+      plotLineColorFalling: "rgba(41, 98, 255, 1)",
+      gridLineColor: "rgba(42, 46, 57, 0)",
+      scaleFontColor: "rgba(120, 123, 134, 1)",
+      belowLineFillColorGrowing: "rgba(41, 98, 255, 0.12)",
+      belowLineFillColorFalling: "rgba(41, 98, 255, 0.12)",
+      belowLineFillColorGrowingBottom: "rgba(41, 98, 255, 0)",
+      belowLineFillColorFallingBottom: "rgba(41, 98, 255, 0)",
+      symbolActiveColor: "rgba(41, 98, 255, 0.12)"
     })
     container.appendChild(script)
     return () => { if (container) { container.innerHTML = '' } }
@@ -164,9 +206,29 @@ export default function MarketData() {
           </div>
 
           {/* Main Content Grid */}
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-            {/* Left Column: Economic Calendar & Heatmap */}
-            <div className="xl:col-span-2 space-y-6">
+          <div className="space-y-6">
+            {/* Full Width: Cryptocurrency Data Analysis */}
+            <div>
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">📈</span>
+                  <h2 className="text-xl font-semibold text-krtext">Cryptocurrency Data Analysis</h2>
+                </div>
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-krgold/10 border border-krgold/30 rounded-lg">
+                  <span className="text-xs font-semibold text-krgold">Binance</span>
+                  <span className="text-xs text-krgold/50">•</span>
+                  <span className="text-xs font-semibold text-krgold">Bybit</span>
+                  <span className="text-xs text-krgold/50">•</span>
+                  <span className="text-xs font-semibold text-krgold">OKX</span>
+                </div>
+              </div>
+              <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[700px]">
+                <div ref={cryptoScreenerRef} className="h-full w-full"></div>
+              </div>
+            </div>
+
+            {/* Three Column Row: Economic Calendar, Heatmap, Trending */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Economic Calendar */}
               <div>
                 <div className="flex items-center gap-3 mb-6">
@@ -182,13 +244,13 @@ export default function MarketData() {
               <div>
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center gap-3">
-                    <span className="text-2xl">�</span>
-                    <h2 className="text-xl font-semibold text-krtext">Crypto Market Heatmap</h2>
+                    <span className="text-2xl">🔥</span>
+                    <h2 className="text-xl font-semibold text-krtext">Market Heatmap</h2>
                   </div>
                   <select
                     value={heatmapMetric}
                     onChange={(e) => setHeatmapMetric(e.target.value as 'change' | 'volume' | 'open_interest')}
-                    className="bg-krcard border border-krborder rounded-lg px-3 py-2 text-sm text-krtext focus:outline-none focus:border-krgold"
+                    className="bg-krcard border border-krborder rounded-lg px-2 py-1 text-xs text-krtext focus:outline-none focus:border-krgold"
                   >
                     <option value="change">Change %</option>
                     <option value="volume">Volume</option>
@@ -200,20 +262,20 @@ export default function MarketData() {
                 </div>
               </div>
 
-              {/* Cryptocurrency Data Analysis */}
+              {/* Top Trending Coins */}
               <div>
                 <div className="flex items-center gap-3 mb-6">
-                  <span className="text-2xl">📈</span>
-                  <h2 className="text-xl font-semibold text-krtext">Cryptocurrency Data Analysis</h2>
+                  <span className="text-2xl">⭐</span>
+                  <h2 className="text-xl font-semibold text-krtext">Top Trending</h2>
                 </div>
-                <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[600px]">
-                  <div ref={cryptoScreenerRef} className="h-full w-full"></div>
+                <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[500px]">
+                  <div ref={trendingRef} className="h-full w-full"></div>
                 </div>
               </div>
             </div>
-                
-            {/* Right Column: Crypto Data */}
-            <div className="xl:col-span-1 space-y-6">
+
+            {/* Two Column Row: Top Gainers & Top Losers */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Top Crypto Gainers */}
               <div>
                 <div className="flex items-center justify-between mb-4">
@@ -319,9 +381,9 @@ export default function MarketData() {
           {/* Data Sources Footer */}
           <div className="mt-8 pt-6 border-t border-krborder">
             <div className="text-xs text-krmuted text-center">
-              <span className="font-semibold">Data Sources:</span> Economic calendar, crypto heatmap & screener powered by{' '}
+              <span className="font-semibold">Data Sources:</span> Economic calendar, crypto heatmap, screener & trending powered by{' '}
               <span className="text-krgold font-medium">TradingView</span> • Top gainers/losers from{' '}
-              <span className="text-krgold font-medium">CoinGecko</span> • Comprehensive crypto analysis with sortable metrics • Updates every{' '}
+              <span className="text-krgold font-medium">CoinGecko</span> • Screener filtered to Binance, Bybit & OKX exchanges • Updates every{' '}
               <span className="text-green-400">1 minute</span>
             </div>
           </div>
