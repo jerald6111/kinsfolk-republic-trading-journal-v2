@@ -24,14 +24,26 @@ if (Test-Path $currentVersionFile) {
     Write-Host "✅ Archived version $currentVersion to archive/" -ForegroundColor Green
 }
 
-# Step 2: Clean up old archives (keep only last 2 versions)
-Write-Host "🧹 Cleaning old archive versions..." -ForegroundColor Yellow
+# Step 2: Clean up old versions (keep only last 2 installers and archives)
+Write-Host "🧹 Cleaning old versions..." -ForegroundColor Yellow
+
+# Clean old archive JSON files (keep last 2)
 $archiveFiles = Get-ChildItem "public/downloads/archive/version-*.json" | Sort-Object Name -Descending
 if ($archiveFiles.Count -gt 2) {
     $filesToRemove = $archiveFiles | Select-Object -Skip 2
     foreach ($file in $filesToRemove) {
         Remove-Item $file.FullName
-        Write-Host "🗑️  Removed old version: $($file.Name)" -ForegroundColor Red
+        Write-Host "🗑️  Removed old archive: $($file.Name)" -ForegroundColor Red
+    }
+}
+
+# Clean old installer files (keep last 2 versions)
+$installerFiles = Get-ChildItem "public/downloads/KRTJ-Desktop-Setup-*.exe" | Sort-Object Name -Descending
+if ($installerFiles.Count -gt 2) {
+    $filesToRemove = $installerFiles | Select-Object -Skip 2
+    foreach ($file in $filesToRemove) {
+        Remove-Item $file.FullName
+        Write-Host "🗑️  Removed old installer: $($file.Name)" -ForegroundColor Red
     }
 }
 

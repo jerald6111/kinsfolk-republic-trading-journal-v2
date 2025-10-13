@@ -11,16 +11,13 @@ yarn-debug.log*
 yarn-error.log*
 /*.tgz
 
-# Electron build outputs
+# Electron build outputs (but allow downloads folder)
 desktop/electron-dist/
-public/downloads/*.exe
+!public/downloads/
 
-# Archive folder should be tracked (JSON files only)
-!public/downloads/archive/
-public/downloads/archive/*.exe
-
-# Large executable files
+# Large executable files (except in downloads)
 *.exe
+!public/downloads/*.exe
 *.dmg
 *.pkg
 *.deb
