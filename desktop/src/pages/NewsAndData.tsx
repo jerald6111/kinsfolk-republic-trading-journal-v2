@@ -43,6 +43,11 @@ export default function NewsAndData() {
     if (!calendarRef.current) return
     const container = calendarRef.current
     container.innerHTML = ''
+    
+    // Set explicit height to ensure the widget uses full container
+    container.style.height = '100%'
+    container.style.minHeight = '600px'
+    
     const script = document.createElement('script')
     script.type = 'text/javascript'
     script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-events.js'
@@ -51,7 +56,7 @@ export default function NewsAndData() {
       colorTheme: 'dark',
       isTransparent: true,
       width: '100%',
-      height: '100%',
+      height: 600, // Set explicit pixel height for TradingView widget
       locale: 'en',
       importanceFilter: '0,1',
       countryFilter: 'us,eu,gb,jp,cn,au'
@@ -268,8 +273,8 @@ export default function NewsAndData() {
                   <span className="text-2xl">�</span>
                   <h2 className="text-xl font-semibold text-krtext">Economic Calendar</h2>
                 </div>
-                <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[calc(100vh-280px)]">
-                  <div ref={calendarRef} className="h-full w-full"></div>
+                <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[calc(100vh-280px)] min-h-[650px]">
+                  <div ref={calendarRef} className="h-full w-full min-h-[600px]" style={{height: '100%', minHeight: '600px'}}></div>
                 </div>
               </div>
             </div>

@@ -1,16 +1,16 @@
 {
-  "version": "1.6.3",
+  "version": "1.6.4",
   "releaseDate": "2024-12-28",
-  "downloadUrl": "/downloads/KRTJ-Desktop-Setup-1.6.3.exe",
+  "downloadUrl": "/downloads/KRTJ-Desktop-Setup-1.6.4.exe",
   "releaseNotes": {
-    "title": "KRTJ Desktop v1.6.3 - Update Detection Fixed & Economic Calendar Enhanced! �📈",
+    "title": "KRTJ Desktop v1.6.4 - Economic Calendar Height Fixed! 📊📈",
     "features": [
-      "FIXED: Auto-update detection now works reliably with cache-busting technology",
-      "FIXED: Economic Calendar layout updated to match main website format perfectly",
-      "IMPROVED: Economic Calendar now uses full height and width for better viewing",
-      "IMPROVED: Update check system bypasses browser cache for fresh version data", 
-      "ENHANCED: Economic Calendar widget configuration streamlined like web version",
-      "OPTIMIZED: Reduced loading complexity while maintaining reliability"
+      "CRITICAL FIX: Economic Calendar now displays at proper full height (600px minimum)",
+      "FIXED: TradingView widget height configuration set to explicit pixel values", 
+      "IMPROVED: Economic Calendar container styling with min-height enforcement",
+      "ENHANCED: Widget container now properly enforces height dimensions",
+      "OPTIMIZED: Calendar widget fills the entire allocated container space",
+      "RESOLVED: Small calendar display issue completely eliminated"
     ],
     "improvements": [
       "Completely rewritten tray menu system with reliable navigation",
@@ -21,16 +21,16 @@
       "Enhanced memory management with proper event listener cleanup"
     ],
     "bugFixes": [
-      "CRITICAL FIX: Auto-update detection not working - added timestamp cache-busting to version checks", 
-      "FIXED: Economic Calendar layout now matches main website format exactly",
-      "FIXED: Economic Calendar height and width optimized for full container usage",
-      "IMPROVED: Update check URL includes cache-busting parameter for reliable detection",
-      "ENHANCED: Simplified Economic Calendar widget initialization like web version",
-      "OPTIMIZED: Removed unnecessary loading states that could interfere with display",
-      "RESOLVED: Version comparison working correctly with fresh data retrieval",
-      "IMPROVED: Update notification system more responsive to new releases"
+      "CRITICAL FIX: Economic Calendar size issue - widget now uses proper 600px minimum height",
+      "FIXED: TradingView widget configuration updated with explicit height: 600 pixels",
+      "FIXED: Container styling enhanced with min-height enforcement (650px container, 600px widget)",
+      "RESOLVED: Economic Calendar no longer displays as small compressed widget",
+      "IMPROVED: Widget container forces proper dimensions with inline styling",
+      "ENHANCED: Calendar display now matches expected full-size appearance",
+      "OPTIMIZED: Container CSS classes and inline styles work together for proper sizing",
+      "FIXED: Calendar widget properly utilizes allocated screen real estate"
     ],
-    "notes": "Fix for auto-update detection and Economic Calendar layout! This version ensures the app can reliably detect new updates and displays the Economic Calendar in the same format as the main website. 🔄📊"
+    "notes": "Emergency fix for Economic Calendar height! The calendar widget was displaying too small - now forces proper 600px minimum height with container styling and explicit TradingView widget dimensions. 📊✨"
   },
   "minimumVersion": "1.0.0",
   "isRequired": false,

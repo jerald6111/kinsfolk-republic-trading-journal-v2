@@ -1,6 +1,6 @@
 {
   "name": "kinsfolk-republic-trading-journal-desktop",
-  "version": "1.6.3",
+  "version": "1.6.4",
   "description": "Kinsfolk Republic Trading Journal - Desktop Application",
   "main": "main.js",
   "private": true,
