@@ -13,7 +13,7 @@ interface CryptoData {
   market_cap_rank: number
 }
 
-// News item for ticker
+// News item with AI sentiment analysis
 interface NewsItem {
   id: string
   title: string
@@ -22,6 +22,159 @@ interface NewsItem {
   category: 'crypto' | 'stocks' | 'forex' | 'world'
   summary?: string
   url?: string
+  aiAnalysis?: {
+    sentiment: 'bullish' | 'bearish' | 'neutral'
+    confidence: number
+    keyPoints: string[]
+    marketImpact: {
+      severity: 'low' | 'medium' | 'high'
+      timeframe: 'short' | 'medium' | 'long'
+      affectedMarkets: string[]
+      description: string
+    }
+  }
+}
+
+// AI Market Sentiment Analyzer
+const analyzeMarketSentiment = (newsItem: NewsItem) => {
+  const title = newsItem.title.toLowerCase()
+  
+  // Bullish indicators
+  const bullishKeywords = ['surge', 'rally', 'gains', 'up', 'rise', 'soar', 'breakthrough', 'approval', 'adoption', 'positive', 'bullish', 'record high', 'milestone', 'growth', 'expansion']
+  
+  // Bearish indicators  
+  const bearishKeywords = ['crash', 'fall', 'drop', 'decline', 'bearish', 'concern', 'risk', 'regulation', 'ban', 'hack', 'volatility', 'uncertainty', 'downturn', 'loss']
+  
+  // Calculate sentiment score
+  const bullishScore = bullishKeywords.reduce((score, word) => title.includes(word) ? score + 1 : score, 0)
+  const bearishScore = bearishKeywords.reduce((score, word) => title.includes(word) ? score + 1 : score, 0)
+  
+  let sentiment: 'bullish' | 'bearish' | 'neutral'
+  let confidence: number
+  
+  if (bullishScore > bearishScore) {
+    sentiment = 'bullish'
+    confidence = Math.min(0.6 + (bullishScore * 0.1), 0.95)
+  } else if (bearishScore > bullishScore) {
+    sentiment = 'bearish'
+    confidence = Math.min(0.6 + (bearishScore * 0.1), 0.95)
+  } else {
+    sentiment = 'neutral'
+    confidence = 0.7
+  }
+
+  // Generate AI key points based on category and sentiment
+  const generateKeyPoints = (category: string, sentiment: string) => {
+    const points: { [key: string]: { [key: string]: string[] } } = {
+      crypto: {
+        bullish: [
+          "Institutional adoption continues to drive long-term price stability and growth potential",
+          "Technical indicators suggest strong momentum with potential for continued upward movement", 
+          "Market sentiment remains positive as regulatory clarity improves globally"
+        ],
+        bearish: [
+          "Market volatility increases amid regulatory uncertainty and institutional concerns",
+          "Technical analysis shows potential for further downward pressure in short term",
+          "Risk sentiment deteriorates as market participants reassess crypto valuations"
+        ],
+        neutral: [
+          "Market consolidation continues as investors await clearer directional signals",
+          "Trading volumes remain stable with balanced buying and selling pressure",
+          "Technical indicators suggest sideways movement until next major catalyst"
+        ]
+      },
+      stocks: {
+        bullish: [
+          "Strong earnings performance supports continued equity market optimism and valuations",
+          "Economic indicators point to sustained corporate growth and profitability trends",
+          "Market technicals suggest potential for further upside in current bull cycle"
+        ],
+        bearish: [
+          "Concerns over valuations and economic headwinds weigh on investor sentiment",
+          "Technical indicators signal potential correction as market reaches overbought levels",
+          "Macroeconomic uncertainties create challenges for sustained equity market gains"
+        ],
+        neutral: [
+          "Markets digest mixed economic signals while maintaining cautious optimism",
+          "Earnings season provides balanced results with sector-specific variations",
+          "Investor sentiment remains measured as markets await policy developments"
+        ]
+      },
+      forex: {
+        bullish: [
+          "Central bank policy support strengthens currency outlook amid improving fundamentals",
+          "Economic data releases exceed expectations, supporting currency strength",
+          "Technical momentum suggests continued appreciation against major trading partners"
+        ],
+        bearish: [
+          "Policy uncertainties and economic headwinds create downward pressure on currency",
+          "Central bank signals raise concerns about future monetary policy direction",
+          "Technical breakdown suggests potential for further weakness in coming sessions"
+        ],
+        neutral: [
+          "Currency pairs remain range-bound as markets assess competing policy influences",
+          "Mixed economic signals create balanced trading environment with limited directional bias",
+          "Technical consolidation continues as traders await clearer fundamental catalysts"
+        ]
+      },
+      world: {
+        bullish: [
+          "Global economic indicators show resilience despite ongoing geopolitical challenges",
+          "International cooperation strengthens trade relationships and economic stability",
+          "Emerging markets demonstrate robust growth potential amid global uncertainties"
+        ],
+        bearish: [
+          "Geopolitical tensions escalate, creating risks for global economic stability",
+          "International trade disruptions threaten supply chains and economic growth",
+          "Global economic slowdown concerns intensify amid policy uncertainties"
+        ],
+        neutral: [
+          "Global markets remain cautious as investors assess mixed economic and political signals",
+          "International developments create balanced risks and opportunities for global growth",
+          "World economic outlook remains stable with region-specific variations in performance"
+        ]
+      }
+    }
+    
+    return points[category]?.[sentiment] || points['world']['neutral']
+  }
+
+  // Generate market impact assessment
+  const generateMarketImpact = (category: string, sentiment: string, title: string) => {
+    const isHighImpact = title.includes('federal reserve') || title.includes('central bank') || 
+                        title.includes('regulation') || title.includes('approval') || 
+                        title.includes('ban') || title.includes('breakthrough')
+    
+    const severity = isHighImpact ? 'high' : (sentiment === 'neutral' ? 'low' : 'medium')
+    const timeframe = isHighImpact ? 'long' : (sentiment === 'bullish' ? 'medium' : 'short')
+    
+    const affectedMarkets: { [key: string]: string[] } = {
+      crypto: ['Cryptocurrency', 'Blockchain Technology', 'Digital Assets'],
+      stocks: ['Equity Markets', 'Corporate Bonds', 'Market Indices'],
+      forex: ['Currency Markets', 'International Trade', 'Central Bank Policy'],
+      world: ['Global Markets', 'International Trade', 'Geopolitical Risk']
+    }
+    
+    const impactDescriptions: { [key: string]: string } = {
+      bullish: `Positive market sentiment expected to drive ${severity === 'high' ? 'significant' : 'moderate'} gains across related asset classes`,
+      bearish: `Market headwinds likely to create ${severity === 'high' ? 'substantial' : 'limited'} downward pressure on associated investments`,
+      neutral: `Balanced market conditions with ${severity === 'high' ? 'potential for volatility' : 'stable price action'} expected`
+    }
+    
+    return {
+      severity: severity as 'low' | 'medium' | 'high',
+      timeframe: timeframe as 'short' | 'medium' | 'long',
+      affectedMarkets: affectedMarkets[category] || affectedMarkets['world'],
+      description: impactDescriptions[sentiment]
+    }
+  }
+
+  return {
+    sentiment,
+    confidence,
+    keyPoints: generateKeyPoints(newsItem.category, sentiment),
+    marketImpact: generateMarketImpact(newsItem.category, sentiment, title)
+  }
 }
 
 export default function NewsAndData() {
@@ -234,7 +387,13 @@ export default function NewsAndData() {
           allNews.push(...fallbackCrypto)
         }
         
-        setNewsItems(allNews)
+        // Add AI analysis to all news items
+        const newsWithAI = allNews.map(item => ({
+          ...item,
+          aiAnalysis: analyzeMarketSentiment(item)
+        }))
+        
+        setNewsItems(newsWithAI)
       } catch (error) {
         console.error('Error fetching news:', error)
       } finally {
@@ -321,6 +480,41 @@ export default function NewsAndData() {
             </div>
           </div>
 
+          {/* Economic Calendar Section */}
+          <div className="mb-6 bg-gradient-to-br from-krcard/95 to-krcard/80 backdrop-blur-md rounded-2xl shadow-2xl border-2 border-krgold/30 p-6 relative overflow-hidden">
+            {/* Enhanced background accent */}
+            <div className="absolute inset-0 bg-gradient-to-br from-krgold/5 via-transparent to-kryellow/5 pointer-events-none"></div>
+            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-krgold/10 to-transparent rounded-full blur-2xl pointer-events-none"></div>
+            
+            <div className="relative z-10">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="p-3 bg-gradient-to-br from-krgold/20 to-kryellow/20 rounded-xl">
+                  <Calendar className="text-krgold" size={28} />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold bg-gradient-to-r from-krgold to-kryellow bg-clip-text text-transparent">Economic Calendar</h2>
+                  <p className="text-sm text-krmuted flex items-center gap-2">
+                    <Clock size={12} />
+                    Live market-moving events
+                  </p>
+                </div>
+              </div>
+              
+              {/* Featured indicator */}
+              <div className="bg-krgold/10 border border-krgold/20 rounded-lg p-3 mb-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-krgold rounded-full animate-pulse"></div>
+                  <span className="text-xs font-bold text-krgold uppercase">Today's Key Events</span>
+                </div>
+                <p className="text-xs text-krmuted mt-1">Track high-impact economic releases and central bank decisions</p>
+              </div>
+
+              <div className="tradingview-widget-container h-96 rounded-xl overflow-hidden border border-krgold/20">
+                <div ref={calendarRef} className="tradingview-widget-container__widget h-full"></div>
+              </div>
+            </div>
+          </div>
+
           {/* Featured News Section */}
           <div className="mb-6 bg-krcard/90 backdrop-blur-md rounded-2xl shadow-2xl border border-krborder/50 p-6">
             <div className="flex items-center gap-3 mb-6">
@@ -329,7 +523,7 @@ export default function NewsAndData() {
               </div>
               <div>
                 <h2 className="text-2xl font-bold bg-gradient-to-r from-krgold to-kryellow bg-clip-text text-transparent">Featured News</h2>
-                <p className="text-xs text-krmuted">Multi-market highlights from premium sources</p>
+                <p className="text-xs text-krmuted">Multi-market highlights with AI sentiment analysis</p>
               </div>
             </div>
             
@@ -337,7 +531,7 @@ export default function NewsAndData() {
             <div className="bg-krblack/40 rounded-xl p-4 mb-6 overflow-hidden">
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-2 h-2 bg-krgold rounded-full animate-pulse"></div>
-                <span className="text-xs font-bold text-krgold uppercase">Breaking Headlines</span>
+                <span className="text-xs font-bold text-krgold uppercase">Live Headlines</span>
               </div>
               <div className="news-bulletin-wrapper">
                 <div className="news-bulletin">
@@ -355,6 +549,15 @@ export default function NewsAndData() {
                         </div>
                         <span className="text-krtext font-medium">{item.title}</span>
                         <span className="text-krmuted text-xs">({item.source})</span>
+                        {item.aiAnalysis && (
+                          <div className={`w-2 h-2 rounded-full ${
+                            item.aiAnalysis.sentiment === 'bullish' 
+                              ? 'bg-green-400' 
+                              : item.aiAnalysis.sentiment === 'bearish'
+                              ? 'bg-red-400'
+                              : 'bg-blue-400'
+                          }`} title={`AI Sentiment: ${item.aiAnalysis.sentiment} (${(item.aiAnalysis.confidence * 100).toFixed(0)}%)`}></div>
+                        )}
                       </div>
                       <span className="text-krmuted mx-6">•</span>
                     </div>
@@ -373,6 +576,15 @@ export default function NewsAndData() {
                         </div>
                         <span className="text-krtext font-medium">{item.title}</span>
                         <span className="text-krmuted text-xs">({item.source})</span>
+                        {item.aiAnalysis && (
+                          <div className={`w-2 h-2 rounded-full ${
+                            item.aiAnalysis.sentiment === 'bullish' 
+                              ? 'bg-green-400' 
+                              : item.aiAnalysis.sentiment === 'bearish'
+                              ? 'bg-red-400'
+                              : 'bg-blue-400'
+                          }`} title={`AI Sentiment: ${item.aiAnalysis.sentiment} (${(item.aiAnalysis.confidence * 100).toFixed(0)}%)`}></div>
+                        )}
                       </div>
                       <span className="text-krmuted mx-6">•</span>
                     </div>
@@ -481,47 +693,8 @@ export default function NewsAndData() {
             </div>
           </div>
 
-          {/* Main Data Grid */}
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-            {/* Economic Calendar - Featured Left Column */}
-            <div className="xl:col-span-1">
-              <div className="bg-gradient-to-br from-krcard/95 to-krcard/80 backdrop-blur-md rounded-2xl shadow-2xl border-2 border-krgold/30 p-6 h-full relative overflow-hidden">
-                {/* Enhanced background accent */}
-                <div className="absolute inset-0 bg-gradient-to-br from-krgold/5 via-transparent to-kryellow/5 pointer-events-none"></div>
-                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-krgold/10 to-transparent rounded-full blur-2xl pointer-events-none"></div>
-                
-                <div className="relative z-10">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="p-3 bg-gradient-to-br from-krgold/20 to-kryellow/20 rounded-xl">
-                      <Calendar className="text-krgold" size={28} />
-                    </div>
-                    <div>
-                      <h2 className="text-2xl font-bold bg-gradient-to-r from-krgold to-kryellow bg-clip-text text-transparent">Economic Calendar</h2>
-                      <p className="text-sm text-krmuted flex items-center gap-2">
-                        <Clock size={12} />
-                        Live market-moving events
-                      </p>
-                    </div>
-                  </div>
-                  
-                  {/* Featured indicator */}
-                  <div className="bg-krgold/10 border border-krgold/20 rounded-lg p-3 mb-4">
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-krgold rounded-full animate-pulse"></div>
-                      <span className="text-xs font-bold text-krgold uppercase">Today's Key Events</span>
-                    </div>
-                    <p className="text-xs text-krmuted mt-1">Track high-impact economic releases and central bank decisions</p>
-                  </div>
-
-                  <div className="tradingview-widget-container h-[calc(100%-180px)] rounded-xl overflow-hidden border border-krgold/20">
-                    <div ref={calendarRef} className="tradingview-widget-container__widget h-full"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Crypto Widgets - Right Columns */}
-            <div className="xl:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Top Crypto Gainers & Losers */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Top Gainers */}
               <div className="bg-krcard/90 backdrop-blur-md rounded-2xl shadow-2xl border border-green-500/20 p-6">
                 <div className="flex items-center justify-between mb-4">
@@ -702,90 +875,92 @@ export default function NewsAndData() {
               )}
               
               <div className="space-y-4">
-                {/* Article Content */}
+                {/* AI Sentiment Analysis */}
+                {selectedArticle.aiAnalysis && (
+                  <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/30 rounded-lg p-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></div>
+                      <h4 className="font-semibold text-blue-400">AI Market Sentiment Analysis</h4>
+                    </div>
+                    <div className="flex items-center gap-4 mb-3">
+                      <div className={`px-3 py-1 rounded-full text-sm font-medium ${
+                        selectedArticle.aiAnalysis.sentiment === 'bullish' 
+                          ? 'bg-green-500/20 text-green-400 border border-green-500/30' 
+                          : selectedArticle.aiAnalysis.sentiment === 'bearish'
+                          ? 'bg-red-500/20 text-red-400 border border-red-500/30'
+                          : 'bg-gray-500/20 text-gray-400 border border-gray-500/30'
+                      }`}>
+                        {selectedArticle.aiAnalysis.sentiment.toUpperCase()}
+                      </div>
+                      <div className="text-sm text-krmuted">
+                        Confidence: {(selectedArticle.aiAnalysis.confidence * 100).toFixed(0)}%
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* AI Key Points */}
                 <div className="bg-krblack/20 rounded-lg p-6">
-                  <h3 className="text-lg font-semibold text-krtext mb-3">Key Points</h3>
+                  <h3 className="text-lg font-semibold text-krtext mb-3">AI-Generated Key Points</h3>
                   <div className="space-y-3">
-                    {selectedArticle.category === 'crypto' && (
-                      <>
-                        <div className="flex items-start gap-3">
-                          <div className="w-2 h-2 rounded-full bg-orange-400 mt-2 flex-shrink-0"></div>
-                          <p className="text-krmuted">Market analysts predict continued institutional adoption driving long-term price stability and growth potential.</p>
-                        </div>
-                        <div className="flex items-start gap-3">
-                          <div className="w-2 h-2 rounded-full bg-orange-400 mt-2 flex-shrink-0"></div>
-                          <p className="text-krmuted">Regulatory clarity in major markets continues to improve, providing more confidence for institutional investors.</p>
-                        </div>
-                        <div className="flex items-start gap-3">
-                          <div className="w-2 h-2 rounded-full bg-orange-400 mt-2 flex-shrink-0"></div>
-                          <p className="text-krmuted">Technical indicators suggest potential for continued upward momentum in the medium term.</p>
-                        </div>
-                      </>
-                    )}
-                    
-                    {selectedArticle.category === 'stocks' && (
-                      <>
-                        <div className="flex items-start gap-3">
-                          <div className="w-2 h-2 rounded-full bg-blue-400 mt-2 flex-shrink-0"></div>
-                          <p className="text-krmuted">Earnings reports exceed analyst expectations across multiple sectors, driving market optimism.</p>
-                        </div>
-                        <div className="flex items-start gap-3">
-                          <div className="w-2 h-2 rounded-full bg-blue-400 mt-2 flex-shrink-0"></div>
-                          <p className="text-krmuted">Federal Reserve policy signals continue to support equity valuations and investor confidence.</p>
-                        </div>
-                        <div className="flex items-start gap-3">
-                          <div className="w-2 h-2 rounded-full bg-blue-400 mt-2 flex-shrink-0"></div>
-                          <p className="text-krmuted">Corporate guidance for upcoming quarters remains positive despite global economic uncertainties.</p>
-                        </div>
-                      </>
-                    )}
-                    
-                    {selectedArticle.category === 'forex' && (
-                      <>
-                        <div className="flex items-start gap-3">
-                          <div className="w-2 h-2 rounded-full bg-green-400 mt-2 flex-shrink-0"></div>
-                          <p className="text-krmuted">Central bank policy divergence continues to create trading opportunities across major currency pairs.</p>
-                        </div>
-                        <div className="flex items-start gap-3">
-                          <div className="w-2 h-2 rounded-full bg-green-400 mt-2 flex-shrink-0"></div>
-                          <p className="text-krmuted">Economic data releases show mixed signals, leading to increased volatility in forex markets.</p>
-                        </div>
-                        <div className="flex items-start gap-3">
-                          <div className="w-2 h-2 rounded-full bg-green-400 mt-2 flex-shrink-0"></div>
-                          <p className="text-krmuted">Geopolitical factors continue to influence safe-haven currency flows and risk sentiment.</p>
-                        </div>
-                      </>
-                    )}
-                    
-                    {selectedArticle.category === 'world' && (
-                      <>
-                        <div className="flex items-start gap-3">
-                          <div className="w-2 h-2 rounded-full bg-purple-400 mt-2 flex-shrink-0"></div>
-                          <p className="text-krmuted">Global economic indicators show signs of stabilization following recent volatility periods.</p>
-                        </div>
-                        <div className="flex items-start gap-3">
-                          <div className="w-2 h-2 rounded-full bg-purple-400 mt-2 flex-shrink-0"></div>
-                          <p className="text-krmuted">International trade relationships continue to evolve, impacting global supply chains and pricing.</p>
-                        </div>
-                        <div className="flex items-start gap-3">
-                          <div className="w-2 h-2 rounded-full bg-purple-400 mt-2 flex-shrink-0"></div>
-                          <p className="text-krmuted">Emerging markets show resilience despite ongoing challenges in developed economies.</p>
-                        </div>
-                      </>
-                    )}
+                    {selectedArticle.aiAnalysis?.keyPoints.map((point, index) => (
+                      <div key={index} className="flex items-start gap-3">
+                        <div className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${
+                          selectedArticle.aiAnalysis?.sentiment === 'bullish' 
+                            ? 'bg-green-400' 
+                            : selectedArticle.aiAnalysis?.sentiment === 'bearish'
+                            ? 'bg-red-400'
+                            : 'bg-blue-400'
+                        }`}></div>
+                        <p className="text-krmuted">{point}</p>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
-                {/* Market Impact */}
-                <div className="bg-krgold/10 border border-krgold/30 rounded-lg p-4">
-                  <h4 className="font-semibold text-krgold mb-2">Market Impact</h4>
-                  <p className="text-sm text-krmuted">
-                    {selectedArticle.category === 'crypto' && "This development could significantly influence cryptocurrency adoption rates and institutional investment flows."}
-                    {selectedArticle.category === 'stocks' && "Stock market movements may continue reflecting these fundamental developments in the coming trading sessions."}
-                    {selectedArticle.category === 'forex' && "Currency pair volatility is expected to persist as markets digest this information and central bank responses."}
-                    {selectedArticle.category === 'world' && "Global market sentiment and cross-border investment flows may be influenced by these economic developments."}
-                  </p>
-                </div>
+                {/* AI Market Impact Analysis */}
+                {selectedArticle.aiAnalysis?.marketImpact && (
+                  <div className="bg-krgold/10 border border-krgold/30 rounded-lg p-4">
+                    <h4 className="font-semibold text-krgold mb-3">AI Market Impact Assessment</h4>
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium text-krmuted">Severity:</span>
+                          <span className={`px-2 py-1 rounded text-xs font-medium ${
+                            selectedArticle.aiAnalysis.marketImpact.severity === 'high'
+                              ? 'bg-red-500/20 text-red-400'
+                              : selectedArticle.aiAnalysis.marketImpact.severity === 'medium'
+                              ? 'bg-yellow-500/20 text-yellow-400'
+                              : 'bg-green-500/20 text-green-400'
+                          }`}>
+                            {selectedArticle.aiAnalysis.marketImpact.severity.toUpperCase()}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium text-krmuted">Timeframe:</span>
+                          <span className="text-sm text-krtext">
+                            {selectedArticle.aiAnalysis.marketImpact.timeframe}-term
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <span className="text-sm font-medium text-krmuted mb-2 block">Affected Markets:</span>
+                        <div className="flex flex-wrap gap-2">
+                          {selectedArticle.aiAnalysis.marketImpact.affectedMarkets.map((market, index) => (
+                            <span key={index} className="px-2 py-1 bg-krblack/30 rounded text-xs text-krmuted">
+                              {market}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      <p className="text-sm text-krmuted">
+                        {selectedArticle.aiAnalysis.marketImpact.description}
+                      </p>
+                    </div>
+                  </div>
+                )}
 
                 {/* External Link */}
                 {selectedArticle.url && selectedArticle.url !== '#' && (

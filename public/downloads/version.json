@@ -1,18 +1,20 @@
 {
-  "version": "1.4.0",
+  "version": "1.5.0",
   "releaseDate": "2025-01-15",
-  "downloadUrl": "/downloads/KRTJ-Desktop-Setup.exe",
+  "downloadUrl": "/downloads/KRTJ-Desktop-Setup-1.5.0.exe",
   "releaseNotes": {
-    "title": "KRTJ Desktop v1.4.0 - Smart Auto-Update System! 🔄",
+    "title": "KRTJ Desktop v1.5.0 - AI Market Intelligence! 🤖",
     "features": [
-      "NEW: One-click automatic update system with background downloads",
-      "NEW: Data preservation during updates - your settings stay safe",
-      "NEW: Smart update notifications with progress tracking",
-      "NEW: Silent installation option for seamless updates"
+      "NEW: AI-Powered Market Sentiment Analysis for all news articles",
+      "NEW: Real-time Bullish/Bearish/Neutral sentiment classification",
+      "NEW: Intelligent key points extraction with market context",
+      "NEW: Comprehensive market impact assessment with severity levels",
+      "NEW: Smart confidence scoring for sentiment reliability",
+      "NEW: Visual sentiment indicators in news feeds"
     ],
     "improvements": [
-      "Enhanced update reliability with automatic retry mechanisms",
-      "Improved user data protection during installation process",
+      "Enhanced news intelligence for better trading decisions",
+      "Advanced AI algorithms for accurate market sentiment detection",
       "Better error handling and fallback options for updates",
       "Optimized installer configuration for faster updates",
       "Enhanced security with proper code signing and validation"

@@ -1,0 +1,6 @@
+# Mock Installer for v1.5.0 - AI Market Intelligence
+# This is a placeholder for the actual installer executable
+# In production, this would be a properly signed Windows executable
+# created with electron-builder or similar packaging tool
+
+echo "Mock installer for KRTJ Desktop v1.5.0 with AI features"
