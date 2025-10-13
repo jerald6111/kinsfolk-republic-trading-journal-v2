@@ -13,9 +13,19 @@ contextBridge.exposeInMainWorld('electronAPI', {
   updateNetworkStatus: (isOnline) => ipcRenderer.send('network-status', isOnline),
   
   // Listen for navigation requests from main process
-  onNavigate: (callback) => ipcRenderer.on('navigate-to', callback),
-  onExportData: (callback) => ipcRenderer.on('export-data', callback),
-  onToggleChatbot: (callback) => ipcRenderer.on('toggle-chatbot', callback),
+  onNavigate: (callback) => {
+    ipcRenderer.on('navigate-to', callback)
+    // Return cleanup function
+    return () => ipcRenderer.removeListener('navigate-to', callback)
+  },
+  onExportData: (callback) => {
+    ipcRenderer.on('export-data', callback)
+    return () => ipcRenderer.removeListener('export-data', callback)
+  },
+  onToggleChatbot: (callback) => {
+    ipcRenderer.on('toggle-chatbot', callback)
+    return () => ipcRenderer.removeListener('toggle-chatbot', callback)
+  },
   
   // Platform info
   platform: process.platform,

@@ -25,7 +25,7 @@ export default function App() {
 
   useEffect(() => {
     // Listen for navigation messages from main process (tray menu clicks)
-    if ((window as any).electronAPI) {
+    if (window.electronAPI) {
       const handleNavigation = (event: any, route: string) => {
         console.log('Navigation requested:', route)
         // Remove hash if present and navigate
@@ -33,7 +33,7 @@ export default function App() {
         navigate(path)
       }
 
-      ;(window as any).electronAPI.onNavigate(handleNavigation)
+      window.electronAPI.onNavigate(handleNavigation)
     }
   }, [navigate])
 
