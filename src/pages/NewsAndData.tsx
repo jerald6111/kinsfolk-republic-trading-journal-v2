@@ -19,6 +19,7 @@ interface NewsItem {
   title: string
   source: string
   publishedAt: string
+  fetchedAt: string // When we fetched this article
   category: 'crypto' | 'stocks' | 'forex' | 'world'
   summary?: string
   url?: string
@@ -114,19 +115,32 @@ export default function NewsAndData() {
       try {
         if (isInitialLoad) setLoading(true)
         const allNewNews: NewsItem[] = []
-        const timestamp = Date.now()
+        const fetchTimestamp = new Date().toLocaleString('en-US', {
+          month: 'long',
+          day: 'numeric', 
+          year: 'numeric',
+          hour: 'numeric',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: true
+        })
+        const cacheTimestamp = Date.now()
+
+        console.log(`🔄 Fetching news at: ${fetchTimestamp}`)
 
         // CRYPTO NEWS - CoinTelegraph RSS
         try {
-          const cryptoResponse = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=https://cointelegraph.com/rss&_t=${timestamp}`)
+          const cryptoResponse = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=https://cointelegraph.com/rss&api_key=YOUR_API_KEY&count=20&_t=${cacheTimestamp}`)
           const cryptoData = await cryptoResponse.json()
           
-          if (cryptoData.items) {
+          if (cryptoData.items && cryptoData.items.length > 0) {
+            console.log(`✅ Fetched ${cryptoData.items.length} crypto articles`)
             const cryptoNews = cryptoData.items.map((item: any) => ({
               id: `crypto-${item.guid || item.link}-${new Date(item.pubDate).getTime()}`,
               title: item.title,
               source: 'CoinTelegraph',
               publishedAt: item.pubDate,
+              fetchedAt: fetchTimestamp,
               category: 'crypto' as const,
               summary: item.description?.replace(/<[^>]*>/g, '').substring(0, 200) + '...',
               url: item.link
@@ -134,20 +148,22 @@ export default function NewsAndData() {
             allNewNews.push(...cryptoNews)
           }
         } catch (error) {
-          console.error('Failed to fetch crypto news:', error)
+          console.error('❌ Failed to fetch crypto news:', error)
         }
 
         // STOCKS NEWS - MarketWatch RSS
         try {
-          const stocksResponse = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=https://feeds.marketwatch.com/marketwatch/topstories/&_t=${timestamp}`)
+          const stocksResponse = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=https://feeds.marketwatch.com/marketwatch/topstories/&count=20&_t=${cacheTimestamp}`)
           const stocksData = await stocksResponse.json()
           
-          if (stocksData.items) {
+          if (stocksData.items && stocksData.items.length > 0) {
+            console.log(`✅ Fetched ${stocksData.items.length} stocks articles`)
             const stocksNews = stocksData.items.map((item: any) => ({
               id: `stocks-${item.guid || item.link}-${new Date(item.pubDate).getTime()}`,
               title: item.title,
               source: 'MarketWatch',
               publishedAt: item.pubDate,
+              fetchedAt: fetchTimestamp,
               category: 'stocks' as const,
               summary: item.description?.replace(/<[^>]*>/g, '').substring(0, 200) + '...',
               url: item.link
@@ -155,20 +171,22 @@ export default function NewsAndData() {
             allNewNews.push(...stocksNews)
           }
         } catch (error) {
-          console.error('Failed to fetch stocks news:', error)
+          console.error('❌ Failed to fetch stocks news:', error)
         }
 
         // FOREX NEWS - ForexLive RSS  
         try {
-          const forexResponse = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=https://www.forexlive.com/feed/&_t=${timestamp}`)
+          const forexResponse = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=https://www.forexlive.com/feed/&count=20&_t=${cacheTimestamp}`)
           const forexData = await forexResponse.json()
           
-          if (forexData.items) {
+          if (forexData.items && forexData.items.length > 0) {
+            console.log(`✅ Fetched ${forexData.items.length} forex articles`)
             const forexNews = forexData.items.map((item: any) => ({
               id: `forex-${item.guid || item.link}-${new Date(item.pubDate).getTime()}`,
               title: item.title,
               source: 'ForexLive',
               publishedAt: item.pubDate,
+              fetchedAt: fetchTimestamp,
               category: 'forex' as const,
               summary: item.description?.replace(/<[^>]*>/g, '').substring(0, 200) + '...',
               url: item.link
@@ -176,20 +194,22 @@ export default function NewsAndData() {
             allNewNews.push(...forexNews)
           }
         } catch (error) {
-          console.error('Failed to fetch forex news:', error)
+          console.error('❌ Failed to fetch forex news:', error)
         }
 
         // WORLD NEWS - BBC World News RSS
         try {
-          const worldResponse = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=http://feeds.bbci.co.uk/news/world/rss.xml&_t=${timestamp}`)
+          const worldResponse = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=http://feeds.bbci.co.uk/news/world/rss.xml&count=20&_t=${cacheTimestamp}`)
           const worldData = await worldResponse.json()
           
-          if (worldData.items) {
+          if (worldData.items && worldData.items.length > 0) {
+            console.log(`✅ Fetched ${worldData.items.length} world articles`)
             const worldNews = worldData.items.map((item: any) => ({
               id: `world-${item.guid || item.link}-${new Date(item.pubDate).getTime()}`,
               title: item.title,
               source: 'BBC News',
               publishedAt: item.pubDate,
+              fetchedAt: fetchTimestamp,
               category: 'world' as const,
               summary: item.description?.replace(/<[^>]*>/g, '').substring(0, 200) + '...',
               url: item.link
@@ -197,8 +217,10 @@ export default function NewsAndData() {
             allNewNews.push(...worldNews)
           }
         } catch (error) {
-          console.error('Failed to fetch world news:', error)
+          console.error('❌ Failed to fetch world news:', error)
         }
+        
+        console.log(`📊 Total articles fetched: ${allNewNews.length}`)
         
         // Stack/accumulate news instead of replacing
         setNewsItems(prevNews => {
@@ -206,11 +228,13 @@ export default function NewsAndData() {
             return allNewNews.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
           }
           
-          // Filter out duplicates and add new items
-          const existingIds = new Set(prevNews.map(item => item.id))
-          const uniqueNewNews = allNewNews.filter(item => !existingIds.has(item.id))
+          // Filter out duplicates by comparing title AND source
+          const existingKeys = new Set(prevNews.map(item => `${item.title}-${item.source}`))
+          const uniqueNewNews = allNewNews.filter(item => !existingKeys.has(`${item.title}-${item.source}`))
           
-          // Combine and sort by date (newest first)
+          console.log(`🆕 ${uniqueNewNews.length} new unique articles added`)
+          
+          // Combine and sort by published date (newest first)
           const combined = [...uniqueNewNews, ...prevNews]
             .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
           
@@ -218,15 +242,19 @@ export default function NewsAndData() {
           return combined.slice(0, 500)
         })
       } catch (error) {
-        console.error('Error fetching live news:', error)
+        console.error('❌ Error fetching live news:', error)
       } finally {
         if (isInitialLoad) setLoading(false)
       }
     }
     
+    console.log('🚀 News feed system initialized - fetching every 60 seconds')
     fetchNews(true) // Initial load
     const interval = setInterval(() => fetchNews(false), 60 * 1000) // Stack new news every 1 minute
-    return () => clearInterval(interval)
+    return () => {
+      clearInterval(interval)
+      console.log('⏹️ News feed system stopped')
+    }
   }, [])
 
   const filteredNews = newsItems.filter(item => item.category === activeNewsCategory)
@@ -270,18 +298,25 @@ export default function NewsAndData() {
 
           {/* Live Feed Ticker */}
           <div className="mb-8">
-            <div className="flex items-center gap-3 mb-4">
-              <span className="text-2xl">📡</span>
-              <h2 className="text-xl font-semibold text-krtext">LIVE FEED</h2>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">📡</span>
+                <h2 className="text-xl font-semibold text-krtext">LIVE FEED</h2>
+                <span className="text-xs text-green-400 animate-pulse">● LIVE</span>
+              </div>
+              <div className="text-xs text-krmuted">
+                Updates every 60s • {newsItems.length} articles loaded
+              </div>
             </div>
             <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 transition-all duration-200 p-4">
               <div className="overflow-hidden">
                 <div className="flex animate-ticker-fast whitespace-nowrap">
-                  {newsItems.concat(newsItems).map((item, index) => (
+                  {newsItems.slice(0, 30).concat(newsItems.slice(0, 30)).map((item, index) => (
                     <span key={index} className="mx-6 text-sm flex items-center">
                       <span className="text-krgold mr-2">•</span>
                       <span className="text-krtext">{item.title}</span>
                       <span className="text-krmuted ml-3 text-xs">- {item.source}</span>
+                      <span className="text-green-400 ml-2 text-xs">⟳ {item.fetchedAt}</span>
                     </span>
                   ))}
                 </div>
@@ -361,9 +396,15 @@ export default function NewsAndData() {
                               {item.title}
                             </h3>
                             
-                            <div className="flex items-center justify-between text-xs text-krmuted">
-                              <span>{item.source}</span>
-                              <span>{new Date(item.publishedAt).toLocaleDateString()}</span>
+                            <div className="flex flex-col gap-1 text-xs text-krmuted">
+                              <div className="flex items-center justify-between">
+                                <span>{item.source}</span>
+                                <span>Published: {new Date(item.publishedAt).toLocaleDateString()}</span>
+                              </div>
+                              <div className="flex items-center gap-1 text-green-400">
+                                <Clock className="w-3 h-3" />
+                                <span className="text-xs">Fetched: {item.fetchedAt}</span>
+                              </div>
                             </div>
                           </div>
                         ))}
@@ -503,11 +544,17 @@ export default function NewsAndData() {
           <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50" onClick={() => setSelectedArticle(null)}>
             <div className="bg-krcard/95 backdrop-blur-md rounded-xl border border-krborder max-w-2xl w-full p-6" onClick={(e) => e.stopPropagation()}>
               <h2 className="text-2xl font-bold mb-2 text-krtext">{selectedArticle.title}</h2>
-              <div className="flex items-center text-xs text-krmuted mb-4">
-                <span>{selectedArticle.source}</span>
-                <span className="mx-2">•</span>
-                <Clock className="w-3 h-3 mr-1" />
-                <span>{new Date(selectedArticle.publishedAt).toLocaleString()}</span>
+              <div className="flex flex-col gap-2 text-xs text-krmuted mb-4">
+                <div className="flex items-center">
+                  <span className="font-semibold">{selectedArticle.source}</span>
+                  <span className="mx-2">•</span>
+                  <Clock className="w-3 h-3 mr-1" />
+                  <span>Published: {new Date(selectedArticle.publishedAt).toLocaleString()}</span>
+                </div>
+                <div className="flex items-center text-green-400">
+                  <Zap className="w-3 h-3 mr-1" />
+                  <span>Fetched: {selectedArticle.fetchedAt}</span>
+                </div>
               </div>
               {selectedArticle.summary && (
                 <div className="bg-krblack/50 p-4 rounded-lg border border-krborder mb-4">
