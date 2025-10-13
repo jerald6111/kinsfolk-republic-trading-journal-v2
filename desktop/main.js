@@ -209,16 +209,20 @@ class KRTJDesktopApp {
       title: '🚀 KRTJ Update Available',
       message: `Version ${updateData.version} is now available!`,
       detail: detailText,
-      buttons: ['Download & Install', 'View Details', 'Remind Me Later'],
-      defaultId: 0,
-      cancelId: 2,
+      buttons: ['Auto Download', 'Open Download Page', 'View Details', 'Remind Me Later'],
+      defaultId: 1,
+      cancelId: 3,
       noLink: true
     })
 
     if (response.response === 0) {
-      // Download and install
+      // Auto download and install
       this.downloadAndInstallUpdate(updateData)
     } else if (response.response === 1) {
+      // Open download page in browser
+      const { shell } = require('electron')
+      shell.openExternal('https://kinsfolk-republic-trading-journal-v.vercel.app/download')
+    } else if (response.response === 2) {
       // Show detailed changelog in a larger dialog
       this.showDetailedChangelog(updateData)
     }
@@ -364,15 +368,25 @@ class KRTJDesktopApp {
         buttons: ['Download in Background']
       })
 
-      // Download the installer
-      const downloadUrl = `https://kinsfolk-republic-trading-journal-v.vercel.app/downloads/KRTJ-Desktop-Setup.exe`
+      // Download the installer - use the URL from updateData or construct full URL
+      const baseUrl = 'https://kinsfolk-republic-trading-journal-v.vercel.app'
+      const downloadUrl = updateData.downloadUrl.startsWith('http') 
+        ? updateData.downloadUrl 
+        : baseUrl + updateData.downloadUrl
       
       await new Promise((resolve, reject) => {
         const file = fs.createWriteStream(installerPath)
         
         https.get(downloadUrl, (response) => {
           if (response.statusCode !== 200) {
-            reject(new Error(`Download failed: ${response.statusCode}`))
+            reject(new Error(`Download failed: HTTP ${response.statusCode}`))
+            return
+          }
+          
+          // Check if we're getting HTML instead of executable
+          const contentType = response.headers['content-type'] || ''
+          if (contentType.includes('text/html')) {
+            reject(new Error('Server returned HTML page instead of installer file'))
             return
           }
           
