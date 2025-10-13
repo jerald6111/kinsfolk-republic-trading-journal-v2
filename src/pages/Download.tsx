@@ -72,7 +72,7 @@ export default function Download() {
             <div className="max-w-4xl mx-auto text-center">
               <div className="inline-flex items-center gap-2 bg-krgold/10 border border-krgold/20 rounded-full px-4 py-2 mb-6">
                 <Laptop className="text-krgold" size={16} />
-                <span className="text-sm text-krgold font-semibold">Windows Desktop Application</span>
+                <span className="text-sm text-krgold font-semibold">Windows Desktop Beta</span>
               </div>
               
               <h1 className="text-4xl md:text-5xl font-bold text-krwhite mb-6">
@@ -80,7 +80,7 @@ export default function Download() {
               </h1>
               
               <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-                Want to use KRTJ without internet? No problem! Download our Windows desktop app for the ultimate offline trading journal experience.
+                Join our beta program! Download our Windows desktop app for early access to enhanced performance, security, and offline functionality. Help us perfect your trading experience!
               </p>
               
               <div className="bg-krcard/80 backdrop-blur-sm border border-krborder rounded-xl p-8 mb-8">
@@ -88,7 +88,7 @@ export default function Download() {
                   <Monitor className="text-krgold" size={32} />
                   <div className="text-left">
                     <h3 className="text-xl font-bold text-krwhite">Kinsfolk Republic Trading Journal</h3>
-                    <p className="text-gray-400">Version 1.0.0 • Windows 10/11</p>
+                    <p className="text-gray-400">Version 1.6.5 Beta • Windows 10/11</p>
                   </div>
                 </div>
                 
@@ -105,11 +105,11 @@ export default function Download() {
                   className="w-full bg-gradient-to-r from-krgold to-kryellow text-krblack px-8 py-4 rounded-xl font-semibold hover:shadow-lg hover:shadow-krgold/50 transition-all flex items-center justify-center gap-2"
                 >
                   <DownloadIcon size={20} />
-                  Download for Windows (FREE)
+                  Download Beta for Windows (FREE)
                 </button>
                 
                 <p className="text-sm text-gray-400 mt-3">
-                  ~45MB • One-time download • No subscription required
+                  ~75MB • Beta Release • Report bugs and suggestions
                 </p>
               </div>
             </div>
@@ -201,16 +201,50 @@ export default function Download() {
           </div>
         </section>
 
+        {/* Beta Notice Section */}
+        <section className="py-16 bg-orange-900/20 border-y border-orange-500/30">
+          <div className="container mx-auto px-6">
+            <div className="max-w-4xl mx-auto text-center">
+              <div className="bg-orange-500/10 border border-orange-500/30 rounded-xl p-6">
+                <h3 className="text-2xl font-bold text-orange-300 mb-4">🚧 Beta Testing Phase</h3>
+                <p className="text-gray-300 mb-4">
+                  Our Windows desktop application is currently in beta testing. We're actively improving features, fixing bugs, and optimizing performance based on user feedback.
+                </p>
+                <div className="grid md:grid-cols-2 gap-4 text-sm">
+                  <div className="text-left">
+                    <h4 className="font-semibold text-orange-300 mb-2">What to Expect:</h4>
+                    <ul className="text-gray-400 space-y-1">
+                      <li>• Full trading journal functionality</li>
+                      <li>• Occasional updates and improvements</li>
+                      <li>• Some features may be experimental</li>
+                      <li>• Regular bug fixes and optimizations</li>
+                    </ul>
+                  </div>
+                  <div className="text-left">
+                    <h4 className="font-semibold text-orange-300 mb-2">Help Us Improve:</h4>
+                    <ul className="text-gray-400 space-y-1">
+                      <li>• Report any bugs or issues you find</li>
+                      <li>• Suggest new features or improvements</li>
+                      <li>• Share your trading workflow feedback</li>
+                      <li>• Join our community discussions</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* CTA Section */}
         <section className="py-20 bg-gradient-to-r from-krgold/10 to-kryellow/10">
           <div className="container mx-auto px-6">
             <div className="max-w-4xl mx-auto text-center">
               <Shield className="text-krgold mx-auto mb-6" size={48} />
               <h2 className="text-3xl md:text-4xl font-bold text-krwhite mb-4">
-                Ready for Offline Trading?
+                Ready to Beta Test?
               </h2>
               <p className="text-xl text-gray-300 mb-8">
-                Download KRTJ Desktop and take your trading analysis anywhere
+                Download KRTJ Desktop Beta and help us shape the future of offline trading analysis
               </p>
               <div className="flex gap-4 justify-center">
                 <button 
@@ -225,7 +259,7 @@ export default function Download() {
                   className="bg-gradient-to-r from-krgold to-kryellow text-krblack px-8 py-3 rounded-xl font-semibold hover:shadow-lg hover:shadow-krgold/50 transition-all flex items-center gap-2"
                 >
                   <DownloadIcon size={20} />
-                  Download Now
+                  Download Beta
                 </button>
                 <Link
                   to="/"

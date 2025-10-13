@@ -37,6 +37,8 @@ export default function NewsAndData() {
   const [losersTimeframe, setLosersTimeframe] = useState<'1h' | '24h' | '7d'>('24h')
   const [activeNewsCategory, setActiveNewsCategory] = useState<'crypto' | 'stocks' | 'forex' | 'world'>('crypto')
   const [selectedArticle, setSelectedArticle] = useState<NewsItem | null>(null)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [newsPerPage] = useState(20)
 
   // Economic Calendar Widget
   useEffect(() => {
@@ -106,12 +108,12 @@ export default function NewsAndData() {
     return () => clearInterval(interval)
   }, [gainersTimeframe, losersTimeframe])
 
-  // Fetch comprehensive news data
+  // Fetch comprehensive news data with accumulation/stacking
   useEffect(() => {
-    const fetchNews = async () => {
+    const fetchNews = async (isInitialLoad = false) => {
       try {
-        setLoading(true)
-        const allNews: NewsItem[] = []
+        if (isInitialLoad) setLoading(true)
+        const allNewNews: NewsItem[] = []
         const timestamp = Date.now()
 
         // CRYPTO NEWS - CoinTelegraph RSS
@@ -121,7 +123,7 @@ export default function NewsAndData() {
           
           if (cryptoData.items) {
             const cryptoNews = cryptoData.items.map((item: any) => ({
-              id: `crypto-${Date.now()}-${Math.random()}`,
+              id: `crypto-${item.guid || item.link}-${new Date(item.pubDate).getTime()}`,
               title: item.title,
               source: 'CoinTelegraph',
               publishedAt: item.pubDate,
@@ -129,7 +131,7 @@ export default function NewsAndData() {
               summary: item.description?.replace(/<[^>]*>/g, '').substring(0, 200) + '...',
               url: item.link
             }))
-            allNews.push(...cryptoNews)
+            allNewNews.push(...cryptoNews)
           }
         } catch (error) {
           console.error('Failed to fetch crypto news:', error)
@@ -142,7 +144,7 @@ export default function NewsAndData() {
           
           if (stocksData.items) {
             const stocksNews = stocksData.items.map((item: any) => ({
-              id: `stocks-${Date.now()}-${Math.random()}`,
+              id: `stocks-${item.guid || item.link}-${new Date(item.pubDate).getTime()}`,
               title: item.title,
               source: 'MarketWatch',
               publishedAt: item.pubDate,
@@ -150,7 +152,7 @@ export default function NewsAndData() {
               summary: item.description?.replace(/<[^>]*>/g, '').substring(0, 200) + '...',
               url: item.link
             }))
-            allNews.push(...stocksNews)
+            allNewNews.push(...stocksNews)
           }
         } catch (error) {
           console.error('Failed to fetch stocks news:', error)
@@ -163,7 +165,7 @@ export default function NewsAndData() {
           
           if (forexData.items) {
             const forexNews = forexData.items.map((item: any) => ({
-              id: `forex-${Date.now()}-${Math.random()}`,
+              id: `forex-${item.guid || item.link}-${new Date(item.pubDate).getTime()}`,
               title: item.title,
               source: 'ForexLive',
               publishedAt: item.pubDate,
@@ -171,7 +173,7 @@ export default function NewsAndData() {
               summary: item.description?.replace(/<[^>]*>/g, '').substring(0, 200) + '...',
               url: item.link
             }))
-            allNews.push(...forexNews)
+            allNewNews.push(...forexNews)
           }
         } catch (error) {
           console.error('Failed to fetch forex news:', error)
@@ -184,7 +186,7 @@ export default function NewsAndData() {
           
           if (worldData.items) {
             const worldNews = worldData.items.map((item: any) => ({
-              id: `world-${Date.now()}-${Math.random()}`,
+              id: `world-${item.guid || item.link}-${new Date(item.pubDate).getTime()}`,
               title: item.title,
               source: 'BBC News',
               publishedAt: item.pubDate,
@@ -192,26 +194,51 @@ export default function NewsAndData() {
               summary: item.description?.replace(/<[^>]*>/g, '').substring(0, 200) + '...',
               url: item.link
             }))
-            allNews.push(...worldNews)
+            allNewNews.push(...worldNews)
           }
         } catch (error) {
           console.error('Failed to fetch world news:', error)
         }
         
-        setNewsItems(allNews)
+        // Stack/accumulate news instead of replacing
+        setNewsItems(prevNews => {
+          if (isInitialLoad) {
+            return allNewNews.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
+          }
+          
+          // Filter out duplicates and add new items
+          const existingIds = new Set(prevNews.map(item => item.id))
+          const uniqueNewNews = allNewNews.filter(item => !existingIds.has(item.id))
+          
+          // Combine and sort by date (newest first)
+          const combined = [...uniqueNewNews, ...prevNews]
+            .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
+          
+          // Keep maximum of 500 items to prevent memory issues
+          return combined.slice(0, 500)
+        })
       } catch (error) {
         console.error('Error fetching live news:', error)
       } finally {
-        setLoading(false)
+        if (isInitialLoad) setLoading(false)
       }
     }
-    fetchNews() // Initial load
-    const interval = setInterval(fetchNews, 60 * 1000) // Refresh every 1 minute for truly LIVE updates
+    
+    fetchNews(true) // Initial load
+    const interval = setInterval(() => fetchNews(false), 60 * 1000) // Stack new news every 1 minute
     return () => clearInterval(interval)
   }, [])
 
   const filteredNews = newsItems.filter(item => item.category === activeNewsCategory)
   const tickerNews = [ ...newsItems.filter(item => item.category === 'crypto').slice(0, 4), ...newsItems.filter(item => item.category === 'stocks').slice(0, 2), ...newsItems.filter(item => item.category === 'forex').slice(0, 1), ...newsItems.filter(item => item.category === 'world').slice(0, 1) ]
+  
+  // Pagination logic
+  const startIndex = (currentPage - 1) * newsPerPage
+  const endIndex = startIndex + newsPerPage
+  const paginatedNews = filteredNews.slice(startIndex, endIndex)
+  const totalPages = Math.ceil(filteredNews.length / newsPerPage)
+  const hasNextPage = currentPage < totalPages
+  const hasPrevPage = currentPage > 1
 
   const categoryIcons = {
     crypto: <Bitcoin className="w-5 h-5" />,
@@ -291,7 +318,7 @@ export default function NewsAndData() {
                   {(Object.keys(categoryIcons) as Array<keyof typeof categoryIcons>).map(cat => (
                     <button
                       key={cat}
-                      onClick={() => setActiveNewsCategory(cat)}
+                      onClick={() => {setActiveNewsCategory(cat); setCurrentPage(1)}}
                       className={`px-3 py-1 rounded-lg text-xs font-medium transition-all ${
                         activeNewsCategory === cat 
                           ? 'bg-krgold text-krblack' 
@@ -314,31 +341,66 @@ export default function NewsAndData() {
                         <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-krgold"></div>
                       </div>
                     ) : (
-                      filteredNews.slice(0, 10).map(item => (
-                        <div 
-                          key={item.id} 
-                          className="bg-krblack/40 rounded-lg hover:bg-krblack/60 transition-all p-3 cursor-pointer"
-                          onClick={() => setSelectedArticle(item)}
-                        >
-                          <div className="flex items-start justify-between mb-2">
-                            <div className="flex items-center space-x-2">
-                              {categoryIcons[item.category]}
-                              <span className="text-xs text-krgold font-medium">
-                                {item.category.toUpperCase()}
-                              </span>
+                      <>
+                        {paginatedNews.map(item => (
+                          <div 
+                            key={item.id} 
+                            className="bg-krblack/40 rounded-lg hover:bg-krblack/60 transition-all p-3 cursor-pointer"
+                            onClick={() => setSelectedArticle(item)}
+                          >
+                            <div className="flex items-start justify-between mb-2">
+                              <div className="flex items-center space-x-2">
+                                {categoryIcons[item.category]}
+                                <span className="text-xs text-krgold font-medium">
+                                  {item.category.toUpperCase()}
+                                </span>
+                              </div>
+                            </div>
+                            
+                            <h3 className="font-medium text-krtext text-sm mb-2 line-clamp-2">
+                              {item.title}
+                            </h3>
+                            
+                            <div className="flex items-center justify-between text-xs text-krmuted">
+                              <span>{item.source}</span>
+                              <span>{new Date(item.publishedAt).toLocaleDateString()}</span>
                             </div>
                           </div>
-                          
-                          <h3 className="font-medium text-krtext text-sm mb-2 line-clamp-2">
-                            {item.title}
-                          </h3>
-                          
-                          <div className="flex items-center justify-between text-xs text-krmuted">
-                            <span>{item.source}</span>
-                            <span>{new Date(item.publishedAt).toLocaleDateString()}</span>
+                        ))}
+                        
+                        {/* Pagination Controls */}
+                        {totalPages > 1 && (
+                          <div className="flex items-center justify-between mt-4 pt-4 border-t border-krborder">
+                            <div className="text-xs text-krmuted">
+                              Page {currentPage} of {totalPages} ({filteredNews.length} total articles)
+                            </div>
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => {setCurrentPage(prev => prev - 1); setActiveNewsCategory(activeNewsCategory)}}
+                                disabled={!hasPrevPage}
+                                className={`px-3 py-1 text-xs rounded ${
+                                  hasPrevPage 
+                                    ? 'bg-krgold text-krblack hover:bg-kryellow' 
+                                    : 'bg-krcard text-krmuted cursor-not-allowed'
+                                }`}
+                              >
+                                Previous
+                              </button>
+                              <button
+                                onClick={() => {setCurrentPage(prev => prev + 1); setActiveNewsCategory(activeNewsCategory)}}
+                                disabled={!hasNextPage}
+                                className={`px-3 py-1 text-xs rounded ${
+                                  hasNextPage 
+                                    ? 'bg-krgold text-krblack hover:bg-kryellow' 
+                                    : 'bg-krcard text-krmuted cursor-not-allowed'
+                                }`}
+                              >
+                                Next
+                              </button>
+                            </div>
                           </div>
-                        </div>
-                      ))
+                        )}
+                      </>
                     )}
                   </div>
                 </div>
@@ -430,8 +492,8 @@ export default function NewsAndData() {
           <div className="mt-8 pt-6 border-t border-krborder">
             <div className="text-xs text-krmuted text-center">
               <span className="font-semibold">Data Sources:</span> Economic calendar and crypto market data powered by{' '}
-              <span className="text-krgold font-medium">TradingView</span> • Multi-market news aggregated from premium sources • Crypto data updates every{' '}
-              <span className="text-green-400">1 minute</span>
+              <span className="text-krgold font-medium">TradingView</span> • Multi-market news stacks every{' '}
+              <span className="text-green-400">1 minute</span> from premium sources • Total articles: <span className="text-krgold">{newsItems.length}</span>
             </div>
           </div>
       </div>
