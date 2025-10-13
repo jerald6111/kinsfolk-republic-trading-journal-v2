@@ -1,32 +1,32 @@
 {
-  "version": "1.3.0",
+  "version": "1.4.0",
   "releaseDate": "2025-01-15",
   "downloadUrl": "/downloads/KRTJ-Desktop-Setup.exe",
   "releaseNotes": {
-    "title": "KRTJ Desktop v1.3.0 - Enhanced News & Data Hub! �",
+    "title": "KRTJ Desktop v1.4.0 - Smart Auto-Update System! 🔄",
     "features": [
-      "NEW: Featured News bulletin with moving ticker across all markets",
-      "NEW: Enhanced Economic Calendar with premium styling and indicators",
-      "NEW: Timeframe selection for Market Data modals (1h, 24h, 7d)",
-      "NEW: Interactive news cards with category-specific themes and images"
+      "NEW: One-click automatic update system with background downloads",
+      "NEW: Data preservation during updates - your settings stay safe",
+      "NEW: Smart update notifications with progress tracking",
+      "NEW: Silent installation option for seamless updates"
     ],
     "improvements": [
-      "Completely redesigned News & Data section for better usability",
-      "Enhanced visual hierarchy with gradient accents and animations",
-      "Improved responsive design across all data components",
-      "Better data filtering and presentation in modal views",
-      "Cleaner interface with removed data source references"
+      "Enhanced update reliability with automatic retry mechanisms",
+      "Improved user data protection during installation process",
+      "Better error handling and fallback options for updates",
+      "Optimized installer configuration for faster updates",
+      "Enhanced security with proper code signing and validation"
     ],
     "bugFixes": [
-      "Fixed news category filtering and display issues",
-      "Improved modal data loading and timeframe calculations",
-      "Enhanced animation performance for news ticker",
-      "Corrected market data refresh intervals"
+      "Fixed update system deleting user data during installation",
+      "Resolved manual download fallback when auto-update fails",
+      "Corrected installer permissions for seamless updates",
+      "Fixed progress tracking during background downloads"
     ],
-    "notes": "Major UI overhaul with enhanced news feeds, improved Economic Calendar, and advanced data filtering! Experience premium financial data presentation with smooth animations and intuitive navigation. 🎯"
+    "notes": "Revolutionary update experience! No more manual downloads - just click 'Update Now' and the app handles everything automatically while preserving all your data and settings. ⚡"
   },
   "minimumVersion": "1.0.0",
   "isRequired": false,
-  "fileSize": "92.8 MB",
+  "fileSize": "93.1 MB",
   "checksum": ""
 }
