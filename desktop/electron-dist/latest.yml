@@ -1,8 +1,8 @@
 version: 1.6.7
 files:
   - url: KRTJ-Desktop-Setup-1.6.7.exe
-    sha512: LJO/Fv+72y3vLNWEus40nCthwOw6n/sR8V2ctqXko4Q+BxCC9M/Sfh3qjs2Cxo+kSsuqPYnWDEwrTWZjc1XzXQ==
-    size: 623933023
+    sha512: 14lL7fQ5qeJZNC9sQG6D14T2MbtC1r3K2Jts6Uffp7+YP71m3Uuus2i7ttYOZSZXHMjHM1036dRuA2NcHiX4Aw==
+    size: 623932802
 path: KRTJ-Desktop-Setup-1.6.7.exe
-sha512: LJO/Fv+72y3vLNWEus40nCthwOw6n/sR8V2ctqXko4Q+BxCC9M/Sfh3qjs2Cxo+kSsuqPYnWDEwrTWZjc1XzXQ==
-releaseDate: '2025-10-14T14:42:09.042Z'
+sha512: 14lL7fQ5qeJZNC9sQG6D14T2MbtC1r3K2Jts6Uffp7+YP71m3Uuus2i7ttYOZSZXHMjHM1036dRuA2NcHiX4Aw==
+releaseDate: '2025-10-14T15:30:30.686Z'

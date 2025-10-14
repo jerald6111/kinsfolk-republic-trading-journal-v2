@@ -194,7 +194,7 @@ export default function VisionBoard(){
       <div className="mb-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <span className="text-4xl">ðŸŽ¯</span>
+            <span className="text-4xl">🎯</span>
             <div>
               <h1 className="text-3xl font-bold bg-gradient-to-r from-krgold to-kryellow bg-clip-text text-transparent">Vision Board</h1>
               <p className="text-krmuted text-sm mt-1">Visualize your goals and track achievements</p>
