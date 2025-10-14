@@ -1,0 +1,36 @@
+{
+  "version": "1.6.0",
+  "releaseDate": "2025-10-14",
+  "downloadUrl": "/downloads/KRTJ-Desktop-Setup.exe",
+  "releaseNotes": {
+    "title": "KRTJ Desktop v1.6.0 - Unified Architecture & Enhanced Performance! 🚀⚡",
+    "features": [
+      "NEW: Unified codebase architecture between web and desktop applications",
+      "NEW: Enhanced component synchronization across platforms",
+      "NEW: Improved build process with optimized asset bundling",
+      "NEW: Advanced error handling and stability improvements",
+      "NEW: Modern TypeScript architecture with improved type safety",
+      "NEW: Streamlined deployment process with automated updates"
+    ],
+    "improvements": [
+      "Unified component library ensuring consistent user experience",
+      "Enhanced performance with optimized asset loading and caching",
+      "Improved memory management and reduced resource consumption",
+      "Better cross-platform compatibility and feature parity",
+      "Streamlined update process with faster installation times",
+      "Enhanced developer experience with unified build tools"
+    ],
+    "bugFixes": [
+      "Resolved component inconsistencies between web and desktop versions",
+      "Fixed potential memory leaks in long-running sessions",
+      "Corrected asset loading issues in production builds",
+      "Improved error recovery and graceful degradation",
+      "Enhanced compatibility with latest Electron security features"
+    ],
+    "notes": "Major architectural upgrade! This release unifies the codebase between web and desktop versions, ensuring consistent features and improved performance across all platforms. 🌟"
+  },
+  "minimumVersion": "1.0.0",
+  "isRequired": false,
+  "fileSize": "74.4 MB",
+  "checksum": "2E67BB99F2EB55256EBDF0855F5D6EB3A3D95725B18AFAEB823C2106D9C4C91F"
+}

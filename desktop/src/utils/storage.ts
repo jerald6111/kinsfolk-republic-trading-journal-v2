@@ -14,6 +14,7 @@ export type AppData = {
   journal: any[],
   playbook: any[],
   wallet: any[],
+  uploadedCharts?: any[],
 }
 
 export function loadData(): AppData {

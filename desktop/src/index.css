@@ -94,6 +94,43 @@ body {
   scrollbar-color: rgba(212, 175, 55, 0.4) rgba(10, 10, 10, 0.3);
 }
 
+/* Market Data Custom Scrollbar - Matches Website Design */
+.scrollbar-custom::-webkit-scrollbar {
+  width: 10px;
+}
+
+.scrollbar-custom::-webkit-scrollbar-track {
+  background: rgba(24, 26, 32, 0.6);
+  border-radius: 8px;
+  margin: 8px 0;
+  border: 1px solid rgba(212, 175, 55, 0.1);
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #F0B90B 0%, #FCD535 100%);
+  border-radius: 8px;
+  border: 2px solid rgba(24, 26, 32, 0.8);
+  box-shadow: 0 2px 8px rgba(240, 185, 11, 0.3);
+  transition: all 0.3s ease;
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #FCD535 0%, #F0B90B 100%);
+  box-shadow: 0 4px 12px rgba(240, 185, 11, 0.5);
+  border-color: rgba(212, 175, 55, 0.4);
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb:active {
+  background: linear-gradient(180deg, #FFE066 0%, #F0B90B 100%);
+  box-shadow: 0 2px 6px rgba(240, 185, 11, 0.6);
+}
+
+/* Firefox scrollbar for custom style */
+.scrollbar-custom {
+  scrollbar-width: thin;
+  scrollbar-color: #F0B90B rgba(24, 26, 32, 0.6);
+}
+
 /* News Ticker Animation */
 .news-ticker-wrapper {
   overflow: hidden;

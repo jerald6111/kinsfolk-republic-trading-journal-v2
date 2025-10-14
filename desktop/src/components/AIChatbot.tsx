@@ -42,20 +42,22 @@ export default function AIChatbot() {
       icon: <Shield className="w-4 h-4" />,
       response: `🎯 **Kinsfolk Republic Trading Journal (KRTJ)**
 
-Hey! I'm your Kinsfolk Assistant. KRTJ is a trading journal and analytics platform available both as a web app and Windows desktop application that helps you log, analyze, and improve your trading performance across crypto, stocks, and forex.
+Hey! I'm your Kinsfolk Assistant. KRTJ is a comprehensive trading journal and analytics platform available both as a web app and Windows desktop application that helps you log, analyze, and improve your trading performance across crypto, stocks, and forex.
 
 **💻 NEW: Windows Desktop App Available!**
-Want enhanced security and offline access? Download our Windows desktop app for the ultimate trading journal experience!
+Want enhanced security and offline access? Download our Windows desktop app for the ultimate trading journal experience with auto-updates!
 
-**Core Sections:**
-• **Vision Board**: Motivation hub for goals and affirmations
-• **Dashboard**: PNL, Win Rate, ROI overview  
-• **Journal**: Log every trade with reasoning and screenshots
-• **Strategies**: Store your playbooks and setups
-• **Snapshots**: Visual gallery of trades and patterns
-• **Wallets**: Track deposits/withdrawals (ROI only updates from trading results)
+**Complete Feature Set:**
+• **Vision Board**: Set and track trading goals with visual motivation
+• **Dashboard**: Real-time PNL, Win Rate, ROI, Profit Factor overview  
+• **Journal**: Log every trade with detailed reasoning and screenshots
+• **Snapshots**: Visual gallery + NEW Upload missed opportunities (not counted as trades!)
+• **Analytics**: Deep performance insights and statistics
+• **Playbook**: Store trading strategies with markdown support
+• **Wallets**: Track deposits/withdrawals for ROI calculations
+• **Market Data**: Live crypto prices, economic calendar, heatmap, trending coins
 
-Built for traders who want clarity, discipline, and data-driven results! �`
+Built for traders who want clarity, discipline, and data-driven results! 📊`
     },
     {
       id: 'analytics',
@@ -65,10 +67,17 @@ Built for traders who want clarity, discipline, and data-driven results! �`
 
 • **Win Rate**: (Wins ÷ Total Trades) × 100 - Aim for consistency over perfection
 • **Profit Factor**: Gross Profit ÷ Gross Loss - Above 1.5 shows solid edge
-• **ROI**: (Current Balance - Deposits) ÷ Deposits × 100 - Withdrawals from profit don't affect this
+• **ROI**: (Current Balance - Deposits) ÷ Deposits × 100 - Only updates from trading, not deposits
 • **Risk/Reward**: Average Win ÷ Average Loss - Healthy systems maintain 1.5:1+
 • **PNL Calendar**: Visual timeline of your trading journey
 • **Top 5 Pairs**: Your best performers ranked by total PNL
+• **Objective Analytics**: Compare Scalping vs Day Trading vs Swing performance
+
+**NEW on Market Data Page:**
+• Top 100/200/300 Cryptos with live prices & 7-day sparklines
+• Trending coins, top gainers & losers updated every 60 seconds
+• Economic calendar for fundamental analysis
+• Market heatmap for sector overview
 
 Remember: Focus on process over profits. Your Journal is your mirror! 🪞`
     },
@@ -93,6 +102,8 @@ Remember: Focus on process over profits. Your Journal is your mirror! 🪞`
 • Focus on execution, not outcome
 • Sometimes the best trade is no trade
 
+**NEW: Use Playbook** - Document your strategies with entry/exit rules and reference images. Keep it collapsible when you know it by heart!
+
 What's your biggest trading challenge right now? 🤔`
     },
     {
@@ -109,6 +120,12 @@ I can check real-time prices for:
 
 Just ask naturally like "Bitcoin price" or "How much is ETH?" and I'll pull live data with 24h changes, market cap, and volume!
 
+**PLUS: Visit /news-data for:**
+• Top 100/200/300 cryptos with sparklines
+• Trending coins & top gainers/losers
+• Economic calendar & market heatmap
+• Auto-refreshes every 60 seconds!
+
 Which coin are you watching? 📊`
     },
     {
@@ -122,6 +139,7 @@ Which coin are you watching? 📊`
 • **Enhanced Security** - Data never leaves your computer
 • **Lightning Performance** - Native desktop speed
 • **Dark Theme** - Optimized for trading environments
+• **Auto-Updates** - Always stay current with latest features
 
 **Perfect For:**
 • Traders wanting maximum privacy
@@ -132,9 +150,9 @@ Which coin are you watching? 📊`
 **Download Info:**
 • Free one-time download (~45MB)
 • Windows 10/11 compatible
-• Same features as web version
+• Same features as web version + better performance
 
-Ready to upgrade your trading setup? Check out the download page! 🚀`
+Ready to upgrade your trading setup? Check out the /download page! 🚀`
     }
   ]
 

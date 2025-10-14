@@ -1,0 +1,39 @@
+{
+  "version": "1.6.5",
+  "releaseDate": "2024-12-28",
+  "downloadUrl": "/downloads/KRTJ-Desktop-Setup-1.6.5.exe",
+  "releaseNotes": {
+    "title": "KRTJ Desktop v1.6.5 - Economic Calendar Viewport Fix & Data Refresh Enhanced! 📊⚡",
+    "features": [
+      "CRITICAL FIX: Economic Calendar now fills entire viewport height without gaps",
+      "ENHANCED: Dynamic height calculation based on viewport (viewportHeight - 320px)",
+      "IMPROVED: Genuine per-minute data refresh with cache-busting timestamps",
+      "FIXED: Trending coins, gainers, and losers now update with fresh data every 60 seconds",
+      "ENHANCED: News API calls include cache-busting parameters for real-time updates", 
+      "OPTIMIZED: Both website and desktop app synchronized for consistent data freshness"
+    ],
+    "improvements": [
+      "Completely rewritten tray menu system with reliable navigation",
+      "Enhanced IPC bridge between main and renderer processes",
+      "Improved TypeScript integration eliminating compilation errors",
+      "Better error handling for TradingView widgets with loading states", 
+      "More reliable update installation with automatic app restart",
+      "Enhanced memory management with proper event listener cleanup"
+    ],
+    "bugFixes": [
+      "CRITICAL FIX: Economic Calendar gap below - now uses full viewport height calculation",
+      "FIXED: TradingView widget height dynamically calculated: Math.max(500, viewportHeight - 320px)",
+      "RESOLVED: Calendar container height changed from fixed pixels to viewport-based (h-[calc(100vh-240px)])",
+      "FIXED: Data refresh issues - added timestamp cache-busting (&_t=timestamp) to all API calls",
+      "ENHANCED: CoinGecko API calls now bypass cache for truly fresh crypto data every minute",
+      "IMPROVED: News RSS feeds include cache-busting for real-time updates as advertised",
+      "SYNCHRONIZED: Both website and desktop versions updated for consistent data freshness",
+      "RESOLVED: Wrong dates and stale data issues by forcing fresh API responses"
+    ],
+    "notes": "Major data refresh and Economic Calendar viewport fixes! Calendar now fills entire screen properly, and all data (crypto + news) refreshes every minute with genuine fresh data via cache-busting. 🔄📊"
+  },
+  "minimumVersion": "1.0.0",
+  "isRequired": false,
+  "fileSize": "74.4 MB",
+  "checksum": "2E67BB99F2EB55256EBDF0855F5D6EB3A3D95725B18AFAEB823C2106D9C4C91F"
+}

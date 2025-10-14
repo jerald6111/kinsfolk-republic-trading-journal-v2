@@ -3,7 +3,7 @@ import FileUploader from '../components/FileUploader'
 import { loadData, saveData, triggerAutoEmailBackup } from '../utils/storage'
 import { marked } from 'marked'
 import Modal from '../components/Modal'
-import { Trash2, Edit2, Eye, X } from 'lucide-react'
+import { Trash2, Edit2, Eye, X, ChevronDown, ChevronUp } from 'lucide-react'
 
 interface Strategy {
   id: number
@@ -34,6 +34,7 @@ export default function Playbook(){
   const [images, setImages] = useState<string[]>(['', '', '', ''])
   const [editingId, setEditingId] = useState<number | null>(null)
   const [viewStrategy, setViewStrategy] = useState<Strategy | null>(null)
+  const [isInfoExpanded, setIsInfoExpanded] = useState(false)
 
   const add = () => {
     const filteredImages = images.filter(img => img.trim() !== '')
@@ -114,47 +115,61 @@ export default function Playbook(){
           </div>
         </div>
 
-        {/* Introduction Card */}
-        <div className="bg-gradient-to-br from-krgold/10 via-krgold/5 to-transparent backdrop-blur-sm rounded-2xl border border-krgold/30 p-6 mb-6">
-          <div className="flex items-start gap-4">
-            <div className="p-3 bg-krgold/20 rounded-xl">
+        {/* Introduction Card - Collapsible */}
+        <div className="bg-gradient-to-br from-krgold/10 via-krgold/5 to-transparent backdrop-blur-sm rounded-2xl border border-krgold/30 mb-6 overflow-hidden">
+          <button
+            onClick={() => setIsInfoExpanded(!isInfoExpanded)}
+            className="w-full p-6 flex items-start gap-4 hover:bg-krgold/5 transition-colors text-left"
+          >
+            <div className="p-3 bg-krgold/20 rounded-xl flex-shrink-0">
               <span className="text-3xl">💡</span>
             </div>
             <div className="flex-1">
-              <h2 className="text-xl font-bold text-krtext mb-3 flex items-center gap-2">
+              <h2 className="text-xl font-bold text-krtext flex items-center gap-2">
                 What is a Trading Playbook?
+                {isInfoExpanded ? (
+                  <ChevronUp size={20} className="text-krgold" />
+                ) : (
+                  <ChevronDown size={20} className="text-krgold" />
+                )}
               </h2>
-              <div className="space-y-2 text-krmuted text-sm">
-                <p>
-                  A trading playbook is your <span className="text-krgold font-semibold">strategic blueprint</span> for consistent success in the markets. 
-                  Think of it as your personal collection of battle-tested setups, entry/exit rules, and market scenarios that work for you.
-                </p>
-                <div className="grid md:grid-cols-3 gap-4 mt-4">
-                  <div className="bg-krcard/50 backdrop-blur-sm rounded-xl p-4 border border-krborder/30">
-                    <div className="text-2xl mb-2">🎯</div>
-                    <h3 className="text-krtext font-semibold mb-1">Define Your Edge</h3>
-                    <p className="text-xs">Document patterns and setups that consistently give you an advantage in the market</p>
-                  </div>
-                  <div className="bg-krcard/50 backdrop-blur-sm rounded-xl p-4 border border-krborder/30">
-                    <div className="text-2xl mb-2">📊</div>
-                    <h3 className="text-krtext font-semibold mb-1">Reduce Emotions</h3>
-                    <p className="text-xs">Pre-defined strategies help you stay disciplined and avoid impulsive decisions</p>
-                  </div>
-                  <div className="bg-krcard/50 backdrop-blur-sm rounded-xl p-4 border border-krborder/30">
-                    <div className="text-2xl mb-2">🔄</div>
-                    <h3 className="text-krtext font-semibold mb-1">Continuous Improvement</h3>
-                    <p className="text-xs">Review and refine your strategies based on real trading results over time</p>
-                  </div>
+              <p className="text-krmuted text-sm mt-1">
+                {isInfoExpanded ? 'Click to collapse' : 'Click to learn more about trading playbooks'}
+              </p>
+            </div>
+          </button>
+          
+          {isInfoExpanded && (
+            <div className="px-6 pb-6 space-y-2 text-krmuted text-sm animate-fade-in">
+              <p>
+                A trading playbook is your <span className="text-krgold font-semibold">strategic blueprint</span> for consistent success in the markets. 
+                Think of it as your personal collection of battle-tested setups, entry/exit rules, and market scenarios that work for you.
+              </p>
+              <div className="grid md:grid-cols-3 gap-4 mt-4">
+                <div className="bg-krcard/50 backdrop-blur-sm rounded-xl p-4 border border-krborder/30">
+                  <div className="text-2xl mb-2">🎯</div>
+                  <h3 className="text-krtext font-semibold mb-1">Define Your Edge</h3>
+                  <p className="text-xs">Document patterns and setups that consistently give you an advantage in the market</p>
                 </div>
-                <div className="mt-4 pt-4 border-t border-krborder/30">
-                  <p className="text-xs">
-                    <span className="text-krgold font-semibold">Pro Tip:</span> Each strategy should include clear entry criteria, exit rules, risk management parameters, 
-                    and visual examples. Update your playbook regularly as you learn what works best for your trading style.
-                  </p>
+                <div className="bg-krcard/50 backdrop-blur-sm rounded-xl p-4 border border-krborder/30">
+                  <div className="text-2xl mb-2">📊</div>
+                  <h3 className="text-krtext font-semibold mb-1">Reduce Emotions</h3>
+                  <p className="text-xs">Pre-defined strategies help you stay disciplined and avoid impulsive decisions</p>
+                </div>
+                <div className="bg-krcard/50 backdrop-blur-sm rounded-xl p-4 border border-krborder/30">
+                  <div className="text-2xl mb-2">🔄</div>
+                  <h3 className="text-krtext font-semibold mb-1">Continuous Improvement</h3>
+                  <p className="text-xs">Review and refine your strategies based on real trading results over time</p>
                 </div>
               </div>
+              <div className="mt-4 pt-4 border-t border-krborder/30">
+                <p className="text-xs">
+                  <span className="text-krgold font-semibold">Pro Tip:</span> Each strategy should include clear entry criteria, exit rules, risk management parameters, 
+                  and visual examples. Update your playbook regularly as you learn what works best for your trading style.
+                </p>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
       

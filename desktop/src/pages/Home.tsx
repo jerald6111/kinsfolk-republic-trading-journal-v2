@@ -20,46 +20,46 @@ export default function Home() {
     {
       icon: <BarChart3 className="text-krgold" size={32} />,
       title: 'Advanced Analytics',
-      description: 'Track your performance with comprehensive analytics including win rate, profit factor, ROI, and more.',
+      description: 'Track performance with comprehensive analytics: win rate, profit factor, ROI, risk/reward ratios, and objective-based breakdowns.',
       image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop'
     },
     {
       icon: <BookOpen className="text-krgold" size={32} />,
       title: 'Trading Journal',
-      description: 'Document every trade with detailed entry and exit reasons, screenshots, and performance metrics.',
+      description: 'Document every trade with detailed entry/exit reasons, chart and PNL screenshots, leverage tracking, and automatic P&L calculations.',
       image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800&auto=format&fit=crop'
     },
     {
       icon: <Target className="text-krgold" size={32} />,
       title: 'Strategy Playbook',
-      description: 'Build and refine your trading strategies with a customizable playbook system.',
+      description: 'Build your trading playbook with markdown support, strategy images, and collapsible sections. Define entry/exit rules and risk management per setup.',
       image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&auto=format&fit=crop'
     },
     {
       icon: <TrendingUp className="text-krgold" size={32} />,
-      title: 'Performance Tracking',
-      description: 'Visualize your equity curve, track drawdowns, and analyze your trading streaks.',
+      title: 'Live Market Data',
+      description: 'Access Top 100/200/300 cryptos with real-time prices, 7-day sparklines, trending coins, economic calendar, and market heatmap (updates every 60s).',
       image: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&auto=format&fit=crop'
     },
     {
       icon: <Calendar className="text-krgold" size={32} />,
-      title: 'PNL Calendar',
-      description: 'View your daily, weekly, and monthly performance at a glance with an intuitive calendar view.',
+      title: 'Visual Snapshots',
+      description: 'Gallery of trade charts and PNL screenshots with filters. NEW: Upload missed opportunities (not counted as entries) for learning purposes.',
       image: 'https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=800&auto=format&fit=crop'
     },
     {
       icon: <Wallet className="text-krgold" size={32} />,
       title: 'Wallet Management',
-      description: 'Track deposits, withdrawals, and see your real-time trading balance with fee accounting.',
+      description: 'Track deposits and withdrawals locally for accurate ROI calculations. No real money transfers - just personal record-keeping.',
       image: 'https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=800&auto=format&fit=crop'
     }
   ]
 
   const news = [
     {
-      title: 'Windows Desktop App Now Available!',
-      date: 'October 13, 2025',
-      description: 'Take your trading journal offline! Download our new Windows desktop application for enhanced security, performance, and complete offline functionality.',
+      title: 'Windows Desktop App Beta Now Available!',
+      date: 'October 14, 2025',
+      description: 'Experience our trading journal offline with our Windows desktop beta! Early access to enhanced security, performance, and offline functionality. Beta testing phase - your feedback is valuable!',
       image: 'https://images.unsplash.com/photo-1587831990711-23ca6441447b?w=400&auto=format&fit=crop'
     },
     {
@@ -112,12 +112,12 @@ export default function Home() {
               </Link>
             </div>
             
-            {/* Windows App Announcement */}
+            {/* Windows App Beta Announcement */}
             <div className="mt-8 inline-flex items-center gap-2 bg-krgold/10 border border-krgold/30 rounded-full px-4 py-2">
               <Monitor className="text-krgold" size={16} />
               <span className="text-sm text-krgold">
                 <Link to="/download" className="hover:underline font-medium">
-                  Now available as Windows desktop app! →
+                  Windows desktop beta now available! Early access →
                 </Link>
               </span>
             </div>
@@ -133,13 +133,13 @@ export default function Home() {
               <div>
                 <div className="inline-flex items-center gap-2 bg-krgold/10 border border-krgold/20 rounded-full px-4 py-2 mb-4">
                   <Monitor className="text-krgold" size={16} />
-                  <span className="text-sm text-krgold font-semibold">New: Desktop Application</span>
+                  <span className="text-sm text-krgold font-semibold">Beta: Desktop Application</span>
                 </div>
                 <h2 className="text-3xl md:text-4xl font-bold text-krwhite mb-4">
                   Take KRTJ <span className="bg-gradient-to-r from-krgold to-kryellow bg-clip-text text-transparent">Offline</span>
                 </h2>
                 <p className="text-gray-300 mb-6 text-lg">
-                  Experience enhanced security, lightning-fast performance, and complete offline functionality with our Windows desktop application.
+                  Join our beta program and experience enhanced security, lightning-fast performance, and complete offline functionality with our Windows desktop application. Your feedback shapes our future!
                 </p>
                 <div className="grid sm:grid-cols-2 gap-4 mb-6">
                   <div className="flex items-center gap-2">
