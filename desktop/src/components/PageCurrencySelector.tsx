@@ -93,35 +93,6 @@ export default function PageCurrencySelector({
                   💡 Set a secondary currency in Settings to view data in multiple currencies
                 </div>
               )}
-
-              {/* All currencies option (advanced) */}
-              <div className="border-t border-krborder mt-1">
-                <div className="px-4 py-2 text-xs font-semibold text-krtext/60">
-                  Other Currencies
-                </div>
-                {currencies
-                  .filter(c => 
-                    c.code !== primaryCurrency.code && 
-                    c.code !== secondaryCurrency?.code
-                  )
-                  .map(c => (
-                    <button
-                      key={c.code}
-                      className={`w-full px-4 py-2 text-left hover:bg-krbg transition-colors flex items-center justify-between ${
-                        displayCurrency.code === c.code ? 'bg-krgold/10 text-krgold' : ''
-                      }`}
-                      onClick={() => {
-                        onCurrencyChange(c);
-                        setIsOpen(false);
-                      }}
-                    >
-                      <span>
-                        <span className="font-medium">{c.symbol}</span> {c.name}
-                      </span>
-                      <span className="text-xs text-krtext/60">{c.code}</span>
-                    </button>
-                  ))}
-              </div>
             </div>
           </div>
         </>

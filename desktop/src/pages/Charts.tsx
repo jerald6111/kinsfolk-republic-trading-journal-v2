@@ -1,10 +1,12 @@
-import React, { useState, useEffect, useMemo } from 'react'
+﻿import React, { useState, useEffect, useMemo } from 'react'
 import { useLocation } from 'react-router-dom'
 import { loadData, saveData } from '../utils/storage'
 import Modal from '../components/Modal'
 import FileUploader from '../components/FileUploader'
 import { TrendingUp, TrendingDown, Calendar, DollarSign, Percent, Filter, X, Upload, Info } from 'lucide-react'
 import { useCurrency } from '../context/CurrencyContext'
+import { usePageCurrency } from '../hooks/usePageCurrency'
+import PageCurrencySelector from '../components/PageCurrencySelector'
 
 interface UploadedChart {
   id: number
@@ -19,7 +21,8 @@ interface UploadedChart {
 
 export default function Charts(){
   const data = loadData()
-  const { formatAmount } = useCurrency()
+  const { formatAmount, formatAmountInCurrency, primaryCurrency } = useCurrency()
+  const { localCurrency, setLocalCurrency, displayCurrency } = usePageCurrency('charts', primaryCurrency)
   const location = useLocation()
   const journal = data.journal || []
   
@@ -126,7 +129,7 @@ export default function Charts(){
       <div className="mb-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="text-4xl">{activeTab === 'Charts' ? '📊' : '💰'}</span>
+            <span className="text-4xl">{activeTab === 'Charts' ? 'ðŸ“Š' : 'ðŸ’°'}</span>
             <div>
               <h1 className="text-3xl font-bold bg-gradient-to-r from-krgold to-kryellow bg-clip-text text-transparent">
                 Snapshots - {activeTab === 'Charts' ? 'Charts' : 'PNL Overview'}
@@ -134,7 +137,14 @@ export default function Charts(){
               <p className="text-krmuted text-sm mt-1">Visual trading documentation</p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          
+          {/* Page Currency Selector */}
+          <div className="flex items-center gap-3">
+            <PageCurrencySelector 
+              localCurrency={localCurrency}
+              onCurrencyChange={setLocalCurrency}
+              label="View prices in"
+            />
             <button
               onClick={() => setShowUploadModal(true)}
               className="flex items-center gap-2 px-4 py-2 bg-krgold/20 hover:bg-krgold/30 text-krgold font-semibold rounded-lg border border-krgold/50 transition-colors"
@@ -262,14 +272,14 @@ export default function Charts(){
                         <div className="text-krmuted text-xs mb-1">Entry</div>
                         <div className="text-krtext font-semibold flex items-center gap-1">
                           <DollarSign size={12} />
-                          {formatAmount(chart.entryPrice)}
+                          {formatAmountInCurrency(chart.entryPrice, displayCurrency)}
                         </div>
                       </div>
                       <div className="bg-krblack/40 rounded-lg p-2 border border-krborder/30">
                         <div className="text-krmuted text-xs mb-1">Exit</div>
                         <div className="text-krtext font-semibold flex items-center gap-1">
                           <DollarSign size={12} />
-                          {formatAmount(chart.exitPrice)}
+                          {formatAmountInCurrency(chart.exitPrice, displayCurrency)}
                         </div>
                       </div>
                     </div>
@@ -292,7 +302,7 @@ export default function Charts(){
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredItems.length === 0 && (
           <div className="col-span-full text-center bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-12">
-            <span className="text-6xl mb-3 block">{activeTab === 'Charts' ? '📊' : '💰'}</span>
+            <span className="text-6xl mb-3 block">{activeTab === 'Charts' ? 'ðŸ“Š' : 'ðŸ’°'}</span>
             <p className="text-krmuted">
               {hasActiveFilters ? `No ${activeTab.toLowerCase()} snapshots match the selected filters.` : `No ${activeTab.toLowerCase()} snapshots available.`}
             </p>
@@ -338,14 +348,14 @@ export default function Charts(){
                     <div className="text-krmuted text-xs mb-1">Entry</div>
                     <div className="text-krtext font-semibold flex items-center gap-1">
                       <DollarSign size={12} />
-                      {formatAmount(it.entryPrice)}
+                      {formatAmountInCurrency(it.entryPrice, displayCurrency)}
                     </div>
                   </div>
                   <div className="bg-krblack/40 rounded-lg p-2 border border-krborder/30">
                     <div className="text-krmuted text-xs mb-1">Exit</div>
                     <div className="text-krtext font-semibold flex items-center gap-1">
                       <DollarSign size={12} />
-                      {formatAmount(it.exitPrice)}
+                      {formatAmountInCurrency(it.exitPrice, displayCurrency)}
                     </div>
                   </div>
                 </div>
@@ -423,23 +433,23 @@ export default function Charts(){
               <div className="space-y-3">
                 <div>
                   <label className="block text-sm font-medium text-gray-400 mb-1">Entry Price</label>
-                  <div className="text-krtext">{formatAmount(viewingTrade.entryPrice)}</div>
+                  <div className="text-krtext">{formatAmountInCurrency(viewingTrade.entryPrice, displayCurrency)}</div>
                   <div className="text-xs text-gray-400">{viewingTrade.date} {viewingTrade.time}</div>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-400 mb-1">Exit Price</label>
-                  <div className="text-krtext">{formatAmount(viewingTrade.exitPrice)}</div>
+                  <div className="text-krtext">{formatAmountInCurrency(viewingTrade.exitPrice, displayCurrency)}</div>
                   <div className="text-xs text-gray-400">{viewingTrade.exitDate} {viewingTrade.exitTime}</div>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-400 mb-1">P&L</label>
                   <div className={`font-semibold ${(viewingTrade.pnlAmount || (viewingTrade.exitPrice - viewingTrade.entryPrice)) > 0 ? 'text-green-400' : 'text-red-400'}`}>
-                    {formatAmount(viewingTrade.pnlAmount || (viewingTrade.exitPrice - viewingTrade.entryPrice))} ({(viewingTrade.pnlPercent || (((viewingTrade.exitPrice - viewingTrade.entryPrice) / viewingTrade.entryPrice) * 100)).toFixed(2)}%)
+                    {formatAmountInCurrency(viewingTrade.pnlAmount || (viewingTrade.exitPrice - viewingTrade.entryPrice, displayCurrency))} ({(viewingTrade.pnlPercent || (((viewingTrade.exitPrice - viewingTrade.entryPrice) / viewingTrade.entryPrice) * 100)).toFixed(2)}%)
                   </div>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-400 mb-1">Fee</label>
-                  <div className="text-krtext">{formatAmount(viewingTrade.fee || 0)}</div>
+                  <div className="text-krtext">{formatAmountInCurrency(viewingTrade.fee || 0, displayCurrency)}</div>
                 </div>
               </div>
             </div>
@@ -606,11 +616,11 @@ export default function Charts(){
                 <div className="space-y-2">
                   <div className="flex justify-between items-center">
                     <span className="text-krmuted text-sm">Entry Price:</span>
-                    <span className="text-krtext font-semibold">${formatAmount(viewingUploadedChart.entryPrice)}</span>
+                    <span className="text-krtext font-semibold">${formatAmountInCurrency(viewingUploadedChart.entryPrice, displayCurrency)}</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-krmuted text-sm">Exit Price:</span>
-                    <span className="text-krtext font-semibold">${formatAmount(viewingUploadedChart.exitPrice)}</span>
+                    <span className="text-krtext font-semibold">${formatAmountInCurrency(viewingUploadedChart.exitPrice, displayCurrency)}</span>
                   </div>
                   <div className="flex justify-between items-center pt-2 border-t border-krborder">
                     <span className="text-krmuted text-sm">Potential P&L:</span>
@@ -651,3 +661,4 @@ export default function Charts(){
     </div>
   )
 }
+

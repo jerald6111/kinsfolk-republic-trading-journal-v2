@@ -1,45 +1,47 @@
-import React, { useState } from 'react'
+﻿import React, { useState } from 'react'
 import FileUploader from '../components/FileUploader'
 import Modal from '../components/Modal'
 import { loadData, saveData, triggerAutoEmailBackup } from '../utils/storage'
 import { Trash2, Edit2, CheckCircle2, X, Image as ImageIcon } from 'lucide-react'
 import { useCurrency } from '../context/CurrencyContext'
+import { usePageCurrency } from '../hooks/usePageCurrency'
+import PageCurrencySelector from '../components/PageCurrencySelector'
 
 type GoalTimeline = 'Short Term (3-6 months)' | 'Mid Term (6-12 months)' | 'Long Term (1-3 years)'
 
 const congratsMessages = [
   {
-    emoji: '🎉',
+    emoji: 'ðŸŽ‰',
     title: 'Outstanding Achievement!',
     message: 'You did it! Another milestone conquered. Your dedication is truly inspiring!',
     color: 'text-krgold'
   },
   {
-    emoji: '🏆',
+    emoji: 'ðŸ†',
     title: 'Victory Unlocked!',
     message: 'Incredible work! You\'ve turned your vision into reality. Celebrate this win!',
     color: 'text-yellow-400'
   },
   {
-    emoji: '⭐',
+    emoji: 'â­',
     title: 'Goal Crushed!',
     message: 'Amazing! You\'re one step closer to your dreams. Keep up the momentum!',
     color: 'text-green-400'
   },
   {
-    emoji: '💪',
+    emoji: 'ðŸ’ª',
     title: 'Success Achieved!',
     message: 'You showed determination and won! This is proof of your commitment to growth.',
     color: 'text-blue-400'
   },
   {
-    emoji: '🚀',
+    emoji: 'ðŸš€',
     title: 'Mission Accomplished!',
     message: 'Fantastic! You\'ve reached new heights. The sky is no longer the limit!',
     color: 'text-purple-400'
   },
   {
-    emoji: '🎯',
+    emoji: 'ðŸŽ¯',
     title: 'Bullseye!',
     message: 'Perfect execution! You hit your target with precision. Onwards and upwards!',
     color: 'text-red-400'
@@ -48,7 +50,8 @@ const congratsMessages = [
 
 export default function VisionBoard(){
   const data = loadData()
-  const { formatAmount } = useCurrency()
+  const { formatAmount, formatAmountInCurrency, primaryCurrency } = useCurrency()
+  const { localCurrency, setLocalCurrency, displayCurrency } = usePageCurrency('vision', primaryCurrency)
   const [items, setItems] = useState(data.vision || [])
   const [title, setTitle] = useState('')
   const [desc, setDesc] = useState('')
@@ -192,12 +195,21 @@ export default function VisionBoard(){
         <div className="max-w-7xl mx-auto">
       {/* Header */}
       <div className="mb-6">
-        <div className="flex items-center gap-3 mb-4">
-          <span className="text-4xl">🎯</span>
-          <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-krgold to-kryellow bg-clip-text text-transparent">Vision Board</h1>
-            <p className="text-krmuted text-sm mt-1">Visualize your goals and track achievements</p>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <span className="text-4xl">ðŸŽ¯</span>
+            <div>
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-krgold to-kryellow bg-clip-text text-transparent">Vision Board</h1>
+              <p className="text-krmuted text-sm mt-1">Visualize your goals and track achievements</p>
+            </div>
           </div>
+          
+          {/* Page Currency Selector */}
+          <PageCurrencySelector 
+            localCurrency={localCurrency}
+            onCurrencyChange={setLocalCurrency}
+            label="View goals in"
+          />
         </div>
 
         {/* Quick Stats Cards */}
@@ -226,21 +238,21 @@ export default function VisionBoard(){
       <div className="grid md:grid-cols-[350px,1fr] gap-4 mb-6">
         <div className="p-6 bg-krcard/90 backdrop-blur-md rounded-2xl shadow-2xl border border-krborder/50 self-start">
           <div className="flex items-center gap-2 mb-4">
-            <span className="text-2xl">{editingGoal ? '✏️' : '➕'}</span>
+            <span className="text-2xl">{editingGoal ? 'âœï¸' : 'âž•'}</span>
             <h2 className="text-lg font-semibold text-krtext">{editingGoal ? 'Edit Goal' : 'Add New Goal'}</h2>
           </div>
           
           <div className="space-y-3">
             <input 
               className="w-full p-3 rounded-xl bg-krblack/30 text-krtext border border-krborder/30 focus:border-krgold/50 focus:ring-2 focus:ring-krgold/20 transition-all placeholder:text-krmuted" 
-              placeholder="🎯 Goal title" 
+              placeholder="ðŸŽ¯ Goal title" 
               value={title} 
               onChange={e=>setTitle(e.target.value)} 
             />
             
             <textarea 
               className="w-full p-3 rounded-xl bg-krblack/30 text-krtext border border-krborder/30 focus:border-krgold/50 focus:ring-2 focus:ring-krgold/20 transition-all placeholder:text-krmuted" 
-              placeholder="📝 Description" 
+              placeholder="ðŸ“ Description" 
               value={desc} 
               onChange={e=>setDesc(e.target.value)} 
               rows={3} 
@@ -248,7 +260,7 @@ export default function VisionBoard(){
             
             <input 
               className="w-full p-3 rounded-xl bg-krblack/30 text-krtext border border-krborder/30 focus:border-krgold/50 focus:ring-2 focus:ring-krgold/20 transition-all placeholder:text-krmuted" 
-              placeholder="💰 Target amount" 
+              placeholder="ðŸ’° Target amount" 
               value={target} 
               onChange={e=>setTarget(e.target.value)} 
             />
@@ -258,9 +270,9 @@ export default function VisionBoard(){
               value={timeline} 
               onChange={e=>setTimeline(e.target.value as GoalTimeline)}
             >
-              <option value="Short Term (3-6 months)" className="bg-krcard text-krtext">⚡ Short Term (3-6 months)</option>
-              <option value="Mid Term (6-12 months)" className="bg-krcard text-krtext">📅 Mid Term (6-12 months)</option>
-              <option value="Long Term (1-3 years)" className="bg-krcard text-krtext">🚀 Long Term (1-3 years)</option>
+              <option value="Short Term (3-6 months)" className="bg-krcard text-krtext">âš¡ Short Term (3-6 months)</option>
+              <option value="Mid Term (6-12 months)" className="bg-krcard text-krtext">ðŸ“… Mid Term (6-12 months)</option>
+              <option value="Long Term (1-3 years)" className="bg-krcard text-krtext">ðŸš€ Long Term (1-3 years)</option>
             </select>
             
             <div className="pt-1">
@@ -271,7 +283,7 @@ export default function VisionBoard(){
               className="w-full px-4 py-3 bg-gradient-to-r from-krgold to-kryellow text-krblack rounded-xl font-bold hover:shadow-lg hover:shadow-krgold/30 transition-all duration-200" 
               onClick={add}
             >
-              {editingGoal ? '💾 Update Goal' : '✨ Add Goal'}
+              {editingGoal ? 'ðŸ’¾ Update Goal' : 'âœ¨ Add Goal'}
             </button>
             
             {editingGoal && (
@@ -292,13 +304,13 @@ export default function VisionBoard(){
           {/* Active Goals */}
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <span className="text-2xl">🎯</span>
+              <span className="text-2xl">ðŸŽ¯</span>
               <h2 className="text-xl font-semibold text-krtext">Active Goals</h2>
             </div>
             
             {activeGoals.length === 0 ? (
               <div className="bg-krcard/50 backdrop-blur-sm rounded-xl border border-krborder/30 p-8 text-center">
-                <span className="text-6xl mb-4 block">🎯</span>
+                <span className="text-6xl mb-4 block">ðŸŽ¯</span>
                 <p className="text-krmuted">No active goals yet. Create your first goal to start visualizing your success!</p>
               </div>
             ) : (
@@ -315,7 +327,7 @@ export default function VisionBoard(){
                     <div className="text-sm space-y-1 mb-3">
                       <div className="flex items-center justify-between">
                         <span className="text-krmuted">Target:</span>
-                        <span className="font-semibold text-krgold">{formatAmount(parseFloat(it.target) || 0)}</span>
+                        <span className="font-semibold text-krgold">{formatAmountInCurrency(parseFloat(it.target, displayCurrency) || 0)}</span>
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-krmuted">Timeline:</span>
@@ -356,7 +368,7 @@ export default function VisionBoard(){
           {completedGoals.length > 0 && (
             <div className="mt-8">
               <div className="flex items-center gap-2 mb-4">
-                <span className="text-2xl">🏆</span>
+                <span className="text-2xl">ðŸ†</span>
                 <h2 className="text-xl font-semibold text-krtext">Achievements</h2>
               </div>
               <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
@@ -373,7 +385,7 @@ export default function VisionBoard(){
                     </div>
                     <div className="text-sm text-krmuted mt-1 line-clamp-2 mb-2">{it.desc}</div>
                     <div className="text-xs text-krmuted mt-2 flex items-center gap-1">
-                      <span>✓ Completed:</span>
+                      <span>âœ“ Completed:</span>
                       <span className="text-krgold">{it.completedDate ? new Date(it.completedDate).toLocaleDateString() : 'N/A'}</span>
                     </div>
                     {it.completionImages && it.completionImages.length > 0 && (
@@ -403,7 +415,7 @@ export default function VisionBoard(){
       <Modal
         isOpen={!!viewingGoal}
         onClose={() => setViewingGoal(null)}
-        title={viewingGoal?.status === 'completed' ? '🏆 Achievement' : '🎯 Goal Details'}
+        title={viewingGoal?.status === 'completed' ? 'ðŸ† Achievement' : 'ðŸŽ¯ Goal Details'}
         maxWidth="max-w-2xl"
       >
         {viewingGoal && (
@@ -417,7 +429,7 @@ export default function VisionBoard(){
             <div className="grid grid-cols-2 gap-4 mb-4">
               <div className="bg-krcard rounded-xl p-3 border border-krborder">
                 <div className="text-sm text-krmuted">Target Amount</div>
-                <div className="text-lg font-bold text-krgold">{formatAmount(parseFloat(viewingGoal.target) || 0)}</div>
+                <div className="text-lg font-bold text-krgold">{formatAmountInCurrency(parseFloat(viewingGoal.target, displayCurrency) || 0)}</div>
               </div>
               <div className="bg-krcard rounded-xl p-3 border border-krborder">
                 <div className="text-sm text-krmuted">Timeline</div>
@@ -468,7 +480,7 @@ export default function VisionBoard(){
       <Modal
         isOpen={showCompletionModal}
         onClose={() => setShowCompletionModal(false)}
-        title="� Complete Your Goal"
+        title="ï¿½ Complete Your Goal"
         maxWidth="max-w-2xl"
       >
         {completingGoal && (
@@ -572,12 +584,12 @@ export default function VisionBoard(){
       <Modal
         isOpen={deleteConfirmStep > 0}
         onClose={cancelDeleteAchievement}
-        title="⚠️ Delete Achievement"
+        title="âš ï¸ Delete Achievement"
       >
         <div className="p-6">
           {deleteConfirmStep === 1 && (
             <div className="text-center">
-              <div className="text-6xl mb-4">🗑️</div>
+              <div className="text-6xl mb-4">ðŸ—‘ï¸</div>
               <h3 className="text-xl font-bold text-krtext mb-3">First Confirmation</h3>
               <p className="text-krmuted mb-2">
                 Are you sure you want to delete this achievement?
@@ -607,7 +619,7 @@ export default function VisionBoard(){
 
           {deleteConfirmStep === 2 && (
             <div className="text-center">
-              <div className="text-6xl mb-4">⚠️</div>
+              <div className="text-6xl mb-4">âš ï¸</div>
               <h3 className="text-xl font-bold text-krdanger mb-3">Final Confirmation</h3>
               <p className="text-krtext font-semibold mb-2">
                 Are you absolutely certain?
@@ -642,3 +654,4 @@ export default function VisionBoard(){
     </div>
   )
 }
+
