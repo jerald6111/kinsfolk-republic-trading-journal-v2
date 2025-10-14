@@ -1,17 +1,54 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { TrendingUp, TrendingDown, Flame } from 'lucide-react'
 
+// Mini Sparkline Component
+const MiniSparkline: React.FC<{ data: number[]; isPositive: boolean }> = ({ data, isPositive }) => {
+  if (!data || data.length === 0) return <div className="w-24 h-8"></div>
+
+  const width = 96
+  const height = 32
+  const padding = 2
+
+  const minValue = Math.min(...data)
+  const maxValue = Math.max(...data)
+  const range = maxValue - minValue || 1
+
+  const points = data.map((value, index) => {
+    const x = (index / (data.length - 1)) * (width - 2 * padding) + padding
+    const y = height - padding - ((value - minValue) / range) * (height - 2 * padding)
+    return `${x},${y}`
+  }).join(' ')
+
+  return (
+    <svg width={width} height={height} className="inline-block">
+      <polyline
+        points={points}
+        fill="none"
+        stroke={isPositive ? '#10b981' : '#ef4444'}
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  )
+}
+
 // Crypto data types
 interface CryptoData {
   id: string
   symbol: string
   name: string
   current_price: number
+  price_change_percentage_1h_in_currency?: number
   price_change_percentage_24h: number
+  price_change_percentage_7d_in_currency?: number
   market_cap: number
   total_volume: number
   image: string
   market_cap_rank: number
+  sparkline_in_7d?: {
+    price: number[]
+  }
 }
 
 interface TrendingCoin {
@@ -98,13 +135,13 @@ export default function MarketData() {
       try {
         setRankingLoading(true)
         const response = await fetch(
-          'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=1&sparkline=false&price_change_percentage=24h'
+          'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=1&sparkline=true&price_change_percentage=1h,24h,7d'
         )
         const data1: CryptoData[] = await response.json()
         
         // Fetch page 2 to get coins 251-300
         const response2 = await fetch(
-          'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=2&sparkline=false&price_change_percentage=24h'
+          'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=2&sparkline=true&price_change_percentage=1h,24h,7d'
         )
         const data2: CryptoData[] = await response2.json()
         
@@ -118,7 +155,7 @@ export default function MarketData() {
     }
 
     fetchRankings()
-    const interval = setInterval(fetchRankings, 30000) // Update every 30 seconds
+    const interval = setInterval(fetchRankings, 60000) // Update every 60 seconds
     return () => clearInterval(interval)
   }, [])
 
@@ -138,7 +175,7 @@ export default function MarketData() {
     }
 
     fetchTrending()
-    const interval = setInterval(fetchTrending, 30000) // Update every 30 seconds
+    const interval = setInterval(fetchTrending, 60000) // Update every 60 seconds
     return () => clearInterval(interval)
   }, [])
 
@@ -174,7 +211,7 @@ export default function MarketData() {
     }
 
     fetchMarketData()
-    const interval = setInterval(fetchMarketData, 30000) // Update every 30 seconds
+    const interval = setInterval(fetchMarketData, 60000) // Update every 60 seconds
     return () => clearInterval(interval)
   }, [])
 
@@ -225,15 +262,18 @@ export default function MarketData() {
                           <th className="text-left py-3 px-4 text-krmuted font-semibold">#</th>
                           <th className="text-left py-3 px-4 text-krmuted font-semibold">Coin</th>
                           <th className="text-right py-3 px-4 text-krmuted font-semibold">Price</th>
-                          <th className="text-right py-3 px-4 text-krmuted font-semibold">24h %</th>
+                          <th className="text-right py-3 px-4 text-krmuted font-semibold">1h</th>
+                          <th className="text-right py-3 px-4 text-krmuted font-semibold">24h</th>
+                          <th className="text-right py-3 px-4 text-krmuted font-semibold">7d</th>
+                          <th className="text-right py-3 px-4 text-krmuted font-semibold">24h Volume</th>
                           <th className="text-right py-3 px-4 text-krmuted font-semibold">Market Cap</th>
-                          <th className="text-right py-3 px-4 text-krmuted font-semibold">Volume (24h)</th>
+                          <th className="text-center py-3 px-4 text-krmuted font-semibold">Last 7 Days</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {cryptoRankings.map((coin) => (
+                        {cryptoRankings.map((coin, index) => (
                           <tr key={coin.id} className="border-b border-krborder/30 hover:bg-krgold/5 transition-colors">
-                            <td className="py-3 px-4 text-krmuted font-semibold">{coin.market_cap_rank}</td>
+                            <td className="py-3 px-4 text-krmuted font-semibold">{index + 1}</td>
                             <td className="py-3 px-4">
                               <div className="flex items-center gap-3">
                                 <img src={coin.image} alt={coin.name} className="w-6 h-6 rounded-full" />
@@ -244,16 +284,36 @@ export default function MarketData() {
                               </div>
                             </td>
                             <td className="py-3 px-4 text-right font-semibold text-krtext">
-                              ${coin.current_price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                              ${coin.current_price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 })}
+                            </td>
+                            <td className={`py-3 px-4 text-right font-bold ${(coin.price_change_percentage_1h_in_currency || 0) >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                              {coin.price_change_percentage_1h_in_currency ? 
+                                `${coin.price_change_percentage_1h_in_currency >= 0 ? '+' : ''}${coin.price_change_percentage_1h_in_currency.toFixed(2)}%` 
+                                : 'N/A'}
                             </td>
                             <td className={`py-3 px-4 text-right font-bold ${coin.price_change_percentage_24h >= 0 ? 'text-green-500' : 'text-red-500'}`}>
                               {coin.price_change_percentage_24h >= 0 ? '+' : ''}{coin.price_change_percentage_24h.toFixed(2)}%
                             </td>
-                            <td className="py-3 px-4 text-right text-krtext">
-                              ${(coin.market_cap / 1e9).toFixed(2)}B
+                            <td className={`py-3 px-4 text-right font-bold ${(coin.price_change_percentage_7d_in_currency || 0) >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                              {coin.price_change_percentage_7d_in_currency ? 
+                                `${coin.price_change_percentage_7d_in_currency >= 0 ? '+' : ''}${coin.price_change_percentage_7d_in_currency.toFixed(2)}%` 
+                                : 'N/A'}
                             </td>
                             <td className="py-3 px-4 text-right text-krtext">
                               ${(coin.total_volume / 1e9).toFixed(2)}B
+                            </td>
+                            <td className="py-3 px-4 text-right text-krtext">
+                              ${(coin.market_cap / 1e9).toFixed(2)}B
+                            </td>
+                            <td className="py-3 px-4 text-center">
+                              {coin.sparkline_in_7d?.price ? (
+                                <MiniSparkline 
+                                  data={coin.sparkline_in_7d.price} 
+                                  isPositive={(coin.price_change_percentage_7d_in_currency || 0) >= 0}
+                                />
+                              ) : (
+                                <div className="w-24 h-8 flex items-center justify-center text-krmuted text-xs">N/A</div>
+                              )}
                             </td>
                           </tr>
                         ))}
@@ -405,7 +465,7 @@ export default function MarketData() {
             <div className="text-xs text-krmuted text-center">
               <span className="font-semibold">Data Sources:</span> Market data powered by{' '}
               <span className="text-krgold font-medium">CoinGecko</span> &{' '}
-              <span className="text-krgold font-medium">TradingView</span> • Real-time updates every 30 seconds • Top 300 cryptocurrencies by market cap
+              <span className="text-krgold font-medium">TradingView</span> • Real-time updates every 60 seconds • Top 300 cryptocurrencies with 7-day sparkline charts
             </div>
           </div>
         </div>
