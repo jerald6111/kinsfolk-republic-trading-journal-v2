@@ -1,13 +1,46 @@
 import React, { useEffect, useRef, useState } from 'react'
+import { TrendingUp, TrendingDown, Flame } from 'lucide-react'
+
+// Crypto data types
+interface CryptoData {
+  id: string
+  symbol: string
+  name: string
+  current_price: number
+  price_change_percentage_24h: number
+  market_cap: number
+  total_volume: number
+  image: string
+  market_cap_rank: number
+}
+
+interface TrendingCoin {
+  item: {
+    id: string
+    coin_id: number
+    name: string
+    symbol: string
+    market_cap_rank: number
+    thumb: string
+    small: string
+    large: string
+    slug: string
+    price_btc: number
+    score: number
+  }
+}
 
 export default function MarketData() {
   const calendarRef = useRef<HTMLDivElement>(null)
   const heatmapRef = useRef<HTMLDivElement>(null)
   const cryptoScreenerRef = useRef<HTMLDivElement>(null)
-  const mostVolatileRef = useRef<HTMLDivElement>(null)
-  const gainersRef = useRef<HTMLDivElement>(null)
-  const losersRef = useRef<HTMLDivElement>(null)
   const [heatmapMetric, setHeatmapMetric] = useState<'change' | 'volume' | 'open_interest'>('change')
+  
+  // CoinGecko data states
+  const [trendingCoins, setTrendingCoins] = useState<TrendingCoin[]>([])
+  const [topGainers, setTopGainers] = useState<CryptoData[]>([])
+  const [topLosers, setTopLosers] = useState<CryptoData[]>([])
+  const [loading, setLoading] = useState(true)
 
   // Economic Calendar Widget
   useEffect(() => {
@@ -89,91 +122,60 @@ export default function MarketData() {
     return () => { if (container) { container.innerHTML = '' } }
   }, [])
 
-  // Most Volatile Widget
+  // Fetch CoinGecko Trending Coins
   useEffect(() => {
-    if (!mostVolatileRef.current) return
-    const container = mostVolatileRef.current
-    container.innerHTML = ''
-    const script = document.createElement('script')
-    script.type = 'text/javascript'
-    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-screener.js'
-    script.async = true
-    script.innerHTML = JSON.stringify({
-      width: "100%",
-      height: "100%",
-      defaultColumn: "overview",
-      defaultScreen: "most_volatile",
-      market: "crypto",
-      showToolbar: true,
-      colorTheme: "dark",
-      locale: "en",
-      isTransparent: true,
-      screener_type: "crypto_mkt",
-      displayCurrency: "USD",
-      filter: [
-        { left: "exchange", operation: "in_range", right: ["BINANCE"] }
-      ]
-    })
-    container.appendChild(script)
-    return () => { if (container) { container.innerHTML = '' } }
+    const fetchTrending = async () => {
+      try {
+        setLoading(true)
+        const response = await fetch('https://api.coingecko.com/api/v3/search/trending')
+        const data = await response.json()
+        setTrendingCoins(data.coins || [])
+      } catch (error) {
+        console.error('Error fetching trending coins:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchTrending()
+    const interval = setInterval(fetchTrending, 60000) // Update every 60 seconds
+    return () => clearInterval(interval)
   }, [])
 
-  // Top Gainers Widget
+  // Fetch CoinGecko Market Data (Gainers & Losers)
   useEffect(() => {
-    if (!gainersRef.current) return
-    const container = gainersRef.current
-    container.innerHTML = ''
-    const script = document.createElement('script')
-    script.type = 'text/javascript'
-    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-screener.js'
-    script.async = true
-    script.innerHTML = JSON.stringify({
-      width: "100%",
-      height: "100%",
-      defaultColumn: "overview",
-      defaultScreen: "top_gainers",
-      market: "crypto",
-      showToolbar: true,
-      colorTheme: "dark",
-      locale: "en",
-      isTransparent: true,
-      screener_type: "crypto_mkt",
-      displayCurrency: "USD",
-      filter: [
-        { left: "exchange", operation: "in_range", right: ["BINANCE"] }
-      ]
-    })
-    container.appendChild(script)
-    return () => { if (container) { container.innerHTML = '' } }
-  }, [])
+    const fetchMarketData = async () => {
+      try {
+        setLoading(true)
+        const response = await fetch(
+          'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=1&sparkline=false&price_change_percentage=24h'
+        )
+        const data: CryptoData[] = await response.json()
+        
+        // Sort for top gainers (highest positive change)
+        const gainers = [...data]
+          .filter(coin => coin.price_change_percentage_24h > 0)
+          .sort((a, b) => b.price_change_percentage_24h - a.price_change_percentage_24h)
+          .slice(0, 10)
+        
+        // Sort for top losers (most negative change)
+        const losers = [...data]
+          .filter(coin => coin.price_change_percentage_24h < 0)
+          .sort((a, b) => a.price_change_percentage_24h - b.price_change_percentage_24h)
+          .slice(0, 10)
+        
+        setTopGainers(gainers)
+        setTopLosers(losers)
+      } catch (error) {
+        console.error('Error fetching market data:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
 
-  // Top Losers Widget
-  useEffect(() => {
-    if (!losersRef.current) return
-    const container = losersRef.current
-    container.innerHTML = ''
-    const script = document.createElement('script')
-    script.type = 'text/javascript'
-    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-screener.js'
-    script.async = true
-    script.innerHTML = JSON.stringify({
-      width: "100%",
-      height: "100%",
-      defaultColumn: "overview",
-      defaultScreen: "top_losers",
-      market: "crypto",
-      showToolbar: true,
-      colorTheme: "dark",
-      locale: "en",
-      isTransparent: true,
-      screener_type: "crypto_mkt",
-      displayCurrency: "USD",
-      filter: [
-        { left: "exchange", operation: "in_range", right: ["BINANCE"] }
-      ]
-    })
-    container.appendChild(script)
-    return () => { if (container) { container.innerHTML = '' } }
+    fetchMarketData()
+    const interval = setInterval(fetchMarketData, 60000) // Update every 60 seconds
+    return () => clearInterval(interval)
   }, [])
 
   return (
@@ -230,7 +232,7 @@ export default function MarketData() {
               </div>
             </div>
 
-            {/* Two Column Row: Heatmap & Most Volatile */}
+            {/* Two Column Row: Heatmap & Trending Coins */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Crypto Heatmap */}
               <div>
@@ -254,14 +256,35 @@ export default function MarketData() {
                 </div>
               </div>
 
-              {/* Most Volatile */}
+              {/* Trending Coins */}
               <div>
                 <div className="flex items-center gap-3 mb-6">
-                  <span className="text-2xl">⚡</span>
-                  <h2 className="text-xl font-semibold text-krtext">Most Volatile</h2>
+                  <Flame className="w-6 h-6 text-orange-500" />
+                  <h2 className="text-xl font-semibold text-krtext">🔥 Trending Coins</h2>
                 </div>
-                <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[600px]">
-                  <div ref={mostVolatileRef} className="h-full w-full"></div>
+                <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[600px] overflow-y-auto">
+                  {loading ? (
+                    <div className="flex items-center justify-center h-full">
+                      <div className="text-krmuted">Loading trending coins...</div>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {trendingCoins.slice(0, 7).map((trending, index) => (
+                        <div key={trending.item.id} className="flex items-center gap-4 p-3 bg-krblack/40 rounded-lg border border-krborder/50 hover:border-krgold/30 transition-colors">
+                          <span className="text-krmuted font-semibold text-sm min-w-[24px]">#{index + 1}</span>
+                          <img src={trending.item.small} alt={trending.item.name} className="w-8 h-8 rounded-full" />
+                          <div className="flex-1">
+                            <div className="font-semibold text-krtext">{trending.item.name}</div>
+                            <div className="text-xs text-krmuted">{trending.item.symbol.toUpperCase()}</div>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-xs text-krmuted">Rank</div>
+                            <div className="text-sm font-semibold text-krgold">#{trending.item.market_cap_rank || 'N/A'}</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -271,22 +294,64 @@ export default function MarketData() {
               {/* Top Crypto Gainers */}
               <div>
                 <div className="flex items-center gap-3 mb-6">
-                  <span className="text-2xl">🚀</span>
-                  <h2 className="text-xl font-semibold text-krtext">Top Gainers</h2>
+                  <TrendingUp className="w-6 h-6 text-green-500" />
+                  <h2 className="text-xl font-semibold text-krtext">🚀 Top Gainers</h2>
                 </div>
-                <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[600px]">
-                  <div ref={gainersRef} className="h-full w-full"></div>
+                <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[600px] overflow-y-auto">
+                  {loading ? (
+                    <div className="flex items-center justify-center h-full">
+                      <div className="text-krmuted">Loading top gainers...</div>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {topGainers.map((coin, index) => (
+                        <div key={coin.id} className="flex items-center gap-4 p-3 bg-krblack/40 rounded-lg border border-krborder/50 hover:border-green-500/30 transition-colors">
+                          <span className="text-krmuted font-semibold text-sm min-w-[24px]">#{index + 1}</span>
+                          <img src={coin.image} alt={coin.name} className="w-8 h-8 rounded-full" />
+                          <div className="flex-1">
+                            <div className="font-semibold text-krtext">{coin.name}</div>
+                            <div className="text-xs text-krmuted">{coin.symbol.toUpperCase()}</div>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-sm font-semibold text-krtext">${coin.current_price.toLocaleString()}</div>
+                            <div className="text-sm font-bold text-green-500">+{coin.price_change_percentage_24h.toFixed(2)}%</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
 
               {/* Top Crypto Losers */}
               <div>
                 <div className="flex items-center gap-3 mb-6">
-                  <span className="text-2xl">🚨</span>
-                  <h2 className="text-xl font-semibold text-krtext">Top Losers</h2>
+                  <TrendingDown className="w-6 h-6 text-red-500" />
+                  <h2 className="text-xl font-semibold text-krtext">🚨 Top Losers</h2>
                 </div>
-                <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[600px]">
-                  <div ref={losersRef} className="h-full w-full"></div>
+                <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[600px] overflow-y-auto">
+                  {loading ? (
+                    <div className="flex items-center justify-center h-full">
+                      <div className="text-krmuted">Loading top losers...</div>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {topLosers.map((coin, index) => (
+                        <div key={coin.id} className="flex items-center gap-4 p-3 bg-krblack/40 rounded-lg border border-krborder/50 hover:border-red-500/30 transition-colors">
+                          <span className="text-krmuted font-semibold text-sm min-w-[24px]">#{index + 1}</span>
+                          <img src={coin.image} alt={coin.name} className="w-8 h-8 rounded-full" />
+                          <div className="flex-1">
+                            <div className="font-semibold text-krtext">{coin.name}</div>
+                            <div className="text-xs text-krmuted">{coin.symbol.toUpperCase()}</div>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-sm font-semibold text-krtext">${coin.current_price.toLocaleString()}</div>
+                            <div className="text-sm font-bold text-red-500">{coin.price_change_percentage_24h.toFixed(2)}%</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -295,8 +360,9 @@ export default function MarketData() {
           {/* Data Sources Footer */}
           <div className="mt-8 pt-6 border-t border-krborder">
             <div className="text-xs text-krmuted text-center">
-              <span className="font-semibold">Data Sources:</span> All market data powered by{' '}
-              <span className="text-krgold font-medium">TradingView</span> • Real-time crypto analysis with live updates • Screener filtered to Binance, Bybit & OKX exchanges
+              <span className="font-semibold">Data Sources:</span> Market data powered by{' '}
+              <span className="text-krgold font-medium">TradingView</span> &{' '}
+              <span className="text-krgold font-medium">CoinGecko</span> • Real-time updates every 60 seconds • Screener filtered to Binance, Bybit & OKX exchanges
             </div>
           </div>
         </div>
