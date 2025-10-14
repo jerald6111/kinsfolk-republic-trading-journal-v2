@@ -94,10 +94,11 @@ export default function Download() {
                 
                 <button 
                   onClick={() => {
-                    // Direct download from website hosting
+                    // Direct download from Google Drive
                     const link = document.createElement('a')
-                    link.href = '/downloads/KRTJ-Desktop-Setup-1.6.6.exe'
-                    link.download = 'KRTJ-Desktop-Setup-1.6.6.exe'
+                    link.href = 'https://drive.google.com/uc?export=download&id=1EUvANrppgmUlMhrRmyrSQ7_TwTNmxU75'
+                    link.target = '_blank';
+                    link.rel = 'noopener noreferrer';
                     document.body.appendChild(link)
                     link.click()
                     document.body.removeChild(link)
