@@ -1,7 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { TrendingUp, TrendingDown, Flame } from 'lucide-react'
-import FiatConverter from '../components/FiatConverter'
-import CryptoConverter from '../components/CryptoConverter'
 
 // Mini Sparkline Component
 const MiniSparkline: React.FC<{ data: number[]; isPositive: boolean }> = ({ data, isPositive }) => {
@@ -255,11 +253,7 @@ export default function MarketData() {
             </p>
           </div>
 
-          {/* Currency Converters */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <FiatConverter />
-            <CryptoConverter />
-          </div>
+
 
           {/* Main Content Grid */}
           <div className="space-y-6">
