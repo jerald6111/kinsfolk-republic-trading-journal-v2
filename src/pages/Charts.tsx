@@ -126,7 +126,7 @@ export default function Charts(){
       <div className="mb-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="text-4xl">{activeTab === 'Charts' ? 'ðŸ“Š' : 'ðŸ’°'}</span>
+            <span className="text-4xl">{activeTab === 'Charts' ? '📊' : '💰'}</span>
             <div>
               <h1 className="text-3xl font-bold bg-gradient-to-r from-krgold to-kryellow bg-clip-text text-transparent">
                 Snapshots - {activeTab === 'Charts' ? 'Charts' : 'PNL Overview'}
@@ -294,7 +294,7 @@ export default function Charts(){
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredItems.length === 0 && (
           <div className="col-span-full text-center bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-12">
-            <span className="text-6xl mb-3 block">{activeTab === 'Charts' ? 'ðŸ“Š' : 'ðŸ’°'}</span>
+            <span className="text-6xl mb-3 block">{activeTab === 'Charts' ? '📊' : '💰'}</span>
             <p className="text-krmuted">
               {hasActiveFilters ? `No ${activeTab.toLowerCase()} snapshots match the selected filters.` : `No ${activeTab.toLowerCase()} snapshots available.`}
             </p>

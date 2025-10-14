@@ -1,4 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
+import FiatConverter from '../components/FiatConverter'
+import CryptoConverter from '../components/CryptoConverter'
 
 interface CryptoItem {
   id: string
@@ -366,6 +368,12 @@ export default function DataMarket() {
               )}
             />
 
+          </div>
+
+          {/* Currency Converters */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <FiatConverter />
+            <CryptoConverter />
           </div>
 
           {/* Crypto Screener */}

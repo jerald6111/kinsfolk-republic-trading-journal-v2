@@ -303,7 +303,7 @@ export default function DataSettings(){
                 Select Your Currency
               </label>
               <p className="text-xs text-krmuted mb-4">
-                Choose a single currency to be used throughout the entire application. All amounts will be displayed in this currency.
+                Set the default currency for displaying all financial amounts in the application.
               </p>
               <select
                 value={primaryCurrency.code}
@@ -319,12 +319,6 @@ export default function DataSettings(){
                   </option>
                 ))}
               </select>
-            </div>
-            <div className="text-sm text-krmuted bg-krblack/30 rounded-lg p-3 border border-krborder/30">
-              <strong className="text-krtext">Selected:</strong> {primaryCurrency.symbol} {primaryCurrency.name} ({primaryCurrency.code})
-              <div className="text-xs text-krmuted/70 mt-2">
-                💡 This currency will be used across all pages: Wallet, Analytics, Journal, Charts, and Vision Board
-              </div>
             </div>
           </div>
         </div>

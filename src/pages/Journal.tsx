@@ -196,11 +196,11 @@ export default function Journal() {
             <h2 className="text-2xl font-bold text-krtext flex items-center gap-2">
               {form.id ? (
                 <>
-                  <span className="text-blue-400">âœï¸</span> Edit Trade
+                  <span className="text-blue-400">✏️</span> Edit Trade
                 </>
               ) : (
                 <>
-                  <span className="text-krgold">âž•</span> New Trade
+                  <span className="text-krgold">➤</span> New Trade
                 </>
               )}
             </h2>
@@ -477,12 +477,12 @@ export default function Journal() {
         {/* Trade History - Right Side */}
         <div className="bg-krcard/90 backdrop-blur-md rounded-2xl shadow-2xl border border-krborder/50 p-6 flex flex-col">
           <h2 className="text-2xl font-bold mb-4 text-krtext flex items-center gap-2">
-            <span className="text-krgold">ðŸ“Š</span> Recent Trades
+            <span className="text-krgold">📊</span> Recent Trades
           </h2>
           <div className="space-y-3 overflow-y-auto pr-2 flex-1 max-h-[calc(100vh-16rem)] custom-scrollbar">
             {items.length === 0 && (
               <div className="text-center py-20">
-                <div className="text-6xl mb-4">ðŸ“ˆ</div>
+                <div className="text-6xl mb-4">📈</div>
                 <p className="text-krmuted">No trades yet</p>
                 <p className="text-xs text-krmuted/60 mt-2">Add your first trade to start tracking!</p>
               </div>
@@ -502,7 +502,7 @@ export default function Journal() {
                       <div className="font-bold text-lg text-krtext group-hover:text-krgold transition-colors">{it.ticker}</div>
                       <div className="text-xs text-krmuted flex items-center gap-2">
                         <span>{it.date}</span>
-                        <span className="text-krborder">â€¢</span>
+                        <span className="text-krborder">•</span>
                         <span>{it.time}</span>
                       </div>
                     </div>
@@ -517,7 +517,7 @@ export default function Journal() {
                     <div className="flex items-center justify-between text-krmuted">
                       <span className="flex items-center gap-1.5">
                         <span className={`w-1.5 h-1.5 rounded-full ${it.position === 'Long' ? 'bg-green-400' : 'bg-red-400'}`}></span>
-                        {it.type} {it.type === 'Futures' ? `${it.leverage}x` : ''} â€¢ {it.position}
+                        {it.type} {it.type === 'Futures' ? `${it.leverage}x` : ''} • {it.position}
                       </span>
                     </div>
                     <div className="flex items-center justify-between pt-2 border-t border-krborder/20">
@@ -547,7 +547,7 @@ export default function Journal() {
                     <div>
                       <h2 className="text-2xl font-bold text-krtext">{viewingTrade.ticker}</h2>
                       <p className="text-sm text-gray-400 mt-1">
-                        {viewingTrade.date} {viewingTrade.time} â†’ {viewingTrade.exitDate} {viewingTrade.exitTime}
+                        {viewingTrade.date} {viewingTrade.time} → {viewingTrade.exitDate} {viewingTrade.exitTime}
                       </p>
                     </div>
                     <div className="text-right">
