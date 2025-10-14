@@ -453,15 +453,6 @@ export default function MarketData() {
               </div>
             </div>
           </div>
-
-          {/* Data Sources Footer */}
-          <div className="mt-8 pt-6 border-t border-krborder">
-            <div className="text-xs text-krmuted text-center">
-              <span className="font-semibold">Data Sources:</span> Market data powered by{' '}
-              <span className="text-krgold font-medium">CoinGecko</span> &{' '}
-              <span className="text-krgold font-medium">TradingView</span> • Real-time updates every 60 seconds • Top 300 cryptocurrencies with 7-day sparkline charts
-            </div>
-          </div>
         </div>
       </div>
     </div>
