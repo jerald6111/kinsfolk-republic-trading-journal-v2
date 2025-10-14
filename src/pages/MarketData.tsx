@@ -105,27 +105,51 @@ export default function MarketData() {
     return () => { if (container) { container.innerHTML = '' } }
   }, [])
 
-  // Top Trending Coins Widget - Crypto Specific
+  // Top Trending Coins Widget - Crypto Market Overview
   useEffect(() => {
     if (!trendingRef.current) return
     const container = trendingRef.current
     container.innerHTML = ''
     const script = document.createElement('script')
     script.type = 'text/javascript'
-    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-screener.js'
+    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js'
     script.async = true
     script.innerHTML = JSON.stringify({
+      colorTheme: "dark",
+      dateRange: "1D",
+      showChart: true,
+      locale: "en",
       width: "100%",
       height: "100%",
-      defaultColumn: "overview",
-      defaultScreen: "most_capitalized",
-      market: "crypto",
-      showToolbar: false,
-      colorTheme: "dark",
-      locale: "en",
+      largeChartUrl: "",
       isTransparent: true,
-      screener_type: "crypto_mkt",
-      displayCurrency: "USD"
+      showSymbolLogo: true,
+      showFloatingTooltip: false,
+      plotLineColorGrowing: "rgba(41, 98, 255, 1)",
+      plotLineColorFalling: "rgba(41, 98, 255, 1)",
+      gridLineColor: "rgba(42, 46, 57, 0)",
+      scaleFontColor: "rgba(120, 123, 134, 1)",
+      belowLineFillColorGrowing: "rgba(41, 98, 255, 0.12)",
+      belowLineFillColorFalling: "rgba(41, 98, 255, 0.12)",
+      belowLineFillColorGrowingBottom: "rgba(41, 98, 255, 0)",
+      belowLineFillColorFallingBottom: "rgba(41, 98, 255, 0)",
+      symbolActiveColor: "rgba(41, 98, 255, 0.12)",
+      tabs: [
+        {
+          title: "Crypto",
+          symbols: [
+            { s: "BINANCE:BTCUSDT", d: "Bitcoin" },
+            { s: "BINANCE:ETHUSDT", d: "Ethereum" },
+            { s: "BINANCE:BNBUSDT", d: "BNB" },
+            { s: "BINANCE:SOLUSDT", d: "Solana" },
+            { s: "BINANCE:XRPUSDT", d: "XRP" },
+            { s: "BINANCE:ADAUSDT", d: "Cardano" },
+            { s: "BINANCE:DOTUSDT", d: "Polkadot" },
+            { s: "BINANCE:MATICUSDT", d: "Polygon" }
+          ],
+          originalTitle: "Crypto"
+        }
+      ]
     })
     container.appendChild(script)
     return () => { if (container) { container.innerHTML = '' } }
@@ -254,11 +278,11 @@ export default function MarketData() {
                 </div>
               </div>
 
-              {/* Top Trending Coins */}
+              {/* Crypto Market Overview */}
               <div>
                 <div className="flex items-center gap-3 mb-6">
-                  <span className="text-2xl">⭐</span>
-                  <h2 className="text-xl font-semibold text-krtext">Top Trending</h2>
+                  <span className="text-2xl">📊</span>
+                  <h2 className="text-xl font-semibold text-krtext">Market Overview</h2>
                 </div>
                 <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[500px]">
                   <div ref={trendingRef} className="h-full w-full"></div>
