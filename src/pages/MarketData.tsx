@@ -110,7 +110,16 @@ export default function MarketData() {
       isTransparent: true,
       screener_type: "crypto_mkt",
       displayCurrency: "USD",
-      enableScrolling: true
+      enableScrolling: true,
+      columnOrder: [
+        "name",
+        "market_cap_calc",
+        "close",
+        "change",
+        "volume",
+        "circulating_supply",
+        "vol_to_market_cap_ratio"
+      ]
     })
     container.appendChild(script)
     return () => { if (container) { container.innerHTML = '' } }
@@ -137,7 +146,16 @@ export default function MarketData() {
       isTransparent: true,
       screener_type: "crypto_mkt",
       displayCurrency: "USD",
-      enableScrolling: true
+      enableScrolling: true,
+      columnOrder: [
+        "name",
+        "market_cap_calc",
+        "close",
+        "change",
+        "volume",
+        "circulating_supply",
+        "vol_to_market_cap_ratio"
+      ]
     })
     container.appendChild(script)
     return () => { if (container) { container.innerHTML = '' } }
@@ -164,7 +182,16 @@ export default function MarketData() {
       isTransparent: true,
       screener_type: "crypto_mkt",
       displayCurrency: "USD",
-      enableScrolling: true
+      enableScrolling: true,
+      columnOrder: [
+        "name",
+        "market_cap_calc",
+        "close",
+        "change",
+        "volume",
+        "circulating_supply",
+        "vol_to_market_cap_ratio"
+      ]
     })
     container.appendChild(script)
     return () => { if (container) { container.innerHTML = '' } }
@@ -213,19 +240,19 @@ export default function MarketData() {
               </div>
             </div>
 
-            {/* Three Column Row: Economic Calendar, Heatmap, Trending */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Economic Calendar */}
-              <div>
-                <div className="flex items-center gap-3 mb-6">
-                  <span className="text-2xl">📅</span>
-                  <h2 className="text-xl font-semibold text-krtext">Economic Calendar</h2>
-                </div>
-                <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[500px]">
-                  <div ref={calendarRef} className="h-full w-full"></div>
-                </div>
+            {/* Full Width: Economic Calendar */}
+            <div>
+              <div className="flex items-center gap-3 mb-6">
+                <span className="text-2xl">📅</span>
+                <h2 className="text-xl font-semibold text-krtext">Economic Calendar</h2>
               </div>
+              <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[700px]">
+                <div ref={calendarRef} className="h-full w-full"></div>
+              </div>
+            </div>
 
+            {/* Two Column Row: Heatmap & Most Volatile */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Crypto Heatmap */}
               <div>
                 <div className="flex items-center justify-between mb-6">
@@ -243,7 +270,7 @@ export default function MarketData() {
                     <option value="open_interest">Open Interest</option>
                   </select>
                 </div>
-                <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[500px]">
+                <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[600px]">
                   <div ref={heatmapRef} className="h-full w-full"></div>
                 </div>
               </div>
@@ -254,7 +281,7 @@ export default function MarketData() {
                   <span className="text-2xl">⚡</span>
                   <h2 className="text-xl font-semibold text-krtext">Most Volatile</h2>
                 </div>
-                <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[500px]">
+                <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[600px]">
                   <div ref={mostVolatileRef} className="h-full w-full"></div>
                 </div>
               </div>
@@ -268,7 +295,7 @@ export default function MarketData() {
                   <span className="text-2xl">🚀</span>
                   <h2 className="text-xl font-semibold text-krtext">Top Gainers</h2>
                 </div>
-                <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[500px]">
+                <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[600px]">
                   <div ref={gainersRef} className="h-full w-full"></div>
                 </div>
               </div>
@@ -279,7 +306,7 @@ export default function MarketData() {
                   <span className="text-2xl">🚨</span>
                   <h2 className="text-xl font-semibold text-krtext">Top Losers</h2>
                 </div>
-                <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[500px]">
+                <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[600px]">
                   <div ref={losersRef} className="h-full w-full"></div>
                 </div>
               </div>
