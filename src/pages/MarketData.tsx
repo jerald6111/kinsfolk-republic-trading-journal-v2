@@ -111,14 +111,15 @@ export default function MarketData() {
       screener_type: "crypto_mkt",
       displayCurrency: "USD",
       enableScrolling: true,
+      filter: [
+        { left: "exchange", operation: "match", right: "BINANCE" },
+        { left: "typespecs", operation: "match", right: "spot" }
+      ],
       columnOrder: [
         "name",
-        "market_cap_calc",
         "close",
-        "change",
-        "volume",
-        "circulating_supply",
-        "vol_to_market_cap_ratio"
+        "change|1",
+        "Recommend.All"
       ]
     })
     container.appendChild(script)
@@ -147,14 +148,15 @@ export default function MarketData() {
       screener_type: "crypto_mkt",
       displayCurrency: "USD",
       enableScrolling: true,
+      filter: [
+        { left: "exchange", operation: "match", right: "BINANCE" },
+        { left: "typespecs", operation: "match", right: "spot" }
+      ],
       columnOrder: [
         "name",
-        "market_cap_calc",
         "close",
-        "change",
-        "volume",
-        "circulating_supply",
-        "vol_to_market_cap_ratio"
+        "change|1",
+        "Recommend.All"
       ]
     })
     container.appendChild(script)
@@ -183,14 +185,15 @@ export default function MarketData() {
       screener_type: "crypto_mkt",
       displayCurrency: "USD",
       enableScrolling: true,
+      filter: [
+        { left: "exchange", operation: "match", right: "BINANCE" },
+        { left: "typespecs", operation: "match", right: "spot" }
+      ],
       columnOrder: [
         "name",
-        "market_cap_calc",
         "close",
-        "change",
-        "volume",
-        "circulating_supply",
-        "vol_to_market_cap_ratio"
+        "change|1",
+        "Recommend.All"
       ]
     })
     container.appendChild(script)
