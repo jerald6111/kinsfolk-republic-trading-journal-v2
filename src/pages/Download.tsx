@@ -92,22 +92,15 @@ export default function Download() {
                   </div>
                 </div>
                 
-                <button 
-                  onClick={() => {
-                    // Direct download from Google Drive
-                    const link = document.createElement('a')
-                    link.href = 'https://drive.google.com/uc?export=download&id=1EUvANrppgmUlMhrRmyrSQ7_TwTNmxU75'
-                    link.target = '_blank';
-                    link.rel = 'noopener noreferrer';
-                    document.body.appendChild(link)
-                    link.click()
-                    document.body.removeChild(link)
-                  }}
+                <a
+                  href="https://drive.google.com/file/d/1EUvANrppgmUlMhrRmyrSQ7_TwTNmxU75/view?usp=sharing"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="w-full bg-gradient-to-r from-krgold to-kryellow text-krblack px-8 py-4 rounded-xl font-semibold hover:shadow-lg hover:shadow-krgold/50 transition-all flex items-center justify-center gap-2"
                 >
                   <DownloadIcon size={20} />
                   Download for Windows (FREE)
-                </button>
+                </a>
                 
                 <p className="text-sm text-gray-400 mt-3">
                   ~75MB • Production Release • Auto-updates included
