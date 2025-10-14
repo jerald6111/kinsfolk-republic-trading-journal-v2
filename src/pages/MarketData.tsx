@@ -104,12 +104,13 @@ export default function MarketData() {
       defaultColumn: "overview",
       defaultScreen: "most_volatile",
       market: "crypto",
-      showToolbar: false,
+      showToolbar: true,
       colorTheme: "dark",
       locale: "en",
       isTransparent: true,
       screener_type: "crypto_mkt",
-      displayCurrency: "USD"
+      displayCurrency: "USD",
+      enableScrolling: true
     })
     container.appendChild(script)
     return () => { if (container) { container.innerHTML = '' } }
@@ -130,12 +131,13 @@ export default function MarketData() {
       defaultColumn: "overview",
       defaultScreen: "top_gainers",
       market: "crypto",
-      showToolbar: false,
+      showToolbar: true,
       colorTheme: "dark",
       locale: "en",
       isTransparent: true,
       screener_type: "crypto_mkt",
-      displayCurrency: "USD"
+      displayCurrency: "USD",
+      enableScrolling: true
     })
     container.appendChild(script)
     return () => { if (container) { container.innerHTML = '' } }
@@ -156,12 +158,13 @@ export default function MarketData() {
       defaultColumn: "overview",
       defaultScreen: "top_losers",
       market: "crypto",
-      showToolbar: false,
+      showToolbar: true,
       colorTheme: "dark",
       locale: "en",
       isTransparent: true,
       screener_type: "crypto_mkt",
-      displayCurrency: "USD"
+      displayCurrency: "USD",
+      enableScrolling: true
     })
     container.appendChild(script)
     return () => { if (container) { container.innerHTML = '' } }
