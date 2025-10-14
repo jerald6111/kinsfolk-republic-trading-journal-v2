@@ -10,6 +10,7 @@ files:
       - preload.js
       - package.json
       - public/krtj-icon.ico
+compression: maximum
 win:
   target: nsis
   icon: public/krtj-icon.ico
@@ -19,4 +20,8 @@ nsis:
   installerIcon: public/krtj-icon.ico
   uninstallerIcon: public/krtj-icon.ico
   artifactName: KRTJ-Desktop-Setup-${version}.exe
+  differentialPackage: true
+publish:
+  provider: generic
+  url: https://kinsfolk-republic-trading-journal-v.vercel.app/downloads/
 electronVersion: 27.3.11

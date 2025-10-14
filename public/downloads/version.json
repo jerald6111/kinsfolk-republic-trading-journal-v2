@@ -1,34 +1,32 @@
 {
-  "version": "1.6.6",
-  "releaseDate": "2025-01-14",
-  "downloadUrl": "/downloads/KRTJ-Desktop-Setup-1.6.6.exe",
+  "version": "1.6.7",
+  "releaseDate": "2025-10-14",
+  "downloadUrl": "/downloads/KRTJ-Desktop-Setup-1.6.7.exe",
   "releaseNotes": {
-    "title": "KRTJ Desktop v1.6.6 - Upload Missed Opportunities & Enhanced AI Features! ��📊",
+    "title": "KRTJ Desktop v1.6.7 - Currency Converters & Emoji Fixes! ��📊",
     "features": [
-      "NEW: Upload Missed Opportunities on Charts/Snapshots page - save trades you didn't take for learning!",
-      "NEW: Missed opportunities are NOT counted as trade entries - perfect for 'what if' analysis",
-      "NEW: Collapsible 'What is a Trading Playbook?' section for cleaner UI",
-      "ENHANCED: AI Chatbot now knows ALL platform features in comprehensive detail",
-      "ENHANCED: Homepage updated with complete feature descriptions including Market Data",
-      "IMPROVED: AI Assistant quick actions reflect latest capabilities"
+      "NEW: Fiat Currency Converter on Market Data page - convert between major currencies",
+      "NEW: Crypto Currency Converter on Market Data page - convert BTC, USDT, BUSD with live rates",
+      "NEW: Real-time exchange rates with auto-refresh every minute",
+      "FIXED: Emoji rendering issues across all pages - proper Unicode display",
+      "ENHANCED: Currency system simplified to single global currency selection",
+      "IMPROVED: DataSettings page reworded for clarity and removed redundant text"
     ],
     "improvements": [
-      "Enhanced Market Data page with Top 100/200/300 crypto rankings",
-      "Live sparkline charts showing 7-day trends for all cryptocurrencies",
-      "60-second auto-refresh for trending coins, gainers, and losers",
-      "Playbook strategies now support collapsible sections for better organization",
-      "Better visual distinction between actual trades and learning opportunities",
-      "Comprehensive AI knowledge base covering all 9 platform sections",
-      "Enhanced memory management with proper event listener cleanup"
+      "Currency converters integrated into Market Data page with clean UI",
+      "Fixed garbled emoji text in Vision Board, Journal, Charts, and other components",
+      "Removed per-page currency selection in favor of global currency management",
+      "Better visual consistency across all currency-related components",
+      "Enhanced user experience with properly displayed icons and symbols"
     ],
     "bugFixes": [
-      "FIXED: Upload modal now properly validates all required fields",
-      "IMPROVED: Collapsible sections maintain state across sessions",
-      "ENHANCED: Better error handling for image uploads",
-      "OPTIMIZED: Faster data persistence for uploaded opportunities",
-      "SYNCHRONIZED: Both website and desktop versions updated with latest features"
+      "FIXED: Emoji encoding issues causing garbled text display",
+      "IMPROVED: Currency converter calculations using correct exchange rates",
+      "ENHANCED: Better error handling for currency conversion operations",
+      "OPTIMIZED: Faster rendering of currency-related components",
+      "SYNCHRONIZED: Both website and desktop versions updated with latest fixes"
     ],
-    "notes": "Major feature update with missed opportunity tracking and enhanced AI assistance! Upload and analyze trades you didn't take, organize your playbook better, and get comprehensive help from the AI chatbot. �📊"
+    "notes": "Quality of life update with currency converters and emoji fixes! Convert currencies in real-time on the Market Data page, and enjoy properly displayed emojis across the entire application. 💱📊"
   },
   "minimumVersion": "1.0.0",
   "isRequired": false,

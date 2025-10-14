@@ -6,8 +6,6 @@ import Modal from '../components/Modal'
 import SendToDiscordButton from '../components/SendToDiscordButton'
 import { loadData, saveData, triggerAutoEmailBackup } from '../utils/storage'
 import { useCurrency } from '../context/CurrencyContext'
-import { usePageCurrency } from '../hooks/usePageCurrency'
-import PageCurrencySelector from '../components/PageCurrencySelector'
 import { JournalEntry, TradeObjective, TradeType, TradePosition } from '../types'
 import { TrendingUp, TrendingDown, Link, X } from 'lucide-react'
 
@@ -18,8 +16,7 @@ const LEVERAGE_OPTIONS = Array.from({ length: 150 }, (_, i) => i + 1)
 
 export default function Journal() {
   const data = loadData()
-  const { formatAmount, formatAmountInCurrency, primaryCurrency, currency } = useCurrency()
-  const { localCurrency, setLocalCurrency, displayCurrency } = usePageCurrency('journal', primaryCurrency)
+  const { formatAmount } = useCurrency()
   const [items, setItems] = useState<JournalEntry[]>(data.journal || [])
   const [strategies, setStrategies] = useState<string[]>([])
   const [viewingTrade, setViewingTrade] = useState<JournalEntry | null>(null)
@@ -149,13 +146,8 @@ export default function Journal() {
             <p className="text-krmuted text-sm mt-1">Track and analyze your trading performance</p>
           </div>
           
-          {/* Page Currency Selector and Total Trades */}
+          {/* Total Trades */}
           <div className="flex items-center gap-3">
-            <PageCurrencySelector 
-              localCurrency={localCurrency}
-              onCurrencyChange={setLocalCurrency}
-              label="View trades in"
-            />
             <div className="bg-krcard/50 backdrop-blur-sm rounded-xl border border-krborder px-4 py-2">
               <p className="text-xs text-krmuted">Total Trades</p>
               <p className="text-2xl font-bold text-krgold">{items.length}</p>
@@ -174,23 +166,23 @@ export default function Journal() {
           <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4">
             <p className="text-xs text-krmuted mb-1">Total P&L</p>
             <p className={`text-xl font-bold ${items.reduce((sum, t) => sum + (t.pnlAmount - (t.fee || 0)), 0) >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-              {formatAmountInCurrency(items.reduce((sum, t, displayCurrency) => sum + (t.pnlAmount - (t.fee || 0)), 0))}
+              {formatAmount(items.reduce((sum, t) => sum + (t.pnlAmount - (t.fee || 0)), 0))}
             </p>
           </div>
           <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4">
             <p className="text-xs text-krmuted mb-1">Avg Win</p>
             <p className="text-xl font-bold text-green-500">
               {items.filter(t => (t.pnlAmount - (t.fee || 0)) > 0).length > 0 
-                ? formatAmountInCurrency(items.filter(t => (t.pnlAmount - (t.fee || 0, displayCurrency)) > 0).reduce((sum, t) => sum + (t.pnlAmount - (t.fee || 0)), 0) / items.filter(t => (t.pnlAmount - (t.fee || 0)) > 0).length)
-                : formatAmountInCurrency(0, displayCurrency)}
+                ? formatAmount(items.filter(t => (t.pnlAmount - (t.fee || 0)) > 0).reduce((sum, t) => sum + (t.pnlAmount - (t.fee || 0)), 0) / items.filter(t => (t.pnlAmount - (t.fee || 0)) > 0).length)
+                : formatAmount(0)}
             </p>
           </div>
           <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4">
             <p className="text-xs text-krmuted mb-1">Avg Loss</p>
             <p className="text-xl font-bold text-red-500">
               {items.filter(t => (t.pnlAmount - (t.fee || 0)) < 0).length > 0 
-                ? formatAmountInCurrency(Math.abs(items.filter(t => (t.pnlAmount - (t.fee || 0, displayCurrency)) < 0).reduce((sum, t) => sum + (t.pnlAmount - (t.fee || 0)), 0) / items.filter(t => (t.pnlAmount - (t.fee || 0)) < 0).length))
-                : formatAmountInCurrency(0, displayCurrency)}
+                ? formatAmount(Math.abs(items.filter(t => (t.pnlAmount - (t.fee || 0)) < 0).reduce((sum, t) => sum + (t.pnlAmount - (t.fee || 0)), 0) / items.filter(t => (t.pnlAmount - (t.fee || 0)) < 0).length))
+                : formatAmount(0)}
             </p>
           </div>
         </div>
@@ -204,11 +196,11 @@ export default function Journal() {
             <h2 className="text-2xl font-bold text-krtext flex items-center gap-2">
               {form.id ? (
                 <>
-                  <span className="text-blue-400">âœï¸</span> Edit Trade
+                  <span className="text-blue-400">✏️</span> Edit Trade
                 </>
               ) : (
                 <>
-                  <span className="text-krgold">âž•</span> New Trade
+                  <span className="text-krgold">➤</span> New Trade
                 </>
               )}
             </h2>
@@ -485,12 +477,12 @@ export default function Journal() {
         {/* Trade History - Right Side */}
         <div className="bg-krcard/90 backdrop-blur-md rounded-2xl shadow-2xl border border-krborder/50 p-6 flex flex-col">
           <h2 className="text-2xl font-bold mb-4 text-krtext flex items-center gap-2">
-            <span className="text-krgold">ðŸ“Š</span> Recent Trades
+            <span className="text-krgold">📊</span> Recent Trades
           </h2>
           <div className="space-y-3 overflow-y-auto pr-2 flex-1 max-h-[calc(100vh-16rem)] custom-scrollbar">
             {items.length === 0 && (
               <div className="text-center py-20">
-                <div className="text-6xl mb-4">ðŸ“ˆ</div>
+                <div className="text-6xl mb-4">📈</div>
                 <p className="text-krmuted">No trades yet</p>
                 <p className="text-xs text-krmuted/60 mt-2">Add your first trade to start tracking!</p>
               </div>
@@ -510,7 +502,7 @@ export default function Journal() {
                       <div className="font-bold text-lg text-krtext group-hover:text-krgold transition-colors">{it.ticker}</div>
                       <div className="text-xs text-krmuted flex items-center gap-2">
                         <span>{it.date}</span>
-                        <span className="text-krborder">â€¢</span>
+                        <span className="text-krborder">•</span>
                         <span>{it.time}</span>
                       </div>
                     </div>
@@ -525,13 +517,13 @@ export default function Journal() {
                     <div className="flex items-center justify-between text-krmuted">
                       <span className="flex items-center gap-1.5">
                         <span className={`w-1.5 h-1.5 rounded-full ${it.position === 'Long' ? 'bg-green-400' : 'bg-red-400'}`}></span>
-                        {it.type} {it.type === 'Futures' ? `${it.leverage}x` : ''} â€¢ {it.position}
+                        {it.type} {it.type === 'Futures' ? `${it.leverage}x` : ''} • {it.position}
                       </span>
                     </div>
                     <div className="flex items-center justify-between pt-2 border-t border-krborder/20">
                       <span className="text-krmuted">Net P&L</span>
                       <span className={`font-bold text-sm ${isProfit ? 'text-green-400' : 'text-red-400'}`}>
-                        {formatAmountInCurrency(netPnl, displayCurrency)}
+                        {formatAmount(netPnl)}
                       </span>
                     </div>
                   </div>
@@ -555,12 +547,12 @@ export default function Journal() {
                     <div>
                       <h2 className="text-2xl font-bold text-krtext">{viewingTrade.ticker}</h2>
                       <p className="text-sm text-gray-400 mt-1">
-                        {viewingTrade.date} {viewingTrade.time} â†’ {viewingTrade.exitDate} {viewingTrade.exitTime}
+                        {viewingTrade.date} {viewingTrade.time} → {viewingTrade.exitDate} {viewingTrade.exitTime}
                       </p>
                     </div>
                     <div className="text-right">
                       <div className={`text-3xl font-bold ${netPnl > 0 ? 'text-green-400' : 'text-red-400'}`}>
-                        {netPnl > 0 ? '+' : ''}{formatAmountInCurrency(netPnl, displayCurrency)}
+                        {netPnl > 0 ? '+' : ''}{formatAmount(netPnl)}
                       </div>
                       <div className={`text-sm font-medium ${netPnl > 0 ? 'text-green-400' : 'text-red-400'}`}>
                         {netPnl > 0 ? <TrendingUp className="inline-block w-4 h-4" /> : <TrendingDown className="inline-block w-4 h-4" />}
@@ -603,12 +595,12 @@ export default function Journal() {
                   <div className="grid grid-cols-2 gap-4 mb-6">
                     <div className="bg-krblack/30 backdrop-blur-sm rounded-xl p-4 border border-krborder">
                       <label className="block text-sm text-gray-400 mb-2">Entry Price</label>
-                      <div className="text-2xl font-bold text-krtext">{formatAmountInCurrency(viewingTrade.entryPrice, displayCurrency)}</div>
+                      <div className="text-2xl font-bold text-krtext">{formatAmount(viewingTrade.entryPrice)}</div>
                       <div className="text-xs text-gray-400 mt-1">{viewingTrade.date} {viewingTrade.time}</div>
                     </div>
                     <div className="bg-krblack/30 backdrop-blur-sm rounded-xl p-4 border border-krborder">
                       <label className="block text-sm text-gray-400 mb-2">Exit Price</label>
-                      <div className="text-2xl font-bold text-krtext">{formatAmountInCurrency(viewingTrade.exitPrice, displayCurrency)}</div>
+                      <div className="text-2xl font-bold text-krtext">{formatAmount(viewingTrade.exitPrice)}</div>
                       <div className="text-xs text-gray-400 mt-1">{viewingTrade.exitDate} {viewingTrade.exitTime}</div>
                     </div>
                   </div>
@@ -618,23 +610,23 @@ export default function Journal() {
                     {viewingTrade.marginCost > 0 && (
                       <div className="bg-krblack/30 backdrop-blur-sm rounded-xl p-4 border border-krborder">
                         <label className="block text-sm text-gray-400 mb-2">Margin Cost</label>
-                        <div className="text-xl font-semibold text-krtext">{formatAmountInCurrency(viewingTrade.marginCost, displayCurrency)}</div>
+                        <div className="text-xl font-semibold text-krtext">{formatAmount(viewingTrade.marginCost)}</div>
                       </div>
                     )}
                     <div className="bg-krblack/30 backdrop-blur-sm rounded-xl p-4 border border-krborder">
                       <label className="block text-sm text-gray-400 mb-2">Gross P&L</label>
                       <div className={`text-xl font-semibold ${viewingTrade.pnlAmount > 0 ? 'text-green-400' : 'text-red-400'}`}>
-                        {formatAmountInCurrency(viewingTrade.pnlAmount, displayCurrency)}
+                        {formatAmount(viewingTrade.pnlAmount)}
                       </div>
                     </div>
                     <div className="bg-krblack/30 backdrop-blur-sm rounded-xl p-4 border border-krborder">
                       <label className="block text-sm text-gray-400 mb-2">Fee</label>
-                      <div className="text-xl font-semibold text-red-400">{formatAmountInCurrency(viewingTrade.fee || 0, displayCurrency)}</div>
+                      <div className="text-xl font-semibold text-red-400">{formatAmount(viewingTrade.fee || 0)}</div>
                     </div>
                     <div className="bg-krblack/30 backdrop-blur-sm rounded-xl p-4 border border-krborder">
                       <label className="block text-sm text-gray-400 mb-2">Net P&L</label>
                       <div className={`text-xl font-bold ${netPnl > 0 ? 'text-green-400' : 'text-red-400'}`}>
-                        {formatAmountInCurrency(netPnl, displayCurrency)}
+                        {formatAmount(netPnl)}
                       </div>
                     </div>
                   </div>
