@@ -111,7 +111,7 @@ export default function MarketData() {
       screener_type: "crypto_mkt",
       displayCurrency: "USD",
       filter: [
-        { left: "exchange", operation: "match", right: "BINANCE" }
+        { left: "exchange", operation: "in_range", right: ["BINANCE"] }
       ]
     })
     container.appendChild(script)
@@ -140,7 +140,7 @@ export default function MarketData() {
       screener_type: "crypto_mkt",
       displayCurrency: "USD",
       filter: [
-        { left: "exchange", operation: "match", right: "BINANCE" }
+        { left: "exchange", operation: "in_range", right: ["BINANCE"] }
       ]
     })
     container.appendChild(script)
@@ -169,7 +169,7 @@ export default function MarketData() {
       screener_type: "crypto_mkt",
       displayCurrency: "USD",
       filter: [
-        { left: "exchange", operation: "match", right: "BINANCE" }
+        { left: "exchange", operation: "in_range", right: ["BINANCE"] }
       ]
     })
     container.appendChild(script)
