@@ -2,10 +2,13 @@ import React, { useState } from 'react'
 import { loadData } from '../utils/storage'
 import { BarChart3, TrendingUp, TrendingDown, Activity, DollarSign, Percent, Target, Calendar, ChevronLeft, ChevronRight, X, Info, Clock, Flame, Shield } from 'lucide-react'
 import { useCurrency } from '../context/CurrencyContext'
+import { usePageCurrency } from '../hooks/usePageCurrency'
+import PageCurrencySelector from '../components/PageCurrencySelector'
 
 export default function TradeAnalytics() {
   const data = loadData()
-  const { formatAmount } = useCurrency()
+  const { formatAmount, formatAmountInCurrency, primaryCurrency } = useCurrency()
+  const { localCurrency, setLocalCurrency, displayCurrency } = usePageCurrency('analytics', primaryCurrency)
   const journal = data.journal || []
   const wallet = data.wallet || []
   
@@ -387,12 +390,21 @@ export default function TradeAnalytics() {
         <div className="max-w-7xl mx-auto">
       {/* Header with Gradient */}
       <div className="mb-6">
-        <div className="flex items-center gap-3 mb-4">
-          <span className="text-4xl">📊</span>
-          <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-krgold to-kryellow bg-clip-text text-transparent">Trade Analytics</h1>
-            <p className="text-krmuted text-sm mt-1">Comprehensive analysis of your trading performance</p>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <span className="text-4xl">📊</span>
+            <div>
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-krgold to-kryellow bg-clip-text text-transparent">Trade Analytics</h1>
+              <p className="text-krmuted text-sm mt-1">Comprehensive analysis of your trading performance</p>
+            </div>
           </div>
+          
+          {/* Page Currency Selector */}
+          <PageCurrencySelector 
+            localCurrency={localCurrency}
+            onCurrencyChange={setLocalCurrency}
+            label="View analytics in"
+          />
         </div>
 
         {/* Key Performance Metrics - 5 columns */}
@@ -425,10 +437,10 @@ export default function TradeAnalytics() {
               <p className="text-xs text-krmuted">Total PnL</p>
             </div>
             <p className={`text-2xl font-bold ${totalPnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-              {formatAmount(totalPnl)}
+              {formatAmountInCurrency(totalPnl, displayCurrency)}
             </p>
             <p className="text-xs text-krmuted mt-1">
-              {totalTrades > 0 ? formatAmount(totalPnl / totalTrades) : formatAmount(0)} avg
+              {totalTrades > 0 ? formatAmountInCurrency(totalPnl / totalTrades, displayCurrency) : formatAmountInCurrency(0, displayCurrency)} avg
             </p>
           </div>
 
@@ -467,7 +479,7 @@ export default function TradeAnalytics() {
               <h3 className="text-sm font-semibold text-krtext">Average Win</h3>
             </div>
             <p className="text-xl font-bold text-green-400 mb-1">
-              {formatAmount(avgWin)}
+              {formatAmountInCurrency(avgWin, displayCurrency)}
             </p>
             <p className="text-xs text-krmuted">
               Across {wins} winning trades
@@ -480,7 +492,7 @@ export default function TradeAnalytics() {
               <h3 className="text-sm font-semibold text-krtext">Average Loss</h3>
             </div>
             <p className="text-xl font-bold text-red-400 mb-1">
-              {formatAmount(avgLoss)}
+              {formatAmountInCurrency(avgLoss, displayCurrency)}
             </p>
             <p className="text-xs text-krmuted">
               Across {losses} losing trades

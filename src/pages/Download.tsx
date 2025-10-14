@@ -72,7 +72,7 @@ export default function Download() {
             <div className="max-w-4xl mx-auto text-center">
               <div className="inline-flex items-center gap-2 bg-krgold/10 border border-krgold/20 rounded-full px-4 py-2 mb-6">
                 <Laptop className="text-krgold" size={16} />
-                <span className="text-sm text-krgold font-semibold">Windows Desktop Beta</span>
+                <span className="text-sm text-krgold font-semibold">Windows Desktop Application</span>
               </div>
               
               <h1 className="text-4xl md:text-5xl font-bold text-krwhite mb-6">
@@ -80,7 +80,7 @@ export default function Download() {
               </h1>
               
               <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-                Join our beta program! Download our Windows desktop app for early access to enhanced performance, security, and offline functionality. Help us perfect your trading experience!
+                Download our professional Windows desktop app for enhanced performance, complete offline functionality, and superior security. Production-ready trading journal software.
               </p>
               
               <div className="bg-krcard/80 backdrop-blur-sm border border-krborder rounded-xl p-8 mb-8">
@@ -88,7 +88,7 @@ export default function Download() {
                   <Monitor className="text-krgold" size={32} />
                   <div className="text-left">
                     <h3 className="text-xl font-bold text-krwhite">Kinsfolk Republic Trading Journal</h3>
-                    <p className="text-gray-400">Version 1.6.5 Beta • Windows 10/11</p>
+                    <p className="text-gray-400">Version 1.6.6 • Windows 10/11 • Auto-Updates Included</p>
                   </div>
                 </div>
                 
@@ -96,8 +96,8 @@ export default function Download() {
                   onClick={() => {
                     // Direct download from website hosting
                     const link = document.createElement('a')
-                    link.href = '/downloads/KRTJ-Desktop-Setup.exe'
-                    link.download = 'KRTJ-Desktop-Setup.exe'
+                    link.href = '/downloads/KRTJ-Desktop-Setup-1.6.6.exe'
+                    link.download = 'KRTJ-Desktop-Setup-1.6.6.exe'
                     document.body.appendChild(link)
                     link.click()
                     document.body.removeChild(link)
@@ -105,12 +105,64 @@ export default function Download() {
                   className="w-full bg-gradient-to-r from-krgold to-kryellow text-krblack px-8 py-4 rounded-xl font-semibold hover:shadow-lg hover:shadow-krgold/50 transition-all flex items-center justify-center gap-2"
                 >
                   <DownloadIcon size={20} />
-                  Download Beta for Windows (FREE)
+                  Download for Windows (FREE)
                 </button>
                 
                 <p className="text-sm text-gray-400 mt-3">
-                  ~75MB • Beta Release • Report bugs and suggestions
+                  ~75MB • Production Release • Auto-updates included
                 </p>
+              </div>
+              
+              {/* System Requirements */}
+              <div className="bg-krcard/60 backdrop-blur-sm border border-krborder rounded-xl p-6 mb-8">
+                <h3 className="text-lg font-bold text-krwhite mb-4 flex items-center gap-2">
+                  <Laptop className="text-krgold" size={20} />
+                  System Requirements
+                </h3>
+                <div className="grid md:grid-cols-2 gap-6 text-sm">
+                  <div>
+                    <h4 className="text-krgold font-semibold mb-2">Minimum Requirements</h4>
+                    <ul className="space-y-2 text-gray-400">
+                      <li className="flex items-start gap-2">
+                        <CheckCircle size={16} className="text-krgold mt-0.5 flex-shrink-0" />
+                        <span>Windows 10 (64-bit) or Windows 11</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <CheckCircle size={16} className="text-krgold mt-0.5 flex-shrink-0" />
+                        <span>2GB RAM minimum (4GB recommended)</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <CheckCircle size={16} className="text-krgold mt-0.5 flex-shrink-0" />
+                        <span>200MB free disk space</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <CheckCircle size={16} className="text-krgold mt-0.5 flex-shrink-0" />
+                        <span>1280x720 screen resolution minimum</span>
+                      </li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4 className="text-krgold font-semibold mb-2">Optional Features</h4>
+                    <ul className="space-y-2 text-gray-400">
+                      <li className="flex items-start gap-2">
+                        <CheckCircle size={16} className="text-krgold mt-0.5 flex-shrink-0" />
+                        <span>Internet connection for live market data</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <CheckCircle size={16} className="text-krgold mt-0.5 flex-shrink-0" />
+                        <span>Internet connection for AI assistant</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <CheckCircle size={16} className="text-krgold mt-0.5 flex-shrink-0" />
+                        <span>Internet connection for auto-updates</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <CheckCircle size={16} className="text-krgold mt-0.5 flex-shrink-0" />
+                        <span>All core features work 100% offline</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

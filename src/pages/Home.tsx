@@ -57,9 +57,9 @@ export default function Home() {
 
   const news = [
     {
-      title: 'Windows Desktop App Beta Now Available!',
+      title: 'Windows Desktop App Now Available!',
       date: 'October 14, 2025',
-      description: 'Experience our trading journal offline with our Windows desktop beta! Early access to enhanced security, performance, and offline functionality. Beta testing phase - your feedback is valuable!',
+      description: 'Our professional Windows desktop application is now ready for production! Enhanced security, offline functionality, auto-updates, and native performance. Download now and take your trading journal offline.',
       image: 'https://images.unsplash.com/photo-1587831990711-23ca6441447b?w=400&auto=format&fit=crop'
     },
     {
@@ -112,12 +112,12 @@ export default function Home() {
               </Link>
             </div>
             
-            {/* Windows App Beta Announcement */}
+            {/* Windows App Announcement */}
             <div className="mt-8 inline-flex items-center gap-2 bg-krgold/10 border border-krgold/30 rounded-full px-4 py-2">
               <Monitor className="text-krgold" size={16} />
               <span className="text-sm text-krgold">
                 <Link to="/download" className="hover:underline font-medium">
-                  Windows desktop beta now available! Early access →
+                  Windows desktop app now available! Download now →
                 </Link>
               </span>
             </div>
@@ -133,13 +133,13 @@ export default function Home() {
               <div>
                 <div className="inline-flex items-center gap-2 bg-krgold/10 border border-krgold/20 rounded-full px-4 py-2 mb-4">
                   <Monitor className="text-krgold" size={16} />
-                  <span className="text-sm text-krgold font-semibold">Beta: Desktop Application</span>
+                  <span className="text-sm text-krgold font-semibold">Desktop Application Available</span>
                 </div>
                 <h2 className="text-3xl md:text-4xl font-bold text-krwhite mb-4">
                   Take KRTJ <span className="bg-gradient-to-r from-krgold to-kryellow bg-clip-text text-transparent">Offline</span>
                 </h2>
                 <p className="text-gray-300 mb-6 text-lg">
-                  Join our beta program and experience enhanced security, lightning-fast performance, and complete offline functionality with our Windows desktop application. Your feedback shapes our future!
+                  Experience enhanced security, lightning-fast performance, and complete offline functionality with our Windows desktop application. Professional trading journal software ready for production use.
                 </p>
                 <div className="grid sm:grid-cols-2 gap-4 mb-6">
                   <div className="flex items-center gap-2">
@@ -156,7 +156,7 @@ export default function Home() {
                   </div>
                   <div className="flex items-center gap-2">
                     <Download className="text-krgold" size={16} />
-                    <span className="text-sm text-gray-300">One-time Download</span>
+                    <span className="text-sm text-gray-300">Auto-Updates Included</span>
                   </div>
                 </div>
                 <Link

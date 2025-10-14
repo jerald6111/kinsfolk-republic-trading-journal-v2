@@ -14,13 +14,22 @@ import {
 } from '../utils/storage'
 import { useCurrency } from '../context/CurrencyContext'
 import Modal from '../components/Modal'
+import CurrencySelector from '../components/CurrencySelector'
 import { AlertTriangle, Save, Link2, Trash2, Mail, Shield, Download, Send, CheckCircle2, Info, Eye, EyeOff } from 'lucide-react'
 
 type EmailFrequency = 'disabled' | 'on-add' | 'on-delete' | 'on-change' | 'daily' | 'weekly'
 
 export default function DataSettings(){
   const fileRef = useRef<HTMLInputElement|null>(null)
-  const { currency, currencies, setCurrency } = useCurrency()
+  const { 
+    primaryCurrency, 
+    secondaryCurrency, 
+    currencies,
+    setPrimaryCurrency,
+    setSecondaryCurrency,
+    showBothCurrencies,
+    lastUpdated 
+  } = useCurrency()
   const [showExportModal, setShowExportModal] = useState(false)
   const [showImportModal, setShowImportModal] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
@@ -291,26 +300,32 @@ export default function DataSettings(){
           </div>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-krtext mb-2">
-                Select Currency (used throughout the application)
+              <label className="block text-sm font-medium text-krtext mb-3">
+                Select Your Currency Preferences
               </label>
-              <select
-                value={currency.code}
-                onChange={(e) => {
-                  const selected = currencies.find(c => c.code === e.target.value)
-                  if (selected) setCurrency(selected)
-                }}
-                className="w-full px-3 py-2 border border-krborder/30 rounded-xl bg-krblack/30 text-krtext focus:ring-2 focus:ring-krgold/20 focus:border-krgold transition-all"
-              >
-                {currencies.map(c => (
-                  <option key={c.code} value={c.code} className="bg-krcard text-krtext">
-                    {c.symbol} - {c.name} ({c.code})
-                  </option>
-                ))}
-              </select>
+              <p className="text-xs text-krmuted mb-4">
+                Choose a primary currency for all transactions. Optionally add a secondary currency to view conversions in real-time.
+              </p>
+              <CurrencySelector />
             </div>
-            <div className="text-sm text-krmuted bg-krblack/30 rounded-lg p-3 border border-krborder/30">
-              Current: <strong className="text-krtext">{currency.symbol} {currency.name}</strong> (Rate: {currency.rate} to USD)
+            <div className="text-sm text-krmuted bg-krblack/30 rounded-lg p-3 border border-krborder/30 space-y-2">
+              <div>
+                <strong className="text-krtext">Primary:</strong> {primaryCurrency.symbol} {primaryCurrency.name} ({primaryCurrency.code})
+              </div>
+              {secondaryCurrency && (
+                <div>
+                  <strong className="text-krtext">Secondary:</strong> {secondaryCurrency.symbol} {secondaryCurrency.name} ({secondaryCurrency.code})
+                </div>
+              )}
+              <div className="text-xs text-krmuted/70 pt-2 border-t border-krborder/30">
+                💡 Exchange rates update automatically every 30 minutes
+                {lastUpdated && ` • Last updated: ${new Date(lastUpdated).toLocaleTimeString()}`}
+              </div>
+              {showBothCurrencies && secondaryCurrency && (
+                <div className="text-xs text-krgold pt-2">
+                  ✓ Dual currency display enabled - amounts will show in both currencies
+                </div>
+              )}
             </div>
           </div>
         </div>

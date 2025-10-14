@@ -1,5 +1,5 @@
-import React from 'react'
-import { Routes, Route } from 'react-router-dom'
+import React, { useEffect } from 'react'
+import { Routes, Route, useNavigate } from 'react-router-dom'
 import Home from './pages/Home'
 import VisionBoard from './pages/VisionBoard'
 import Journal from './pages/Journal'
@@ -19,6 +19,27 @@ import AIChatbot from './components/AIChatbot'
 import { CurrencyProvider } from './context/CurrencyContext'
 
 export default function App() {
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    // Listen for navigation events from main process (tray menu)
+    const handleNavigate = (_event: any, path: string) => {
+      console.log('📍 Navigation request from main process:', path)
+      navigate(path)
+    }
+
+    // @ts-ignore - electron API
+    if (window.electron && window.electron.ipcRenderer) {
+      // @ts-ignore
+      window.electron.ipcRenderer.on('navigate-to', handleNavigate)
+      
+      return () => {
+        // @ts-ignore
+        window.electron.ipcRenderer.removeListener('navigate-to', handleNavigate)
+      }
+    }
+  }, [navigate])
+
   return (
     <CurrencyProvider>
       <div className="min-h-screen bg-gradient-to-b from-krblack to-krbg flex flex-col">
