@@ -101,7 +101,7 @@ export default function MarketData() {
     script.innerHTML = JSON.stringify({
       width: "100%",
       height: "100%",
-      defaultColumn: "name",
+      defaultColumn: "overview",
       defaultScreen: "most_volatile",
       market: "crypto",
       showToolbar: true,
@@ -109,18 +109,7 @@ export default function MarketData() {
       locale: "en",
       isTransparent: true,
       screener_type: "crypto_mkt",
-      displayCurrency: "USD",
-      enableScrolling: true,
-      filter: [
-        { left: "exchange", operation: "equal", right: "BINANCE" },
-        { left: "typespecs", operation: "has", right: "spot" }
-      ],
-      columns: [
-        { id: "name", displayName: "Coin" },
-        { id: "close", displayName: "Price" },
-        { id: "change|1", displayName: "Change % 1m" },
-        { id: "Recommend.All", displayName: "Tech Rating" }
-      ]
+      displayCurrency: "USD"
     })
     container.appendChild(script)
     return () => { if (container) { container.innerHTML = '' } }
@@ -138,7 +127,7 @@ export default function MarketData() {
     script.innerHTML = JSON.stringify({
       width: "100%",
       height: "100%",
-      defaultColumn: "name",
+      defaultColumn: "overview",
       defaultScreen: "top_gainers",
       market: "crypto",
       showToolbar: true,
@@ -146,18 +135,7 @@ export default function MarketData() {
       locale: "en",
       isTransparent: true,
       screener_type: "crypto_mkt",
-      displayCurrency: "USD",
-      enableScrolling: true,
-      filter: [
-        { left: "exchange", operation: "equal", right: "BINANCE" },
-        { left: "typespecs", operation: "has", right: "spot" }
-      ],
-      columns: [
-        { id: "name", displayName: "Coin" },
-        { id: "close", displayName: "Price" },
-        { id: "change|1", displayName: "Change % 1m" },
-        { id: "Recommend.All", displayName: "Tech Rating" }
-      ]
+      displayCurrency: "USD"
     })
     container.appendChild(script)
     return () => { if (container) { container.innerHTML = '' } }
@@ -175,7 +153,7 @@ export default function MarketData() {
     script.innerHTML = JSON.stringify({
       width: "100%",
       height: "100%",
-      defaultColumn: "name",
+      defaultColumn: "overview",
       defaultScreen: "top_losers",
       market: "crypto",
       showToolbar: true,
@@ -183,18 +161,7 @@ export default function MarketData() {
       locale: "en",
       isTransparent: true,
       screener_type: "crypto_mkt",
-      displayCurrency: "USD",
-      enableScrolling: true,
-      filter: [
-        { left: "exchange", operation: "equal", right: "BINANCE" },
-        { left: "typespecs", operation: "has", right: "spot" }
-      ],
-      columns: [
-        { id: "name", displayName: "Coin" },
-        { id: "close", displayName: "Price" },
-        { id: "change|1", displayName: "Change % 1m" },
-        { id: "Recommend.All", displayName: "Tech Rating" }
-      ]
+      displayCurrency: "USD"
     })
     container.appendChild(script)
     return () => { if (container) { container.innerHTML = '' } }
