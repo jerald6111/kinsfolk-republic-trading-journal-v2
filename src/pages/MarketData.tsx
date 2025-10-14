@@ -135,13 +135,13 @@ export default function MarketData() {
       try {
         setRankingLoading(true)
         const response = await fetch(
-          'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=1&sparkline=true&price_change_percentage=1h,24h,7d'
+          'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=1&sparkline=true&price_change_percentage=1h,24h'
         )
         const data1: CryptoData[] = await response.json()
         
         // Fetch page 2 to get coins 251-300
         const response2 = await fetch(
-          'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=2&sparkline=true&price_change_percentage=1h,24h,7d'
+          'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=2&sparkline=true&price_change_percentage=1h,24h'
         )
         const data2: CryptoData[] = await response2.json()
         
@@ -264,7 +264,6 @@ export default function MarketData() {
                           <th className="text-right py-3 px-4 text-krmuted font-semibold">Price</th>
                           <th className="text-right py-3 px-4 text-krmuted font-semibold">1h</th>
                           <th className="text-right py-3 px-4 text-krmuted font-semibold">24h</th>
-                          <th className="text-right py-3 px-4 text-krmuted font-semibold">7d</th>
                           <th className="text-right py-3 px-4 text-krmuted font-semibold">24h Volume</th>
                           <th className="text-right py-3 px-4 text-krmuted font-semibold">Market Cap</th>
                           <th className="text-center py-3 px-4 text-krmuted font-semibold">Last 7 Days</th>
@@ -294,11 +293,6 @@ export default function MarketData() {
                             <td className={`py-3 px-4 text-right font-bold ${coin.price_change_percentage_24h >= 0 ? 'text-green-500' : 'text-red-500'}`}>
                               {coin.price_change_percentage_24h >= 0 ? '+' : ''}{coin.price_change_percentage_24h.toFixed(2)}%
                             </td>
-                            <td className={`py-3 px-4 text-right font-bold ${(coin.price_change_percentage_7d_in_currency || 0) >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                              {coin.price_change_percentage_7d_in_currency ? 
-                                `${coin.price_change_percentage_7d_in_currency >= 0 ? '+' : ''}${coin.price_change_percentage_7d_in_currency.toFixed(2)}%` 
-                                : 'N/A'}
-                            </td>
                             <td className="py-3 px-4 text-right text-krtext">
                               ${(coin.total_volume / 1e9).toFixed(2)}B
                             </td>
@@ -309,7 +303,7 @@ export default function MarketData() {
                               {coin.sparkline_in_7d?.price ? (
                                 <MiniSparkline 
                                   data={coin.sparkline_in_7d.price} 
-                                  isPositive={(coin.price_change_percentage_7d_in_currency || 0) >= 0}
+                                  isPositive={coin.price_change_percentage_24h >= 0}
                                 />
                               ) : (
                                 <div className="w-24 h-8 flex items-center justify-center text-krmuted text-xs">N/A</div>
