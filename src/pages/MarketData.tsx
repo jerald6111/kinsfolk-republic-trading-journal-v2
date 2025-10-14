@@ -101,7 +101,7 @@ export default function MarketData() {
     script.innerHTML = JSON.stringify({
       width: "100%",
       height: "100%",
-      defaultColumn: "overview",
+      defaultColumn: "name",
       defaultScreen: "most_volatile",
       market: "crypto",
       showToolbar: true,
@@ -112,14 +112,14 @@ export default function MarketData() {
       displayCurrency: "USD",
       enableScrolling: true,
       filter: [
-        { left: "exchange", operation: "match", right: "BINANCE" },
-        { left: "typespecs", operation: "match", right: "spot" }
+        { left: "exchange", operation: "equal", right: "BINANCE" },
+        { left: "typespecs", operation: "has", right: "spot" }
       ],
-      columnOrder: [
-        "name",
-        "close",
-        "change|1",
-        "Recommend.All"
+      columns: [
+        { id: "name", displayName: "Coin" },
+        { id: "close", displayName: "Price" },
+        { id: "change|1", displayName: "Change % 1m" },
+        { id: "Recommend.All", displayName: "Tech Rating" }
       ]
     })
     container.appendChild(script)
@@ -138,7 +138,7 @@ export default function MarketData() {
     script.innerHTML = JSON.stringify({
       width: "100%",
       height: "100%",
-      defaultColumn: "overview",
+      defaultColumn: "name",
       defaultScreen: "top_gainers",
       market: "crypto",
       showToolbar: true,
@@ -149,14 +149,14 @@ export default function MarketData() {
       displayCurrency: "USD",
       enableScrolling: true,
       filter: [
-        { left: "exchange", operation: "match", right: "BINANCE" },
-        { left: "typespecs", operation: "match", right: "spot" }
+        { left: "exchange", operation: "equal", right: "BINANCE" },
+        { left: "typespecs", operation: "has", right: "spot" }
       ],
-      columnOrder: [
-        "name",
-        "close",
-        "change|1",
-        "Recommend.All"
+      columns: [
+        { id: "name", displayName: "Coin" },
+        { id: "close", displayName: "Price" },
+        { id: "change|1", displayName: "Change % 1m" },
+        { id: "Recommend.All", displayName: "Tech Rating" }
       ]
     })
     container.appendChild(script)
@@ -175,7 +175,7 @@ export default function MarketData() {
     script.innerHTML = JSON.stringify({
       width: "100%",
       height: "100%",
-      defaultColumn: "overview",
+      defaultColumn: "name",
       defaultScreen: "top_losers",
       market: "crypto",
       showToolbar: true,
@@ -186,14 +186,14 @@ export default function MarketData() {
       displayCurrency: "USD",
       enableScrolling: true,
       filter: [
-        { left: "exchange", operation: "match", right: "BINANCE" },
-        { left: "typespecs", operation: "match", right: "spot" }
+        { left: "exchange", operation: "equal", right: "BINANCE" },
+        { left: "typespecs", operation: "has", right: "spot" }
       ],
-      columnOrder: [
-        "name",
-        "close",
-        "change|1",
-        "Recommend.All"
+      columns: [
+        { id: "name", displayName: "Coin" },
+        { id: "close", displayName: "Price" },
+        { id: "change|1", displayName: "Change % 1m" },
+        { id: "Recommend.All", displayName: "Tech Rating" }
       ]
     })
     container.appendChild(script)
