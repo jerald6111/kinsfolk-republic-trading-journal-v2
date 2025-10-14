@@ -4,8 +4,6 @@ import Modal from '../components/Modal'
 import { loadData, saveData, triggerAutoEmailBackup } from '../utils/storage'
 import { Trash2, Edit2, CheckCircle2, X, Image as ImageIcon } from 'lucide-react'
 import { useCurrency } from '../context/CurrencyContext'
-import { usePageCurrency } from '../hooks/usePageCurrency'
-import PageCurrencySelector from '../components/PageCurrencySelector'
 
 type GoalTimeline = 'Short Term (3-6 months)' | 'Mid Term (6-12 months)' | 'Long Term (1-3 years)'
 
@@ -50,8 +48,7 @@ const congratsMessages = [
 
 export default function VisionBoard(){
   const data = loadData()
-  const { formatAmount, formatAmountInCurrency, primaryCurrency } = useCurrency()
-  const { localCurrency, setLocalCurrency, displayCurrency } = usePageCurrency('vision', primaryCurrency)
+  const { formatAmount } = useCurrency()
   const [items, setItems] = useState(data.vision || [])
   const [title, setTitle] = useState('')
   const [desc, setDesc] = useState('')
@@ -203,13 +200,6 @@ export default function VisionBoard(){
               <p className="text-krmuted text-sm mt-1">Visualize your goals and track achievements</p>
             </div>
           </div>
-          
-          {/* Page Currency Selector */}
-          <PageCurrencySelector 
-            localCurrency={localCurrency}
-            onCurrencyChange={setLocalCurrency}
-            label="View goals in"
-          />
         </div>
 
         {/* Quick Stats Cards */}
@@ -327,7 +317,7 @@ export default function VisionBoard(){
                     <div className="text-sm space-y-1 mb-3">
                       <div className="flex items-center justify-between">
                         <span className="text-krmuted">Target:</span>
-                        <span className="font-semibold text-krgold">{formatAmountInCurrency(parseFloat(it.target, displayCurrency) || 0)}</span>
+                        <span className="font-semibold text-krgold">{formatAmount(parseFloat(it.target) || 0)}</span>
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-krmuted">Timeline:</span>
@@ -429,7 +419,7 @@ export default function VisionBoard(){
             <div className="grid grid-cols-2 gap-4 mb-4">
               <div className="bg-krcard rounded-xl p-3 border border-krborder">
                 <div className="text-sm text-krmuted">Target Amount</div>
-                <div className="text-lg font-bold text-krgold">{formatAmountInCurrency(parseFloat(viewingGoal.target, displayCurrency) || 0)}</div>
+                <div className="text-lg font-bold text-krgold">{formatAmount(parseFloat(viewingGoal.target) || 0)}</div>
               </div>
               <div className="bg-krcard rounded-xl p-3 border border-krborder">
                 <div className="text-sm text-krmuted">Timeline</div>

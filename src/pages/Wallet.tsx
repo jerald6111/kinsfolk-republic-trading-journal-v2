@@ -1,8 +1,6 @@
 import React, { useState } from 'react'
 import { loadData, saveData, triggerAutoEmailBackup } from '../utils/storage'
 import { useCurrency } from '../context/CurrencyContext'
-import { usePageCurrency } from '../hooks/usePageCurrency'
-import PageCurrencySelector from '../components/PageCurrencySelector'
 import { Trash2, Edit2 } from 'lucide-react'
 
 interface Transaction {
@@ -15,8 +13,7 @@ interface Transaction {
 
 export default function Wallet() {
   const data = loadData()
-  const { formatAmount, formatAmountInCurrency, primaryCurrency } = useCurrency()
-  const { localCurrency, setLocalCurrency, displayCurrency } = usePageCurrency('wallet', primaryCurrency)
+  const { formatAmount } = useCurrency()
   const [items, setItems] = useState<Transaction[]>(data.wallet || [])
   const [form, setForm] = useState({ date: '', type: 'deposit', amount: '', notes: '' })
   const [editingId, setEditingId] = useState<number | null>(null)
@@ -106,13 +103,6 @@ export default function Wallet() {
               <p className="text-krmuted text-sm mt-1">Manage deposits, withdrawals, and track your balance</p>
             </div>
           </div>
-          
-          {/* Page Currency Selector */}
-          <PageCurrencySelector 
-            localCurrency={localCurrency}
-            onCurrencyChange={setLocalCurrency}
-            label="View balance in"
-          />
         </div>
 
         {/* Balance Stats Cards */}
@@ -120,21 +110,21 @@ export default function Wallet() {
           <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4">
             <p className="text-xs text-krmuted mb-1">Current Balance</p>
             <p className={`text-2xl font-bold ${balance >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-              {formatAmountInCurrency(balance, displayCurrency)}
+              {formatAmount(balance)}
             </p>
           </div>
           <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4">
             <p className="text-xs text-krmuted mb-1">Total Deposits</p>
-            <p className="text-2xl font-bold text-blue-400">{formatAmountInCurrency(totalDeposits, displayCurrency)}</p>
+            <p className="text-2xl font-bold text-blue-400">{formatAmount(totalDeposits)}</p>
           </div>
           <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4">
             <p className="text-xs text-krmuted mb-1">Total Withdrawals</p>
-            <p className="text-2xl font-bold text-orange-400">{formatAmountInCurrency(totalWithdrawals, displayCurrency)}</p>
+            <p className="text-2xl font-bold text-orange-400">{formatAmount(totalWithdrawals)}</p>
           </div>
           <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4">
             <p className="text-xs text-krmuted mb-1">Trading P&L</p>
             <p className={`text-2xl font-bold ${totalTradingPnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-              {formatAmountInCurrency(totalTradingPnl, displayCurrency)}
+              {formatAmount(totalTradingPnl)}
             </p>
           </div>
         </div>
@@ -246,8 +236,8 @@ export default function Wallet() {
                   </div>
                   
                   <div className="flex items-start gap-3">
-                    <div className={`text-2xl font-bold ${it.type === 'deposit' ? 'text-green-400' : 'text-red-400'}`}>
-                      {it.type === 'deposit' ? '+' : '-'}{formatAmountInCurrency(Number(it.amount), displayCurrency)}
+                    <div className={`text-xl font-bold ${it.type === 'deposit' ? 'text-green-400' : 'text-red-400'}`}>
+                      {it.type === 'deposit' ? '+' : '-'}{formatAmount(Number(it.amount))}
                     </div>
                     
                     <div className="flex flex-col gap-2">

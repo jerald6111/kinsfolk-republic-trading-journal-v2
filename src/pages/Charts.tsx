@@ -5,8 +5,6 @@ import Modal from '../components/Modal'
 import FileUploader from '../components/FileUploader'
 import { TrendingUp, TrendingDown, Calendar, DollarSign, Percent, Filter, X, Upload, Info } from 'lucide-react'
 import { useCurrency } from '../context/CurrencyContext'
-import { usePageCurrency } from '../hooks/usePageCurrency'
-import PageCurrencySelector from '../components/PageCurrencySelector'
 
 interface UploadedChart {
   id: number
@@ -21,8 +19,7 @@ interface UploadedChart {
 
 export default function Charts(){
   const data = loadData()
-  const { formatAmount, formatAmountInCurrency, primaryCurrency } = useCurrency()
-  const { localCurrency, setLocalCurrency, displayCurrency } = usePageCurrency('charts', primaryCurrency)
+  const { formatAmount } = useCurrency()
   const location = useLocation()
   const journal = data.journal || []
   
@@ -138,13 +135,8 @@ export default function Charts(){
             </div>
           </div>
           
-          {/* Page Currency Selector */}
+          {/* Upload Chart Button */}
           <div className="flex items-center gap-3">
-            <PageCurrencySelector 
-              localCurrency={localCurrency}
-              onCurrencyChange={setLocalCurrency}
-              label="View prices in"
-            />
             <button
               onClick={() => setShowUploadModal(true)}
               className="flex items-center gap-2 px-4 py-2 bg-krgold/20 hover:bg-krgold/30 text-krgold font-semibold rounded-lg border border-krgold/50 transition-colors"
@@ -272,14 +264,14 @@ export default function Charts(){
                         <div className="text-krmuted text-xs mb-1">Entry</div>
                         <div className="text-krtext font-semibold flex items-center gap-1">
                           <DollarSign size={12} />
-                          {formatAmountInCurrency(chart.entryPrice, displayCurrency)}
+                          {formatAmount(chart.entryPrice)}
                         </div>
                       </div>
                       <div className="bg-krblack/40 rounded-lg p-2 border border-krborder/30">
                         <div className="text-krmuted text-xs mb-1">Exit</div>
                         <div className="text-krtext font-semibold flex items-center gap-1">
                           <DollarSign size={12} />
-                          {formatAmountInCurrency(chart.exitPrice, displayCurrency)}
+                          {formatAmount(chart.exitPrice)}
                         </div>
                       </div>
                     </div>
@@ -348,14 +340,14 @@ export default function Charts(){
                     <div className="text-krmuted text-xs mb-1">Entry</div>
                     <div className="text-krtext font-semibold flex items-center gap-1">
                       <DollarSign size={12} />
-                      {formatAmountInCurrency(it.entryPrice, displayCurrency)}
+                      {formatAmount(it.entryPrice)}
                     </div>
                   </div>
                   <div className="bg-krblack/40 rounded-lg p-2 border border-krborder/30">
                     <div className="text-krmuted text-xs mb-1">Exit</div>
                     <div className="text-krtext font-semibold flex items-center gap-1">
                       <DollarSign size={12} />
-                      {formatAmountInCurrency(it.exitPrice, displayCurrency)}
+                      {formatAmount(it.exitPrice)}
                     </div>
                   </div>
                 </div>
@@ -433,23 +425,23 @@ export default function Charts(){
               <div className="space-y-3">
                 <div>
                   <label className="block text-sm font-medium text-gray-400 mb-1">Entry Price</label>
-                  <div className="text-krtext">{formatAmountInCurrency(viewingTrade.entryPrice, displayCurrency)}</div>
+                  <div className="text-krtext">{formatAmount(viewingTrade.entryPrice)}</div>
                   <div className="text-xs text-gray-400">{viewingTrade.date} {viewingTrade.time}</div>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-400 mb-1">Exit Price</label>
-                  <div className="text-krtext">{formatAmountInCurrency(viewingTrade.exitPrice, displayCurrency)}</div>
+                  <div className="text-krtext">{formatAmount(viewingTrade.exitPrice)}</div>
                   <div className="text-xs text-gray-400">{viewingTrade.exitDate} {viewingTrade.exitTime}</div>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-400 mb-1">P&L</label>
                   <div className={`font-semibold ${(viewingTrade.pnlAmount || (viewingTrade.exitPrice - viewingTrade.entryPrice)) > 0 ? 'text-green-400' : 'text-red-400'}`}>
-                    {formatAmountInCurrency(viewingTrade.pnlAmount || (viewingTrade.exitPrice - viewingTrade.entryPrice, displayCurrency))} ({(viewingTrade.pnlPercent || (((viewingTrade.exitPrice - viewingTrade.entryPrice) / viewingTrade.entryPrice) * 100)).toFixed(2)}%)
+                    {formatAmount(viewingTrade.pnlAmount || (viewingTrade.exitPrice - viewingTrade.entryPrice))} ({(viewingTrade.pnlPercent || (((viewingTrade.exitPrice - viewingTrade.entryPrice) / viewingTrade.entryPrice) * 100)).toFixed(2)}%)
                   </div>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-400 mb-1">Fee</label>
-                  <div className="text-krtext">{formatAmountInCurrency(viewingTrade.fee || 0, displayCurrency)}</div>
+                  <div className="text-krtext">{formatAmount(viewingTrade.fee || 0)}</div>
                 </div>
               </div>
             </div>
@@ -616,11 +608,11 @@ export default function Charts(){
                 <div className="space-y-2">
                   <div className="flex justify-between items-center">
                     <span className="text-krmuted text-sm">Entry Price:</span>
-                    <span className="text-krtext font-semibold">${formatAmountInCurrency(viewingUploadedChart.entryPrice, displayCurrency)}</span>
+                    <span className="text-krtext font-semibold">{formatAmount(viewingUploadedChart.entryPrice)}</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-krmuted text-sm">Exit Price:</span>
-                    <span className="text-krtext font-semibold">${formatAmountInCurrency(viewingUploadedChart.exitPrice, displayCurrency)}</span>
+                    <span className="text-krtext font-semibold">{formatAmount(viewingUploadedChart.exitPrice)}</span>
                   </div>
                   <div className="flex justify-between items-center pt-2 border-t border-krborder">
                     <span className="text-krmuted text-sm">Potential P&L:</span>
