@@ -109,7 +109,10 @@ export default function MarketData() {
       locale: "en",
       isTransparent: true,
       screener_type: "crypto_mkt",
-      displayCurrency: "USD"
+      displayCurrency: "USD",
+      filter: [
+        { left: "exchange", operation: "match", right: "BINANCE" }
+      ]
     })
     container.appendChild(script)
     return () => { if (container) { container.innerHTML = '' } }
@@ -135,7 +138,10 @@ export default function MarketData() {
       locale: "en",
       isTransparent: true,
       screener_type: "crypto_mkt",
-      displayCurrency: "USD"
+      displayCurrency: "USD",
+      filter: [
+        { left: "exchange", operation: "match", right: "BINANCE" }
+      ]
     })
     container.appendChild(script)
     return () => { if (container) { container.innerHTML = '' } }
@@ -161,7 +167,10 @@ export default function MarketData() {
       locale: "en",
       isTransparent: true,
       screener_type: "crypto_mkt",
-      displayCurrency: "USD"
+      displayCurrency: "USD",
+      filter: [
+        { left: "exchange", operation: "match", right: "BINANCE" }
+      ]
     })
     container.appendChild(script)
     return () => { if (container) { container.innerHTML = '' } }
