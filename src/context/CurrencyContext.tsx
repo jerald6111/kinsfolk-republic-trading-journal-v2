@@ -9,18 +9,18 @@ export type Currency = {
 
 const baseCurrencies: Currency[] = [
   { code: 'USD', symbol: '$', name: 'US Dollar', rate: 1 },
-  { code: 'EUR', symbol: '', name: 'Euro', rate: 0.92 },
-  { code: 'GBP', symbol: '', name: 'British Pound', rate: 0.79 },
-  { code: 'PHP', symbol: '', name: 'Philippine Peso', rate: 56.5 },
-  { code: 'JPY', symbol: '', name: 'Japanese Yen', rate: 149.5 },
+  { code: 'PHP', symbol: '₱', name: 'Philippine Peso', rate: 56.5 },
+  { code: 'EUR', symbol: '€', name: 'Euro', rate: 0.92 },
+  { code: 'GBP', symbol: '£', name: 'British Pound', rate: 0.79 },
+  { code: 'JPY', symbol: '¥', name: 'Japanese Yen', rate: 149.5 },
   { code: 'AUD', symbol: 'A$', name: 'Australian Dollar', rate: 1.53 },
   { code: 'CAD', symbol: 'C$', name: 'Canadian Dollar', rate: 1.36 },
   { code: 'CHF', symbol: 'Fr', name: 'Swiss Franc', rate: 0.88 },
-  { code: 'CNY', symbol: '', name: 'Chinese Yuan', rate: 7.24 },
-  { code: 'INR', symbol: '', name: 'Indian Rupee', rate: 83.12 },
-  { code: 'BTC', symbol: '', name: 'Bitcoin', rate: 0.000024 },
-  { code: 'USDT', symbol: '', name: 'Tether', rate: 1 },
-  { code: 'BUSD', symbol: 'B', name: 'Binance USD', rate: 1 },
+  { code: 'CNY', symbol: '¥', name: 'Chinese Yuan', rate: 7.24 },
+  { code: 'INR', symbol: '₹', name: 'Indian Rupee', rate: 83.12 },
+  { code: 'BTC', symbol: '₿', name: 'Bitcoin', rate: 0.000024 },
+  { code: 'USDT', symbol: '₮', name: 'Tether', rate: 1 },
+  { code: 'BUSD', symbol: 'Ƀ', name: 'Binance USD', rate: 1 },
 ];
 
 type CurrencyContextType = {
