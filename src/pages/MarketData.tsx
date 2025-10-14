@@ -71,6 +71,7 @@ export default function MarketData() {
   const calendarRef = useRef<HTMLDivElement>(null)
   const heatmapRef = useRef<HTMLDivElement>(null)
   const [heatmapMetric, setHeatmapMetric] = useState<'change' | 'volume' | 'open_interest'>('change')
+  const [rankingLimit, setRankingLimit] = useState<100 | 200 | 300>(100)
   
   // CoinGecko data states
   const [cryptoRankings, setCryptoRankings] = useState<CryptoData[]>([])
@@ -129,24 +130,40 @@ export default function MarketData() {
     return () => { if (container) { container.innerHTML = '' } }
   }, [heatmapMetric])
 
-  // Fetch CoinGecko Crypto Rankings (Top 300 by Market Cap)
+  // Fetch CoinGecko Crypto Rankings (Dynamic based on rankingLimit)
   useEffect(() => {
     const fetchRankings = async () => {
       try {
         setRankingLoading(true)
-        const response = await fetch(
-          'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=1&sparkline=true&price_change_percentage=1h,24h'
-        )
-        const data1: CryptoData[] = await response.json()
         
-        // Fetch page 2 to get coins 251-300
-        const response2 = await fetch(
-          'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=2&sparkline=true&price_change_percentage=1h,24h'
-        )
-        const data2: CryptoData[] = await response2.json()
-        
-        // Combine both pages
-        setCryptoRankings([...data1, ...data2])
+        if (rankingLimit === 100) {
+          // Fetch only 100 coins for faster loading
+          const response = await fetch(
+            'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=true&price_change_percentage=1h,24h'
+          )
+          const data: CryptoData[] = await response.json()
+          setCryptoRankings(data)
+        } else if (rankingLimit === 200) {
+          // Fetch 200 coins
+          const response = await fetch(
+            'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=200&page=1&sparkline=true&price_change_percentage=1h,24h'
+          )
+          const data: CryptoData[] = await response.json()
+          setCryptoRankings(data)
+        } else {
+          // Fetch 300 coins (250 + 50)
+          const response = await fetch(
+            'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=1&sparkline=true&price_change_percentage=1h,24h'
+          )
+          const data1: CryptoData[] = await response.json()
+          
+          const response2 = await fetch(
+            'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=2&sparkline=true&price_change_percentage=1h,24h'
+          )
+          const data2: CryptoData[] = await response2.json()
+          
+          setCryptoRankings([...data1, ...data2])
+        }
       } catch (error) {
         console.error('Error fetching crypto rankings:', error)
       } finally {
@@ -157,7 +174,7 @@ export default function MarketData() {
     fetchRankings()
     const interval = setInterval(fetchRankings, 60000) // Update every 60 seconds
     return () => clearInterval(interval)
-  }, [])
+  }, [rankingLimit])
 
   // Fetch CoinGecko Trending Coins
   useEffect(() => {
@@ -344,9 +361,15 @@ export default function MarketData() {
                   <span className="text-2xl">📈</span>
                   <h2 className="text-xl font-semibold text-krtext">Cryptocurrency by Ranking</h2>
                 </div>
-                <div className="flex items-center gap-2 px-3 py-1.5 bg-krgold/10 border border-krgold/30 rounded-lg">
-                  <span className="text-xs font-semibold text-krgold">Top 300 by Market Cap</span>
-                </div>
+                <select
+                  value={rankingLimit}
+                  onChange={(e) => setRankingLimit(Number(e.target.value) as 100 | 200 | 300)}
+                  className="bg-krcard border border-krgold/30 rounded-lg px-3 py-1.5 text-xs text-krgold font-semibold focus:outline-none focus:border-krgold hover:bg-krgold/10 transition-colors cursor-pointer"
+                >
+                  <option value={100}>Top 100 by Market Cap</option>
+                  <option value={200}>Top 200 by Market Cap</option>
+                  <option value={300}>Top 300 by Market Cap</option>
+                </select>
               </div>
               <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[700px] overflow-y-auto scrollbar-custom">
                 {rankingLoading ? (
