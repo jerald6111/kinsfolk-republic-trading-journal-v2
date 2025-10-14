@@ -1,3 +1,5 @@
+import FiatConverter from '../components/FiatConverter'
+import CryptoConverter from '../components/CryptoConverter'
 import React, { useEffect, useRef, useState } from 'react'
 import FiatConverter from '../components/FiatConverter'
 import CryptoConverter from '../components/CryptoConverter'
@@ -274,6 +276,12 @@ export default function DataMarket() {
             <p className="text-krmuted text-sm md:text-base ml-14">
               Powered by CoinGecko & TradingView - Professional crypto market analysis tools with 1-minute updates
             </p>
+          </div>
+
+          {/* Currency Converters */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <FiatConverter />
+            <CryptoConverter />
           </div>
 
           {/* Crypto Data Widgets Grid */}

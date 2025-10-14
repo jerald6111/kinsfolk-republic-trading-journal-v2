@@ -1,9 +1,11 @@
-﻿import React, { useState } from 'react'
+﻿
+import React, { useState } from 'react'
 import FileUploader from '../components/FileUploader'
 import Modal from '../components/Modal'
 import { loadData, saveData, triggerAutoEmailBackup } from '../utils/storage'
 import { Trash2, Edit2, CheckCircle2, X, Image as ImageIcon } from 'lucide-react'
 import { useCurrency } from '../context/CurrencyContext'
+
 
 type GoalTimeline = 'Short Term (3-6 months)' | 'Mid Term (6-12 months)' | 'Long Term (1-3 years)'
 
@@ -223,6 +225,8 @@ export default function VisionBoard(){
             </p>
           </div>
         </div>
+
+
       </div>
 
       <div className="grid md:grid-cols-[350px,1fr] gap-4 mb-6">
@@ -242,7 +246,7 @@ export default function VisionBoard(){
             
             <textarea 
               className="w-full p-3 rounded-xl bg-krblack/30 text-krtext border border-krborder/30 focus:border-krgold/50 focus:ring-2 focus:ring-krgold/20 transition-all placeholder:text-krmuted" 
-              placeholder="ðŸ“ Description" 
+              placeholder="📝 Description" 
               value={desc} 
               onChange={e=>setDesc(e.target.value)} 
               rows={3} 
