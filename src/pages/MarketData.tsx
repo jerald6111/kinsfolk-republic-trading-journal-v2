@@ -238,6 +238,105 @@ export default function MarketData() {
 
           {/* Main Content Grid */}
           <div className="space-y-6">
+            {/* Three Column Row: Trending Coins, Top Gainers & Top Losers */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Trending Coins */}
+              <div>
+                <div className="flex items-center gap-3 mb-6">
+                  <Flame className="w-6 h-6 text-orange-500" />
+                  <h2 className="text-xl font-semibold text-krtext">🔥 Trending</h2>
+                </div>
+                <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[600px] overflow-y-auto scrollbar-custom">
+                  {loading ? (
+                    <div className="flex items-center justify-center h-full">
+                      <div className="text-krmuted">Loading trending coins...</div>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {trendingCoins.slice(0, 7).map((trending, index) => (
+                        <div key={trending.item.id} className="flex items-center gap-4 p-3 bg-krblack/40 rounded-lg border border-krborder/50 hover:border-krgold/30 transition-colors">
+                          <span className="text-krmuted font-semibold text-sm min-w-[24px]">#{index + 1}</span>
+                          <img src={trending.item.small} alt={trending.item.name} className="w-8 h-8 rounded-full" />
+                          <div className="flex-1">
+                            <div className="font-semibold text-krtext">{trending.item.name}</div>
+                            <div className="text-xs text-krmuted">{trending.item.symbol.toUpperCase()}</div>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-xs text-krmuted">Rank</div>
+                            <div className="text-sm font-semibold text-krgold">#{trending.item.market_cap_rank || 'N/A'}</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Top Crypto Gainers */}
+              <div>
+                <div className="flex items-center gap-3 mb-6">
+                  <TrendingUp className="w-6 h-6 text-green-500" />
+                  <h2 className="text-xl font-semibold text-krtext">🚀 Top Gainers</h2>
+                </div>
+                <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[600px] overflow-y-auto scrollbar-custom">
+                  {loading ? (
+                    <div className="flex items-center justify-center h-full">
+                      <div className="text-krmuted">Loading top gainers...</div>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {topGainers.map((coin, index) => (
+                        <div key={coin.id} className="flex items-center gap-4 p-3 bg-krblack/40 rounded-lg border border-krborder/50 hover:border-green-500/30 transition-colors">
+                          <span className="text-krmuted font-semibold text-sm min-w-[24px]">#{index + 1}</span>
+                          <img src={coin.image} alt={coin.name} className="w-8 h-8 rounded-full" />
+                          <div className="flex-1">
+                            <div className="font-semibold text-krtext">{coin.name}</div>
+                            <div className="text-xs text-krmuted">{coin.symbol.toUpperCase()}</div>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-sm font-semibold text-krtext">${coin.current_price.toLocaleString()}</div>
+                            <div className="text-sm font-bold text-green-500">+{coin.price_change_percentage_24h.toFixed(2)}%</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Top Crypto Losers */}
+              <div>
+                <div className="flex items-center gap-3 mb-6">
+                  <TrendingDown className="w-6 h-6 text-red-500" />
+                  <h2 className="text-xl font-semibold text-krtext">🚨 Top Losers</h2>
+                </div>
+                <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[600px] overflow-y-auto scrollbar-custom">
+                  {loading ? (
+                    <div className="flex items-center justify-center h-full">
+                      <div className="text-krmuted">Loading top losers...</div>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {topLosers.map((coin, index) => (
+                        <div key={coin.id} className="flex items-center gap-4 p-3 bg-krblack/40 rounded-lg border border-krborder/50 hover:border-red-500/30 transition-colors">
+                          <span className="text-krmuted font-semibold text-sm min-w-[24px]">#{index + 1}</span>
+                          <img src={coin.image} alt={coin.name} className="w-8 h-8 rounded-full" />
+                          <div className="flex-1">
+                            <div className="font-semibold text-krtext">{coin.name}</div>
+                            <div className="text-xs text-krmuted">{coin.symbol.toUpperCase()}</div>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-sm font-semibold text-krtext">${coin.current_price.toLocaleString()}</div>
+                            <div className="text-sm font-bold text-red-500">{coin.price_change_percentage_24h.toFixed(2)}%</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
             {/* Full Width: Cryptocurrency by Ranking */}
             <div>
               <div className="flex items-center justify-between mb-6">
@@ -329,127 +428,25 @@ export default function MarketData() {
               </div>
             </div>
 
-            {/* Two Column Row: Heatmap & Trending Coins */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Crypto Heatmap */}
-              <div>
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center gap-3">
-                    <span className="text-2xl">🔥</span>
-                    <h2 className="text-xl font-semibold text-krtext">Market Heatmap</h2>
-                  </div>
-                  <select
-                    value={heatmapMetric}
-                    onChange={(e) => setHeatmapMetric(e.target.value as 'change' | 'volume' | 'open_interest')}
-                    className="bg-krcard border border-krborder rounded-lg px-2 py-1 text-xs text-krtext focus:outline-none focus:border-krgold"
-                  >
-                    <option value="change">Change %</option>
-                    <option value="volume">Volume</option>
-                    <option value="open_interest">Open Interest</option>
-                  </select>
+            {/* Full Width: Market Heatmap */}
+            <div>
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">🔥</span>
+                  <h2 className="text-xl font-semibold text-krtext">Market Heatmap</h2>
                 </div>
-                <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[600px]">
-                  <div ref={heatmapRef} className="h-full w-full"></div>
-                </div>
+                <select
+                  value={heatmapMetric}
+                  onChange={(e) => setHeatmapMetric(e.target.value as 'change' | 'volume' | 'open_interest')}
+                  className="bg-krcard border border-krborder rounded-lg px-2 py-1 text-xs text-krtext focus:outline-none focus:border-krgold"
+                >
+                  <option value="change">Change %</option>
+                  <option value="volume">Volume</option>
+                  <option value="open_interest">Open Interest</option>
+                </select>
               </div>
-
-              {/* Trending Coins */}
-              <div>
-                <div className="flex items-center gap-3 mb-6">
-                  <Flame className="w-6 h-6 text-orange-500" />
-                  <h2 className="text-xl font-semibold text-krtext">🔥 Trending Coins</h2>
-                </div>
-                <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[600px] overflow-y-auto scrollbar-custom">
-                  {loading ? (
-                    <div className="flex items-center justify-center h-full">
-                      <div className="text-krmuted">Loading trending coins...</div>
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      {trendingCoins.slice(0, 7).map((trending, index) => (
-                        <div key={trending.item.id} className="flex items-center gap-4 p-3 bg-krblack/40 rounded-lg border border-krborder/50 hover:border-krgold/30 transition-colors">
-                          <span className="text-krmuted font-semibold text-sm min-w-[24px]">#{index + 1}</span>
-                          <img src={trending.item.small} alt={trending.item.name} className="w-8 h-8 rounded-full" />
-                          <div className="flex-1">
-                            <div className="font-semibold text-krtext">{trending.item.name}</div>
-                            <div className="text-xs text-krmuted">{trending.item.symbol.toUpperCase()}</div>
-                          </div>
-                          <div className="text-right">
-                            <div className="text-xs text-krmuted">Rank</div>
-                            <div className="text-sm font-semibold text-krgold">#{trending.item.market_cap_rank || 'N/A'}</div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Two Column Row: Top Gainers & Top Losers */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Top Crypto Gainers */}
-              <div>
-                <div className="flex items-center gap-3 mb-6">
-                  <TrendingUp className="w-6 h-6 text-green-500" />
-                  <h2 className="text-xl font-semibold text-krtext">🚀 Top Gainers</h2>
-                </div>
-                <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[600px] overflow-y-auto scrollbar-custom">
-                  {loading ? (
-                    <div className="flex items-center justify-center h-full">
-                      <div className="text-krmuted">Loading top gainers...</div>
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      {topGainers.map((coin, index) => (
-                        <div key={coin.id} className="flex items-center gap-4 p-3 bg-krblack/40 rounded-lg border border-krborder/50 hover:border-green-500/30 transition-colors">
-                          <span className="text-krmuted font-semibold text-sm min-w-[24px]">#{index + 1}</span>
-                          <img src={coin.image} alt={coin.name} className="w-8 h-8 rounded-full" />
-                          <div className="flex-1">
-                            <div className="font-semibold text-krtext">{coin.name}</div>
-                            <div className="text-xs text-krmuted">{coin.symbol.toUpperCase()}</div>
-                          </div>
-                          <div className="text-right">
-                            <div className="text-sm font-semibold text-krtext">${coin.current_price.toLocaleString()}</div>
-                            <div className="text-sm font-bold text-green-500">+{coin.price_change_percentage_24h.toFixed(2)}%</div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Top Crypto Losers */}
-              <div>
-                <div className="flex items-center gap-3 mb-6">
-                  <TrendingDown className="w-6 h-6 text-red-500" />
-                  <h2 className="text-xl font-semibold text-krtext">🚨 Top Losers</h2>
-                </div>
-                <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[600px] overflow-y-auto scrollbar-custom">
-                  {loading ? (
-                    <div className="flex items-center justify-center h-full">
-                      <div className="text-krmuted">Loading top losers...</div>
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      {topLosers.map((coin, index) => (
-                        <div key={coin.id} className="flex items-center gap-4 p-3 bg-krblack/40 rounded-lg border border-krborder/50 hover:border-red-500/30 transition-colors">
-                          <span className="text-krmuted font-semibold text-sm min-w-[24px]">#{index + 1}</span>
-                          <img src={coin.image} alt={coin.name} className="w-8 h-8 rounded-full" />
-                          <div className="flex-1">
-                            <div className="font-semibold text-krtext">{coin.name}</div>
-                            <div className="text-xs text-krmuted">{coin.symbol.toUpperCase()}</div>
-                          </div>
-                          <div className="text-right">
-                            <div className="text-sm font-semibold text-krtext">${coin.current_price.toLocaleString()}</div>
-                            <div className="text-sm font-bold text-red-500">{coin.price_change_percentage_24h.toFixed(2)}%</div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
+              <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[700px]">
+                <div ref={heatmapRef} className="h-full w-full"></div>
               </div>
             </div>
           </div>
