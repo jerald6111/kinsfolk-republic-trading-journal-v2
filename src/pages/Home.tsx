@@ -20,37 +20,37 @@ export default function Home() {
     {
       icon: <BarChart3 className="text-krgold" size={32} />,
       title: 'Advanced Analytics',
-      description: 'Track your performance with comprehensive analytics including win rate, profit factor, ROI, and more.',
+      description: 'Track performance with comprehensive analytics: win rate, profit factor, ROI, risk/reward ratios, and objective-based breakdowns.',
       image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop'
     },
     {
       icon: <BookOpen className="text-krgold" size={32} />,
       title: 'Trading Journal',
-      description: 'Document every trade with detailed entry and exit reasons, screenshots, and performance metrics.',
+      description: 'Document every trade with detailed entry/exit reasons, chart and PNL screenshots, leverage tracking, and automatic P&L calculations.',
       image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800&auto=format&fit=crop'
     },
     {
       icon: <Target className="text-krgold" size={32} />,
       title: 'Strategy Playbook',
-      description: 'Build and refine your trading strategies with a customizable playbook system.',
+      description: 'Build your trading playbook with markdown support, strategy images, and collapsible sections. Define entry/exit rules and risk management per setup.',
       image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&auto=format&fit=crop'
     },
     {
       icon: <TrendingUp className="text-krgold" size={32} />,
-      title: 'Performance Tracking',
-      description: 'Visualize your equity curve, track drawdowns, and analyze your trading streaks.',
+      title: 'Live Market Data',
+      description: 'Access Top 100/200/300 cryptos with real-time prices, 7-day sparklines, trending coins, economic calendar, and market heatmap (updates every 60s).',
       image: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&auto=format&fit=crop'
     },
     {
       icon: <Calendar className="text-krgold" size={32} />,
-      title: 'PNL Calendar',
-      description: 'View your daily, weekly, and monthly performance at a glance with an intuitive calendar view.',
+      title: 'Visual Snapshots',
+      description: 'Gallery of trade charts and PNL screenshots with filters. NEW: Upload missed opportunities (not counted as entries) for learning purposes.',
       image: 'https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=800&auto=format&fit=crop'
     },
     {
       icon: <Wallet className="text-krgold" size={32} />,
       title: 'Wallet Management',
-      description: 'Track deposits, withdrawals, and see your real-time trading balance with fee accounting.',
+      description: 'Track deposits and withdrawals locally for accurate ROI calculations. No real money transfers - just personal record-keeping.',
       image: 'https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=800&auto=format&fit=crop'
     }
   ]
