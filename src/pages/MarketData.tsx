@@ -92,16 +92,24 @@ export default function MarketData() {
     return () => { if (container) { container.innerHTML = '' } }
   }, [heatmapMetric])
 
-  // Fetch CoinGecko Crypto Rankings (Top 100 by Market Cap)
+  // Fetch CoinGecko Crypto Rankings (Top 300 by Market Cap)
   useEffect(() => {
     const fetchRankings = async () => {
       try {
         setRankingLoading(true)
         const response = await fetch(
-          'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false&price_change_percentage=24h'
+          'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=1&sparkline=false&price_change_percentage=24h'
         )
-        const data: CryptoData[] = await response.json()
-        setCryptoRankings(data)
+        const data1: CryptoData[] = await response.json()
+        
+        // Fetch page 2 to get coins 251-300
+        const response2 = await fetch(
+          'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=2&sparkline=false&price_change_percentage=24h'
+        )
+        const data2: CryptoData[] = await response2.json()
+        
+        // Combine both pages
+        setCryptoRankings([...data1, ...data2])
       } catch (error) {
         console.error('Error fetching crypto rankings:', error)
       } finally {
@@ -110,7 +118,7 @@ export default function MarketData() {
     }
 
     fetchRankings()
-    const interval = setInterval(fetchRankings, 60000) // Update every 60 seconds
+    const interval = setInterval(fetchRankings, 30000) // Update every 30 seconds
     return () => clearInterval(interval)
   }, [])
 
@@ -130,7 +138,7 @@ export default function MarketData() {
     }
 
     fetchTrending()
-    const interval = setInterval(fetchTrending, 60000) // Update every 60 seconds
+    const interval = setInterval(fetchTrending, 30000) // Update every 30 seconds
     return () => clearInterval(interval)
   }, [])
 
@@ -166,7 +174,7 @@ export default function MarketData() {
     }
 
     fetchMarketData()
-    const interval = setInterval(fetchMarketData, 60000) // Update every 60 seconds
+    const interval = setInterval(fetchMarketData, 30000) // Update every 30 seconds
     return () => clearInterval(interval)
   }, [])
 
@@ -201,10 +209,10 @@ export default function MarketData() {
                   <h2 className="text-xl font-semibold text-krtext">Cryptocurrency by Ranking</h2>
                 </div>
                 <div className="flex items-center gap-2 px-3 py-1.5 bg-krgold/10 border border-krgold/30 rounded-lg">
-                  <span className="text-xs font-semibold text-krgold">Top 100 by Market Cap</span>
+                  <span className="text-xs font-semibold text-krgold">Top 300 by Market Cap</span>
                 </div>
               </div>
-              <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[700px] overflow-y-auto">
+              <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[700px] overflow-y-auto scrollbar-custom">
                 {rankingLoading ? (
                   <div className="flex items-center justify-center h-full">
                     <div className="text-krmuted">Loading cryptocurrency rankings...</div>
@@ -297,7 +305,7 @@ export default function MarketData() {
                   <Flame className="w-6 h-6 text-orange-500" />
                   <h2 className="text-xl font-semibold text-krtext">🔥 Trending Coins</h2>
                 </div>
-                <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[600px] overflow-y-auto">
+                <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[600px] overflow-y-auto scrollbar-custom">
                   {loading ? (
                     <div className="flex items-center justify-center h-full">
                       <div className="text-krmuted">Loading trending coins...</div>
@@ -332,7 +340,7 @@ export default function MarketData() {
                   <TrendingUp className="w-6 h-6 text-green-500" />
                   <h2 className="text-xl font-semibold text-krtext">🚀 Top Gainers</h2>
                 </div>
-                <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[600px] overflow-y-auto">
+                <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[600px] overflow-y-auto scrollbar-custom">
                   {loading ? (
                     <div className="flex items-center justify-center h-full">
                       <div className="text-krmuted">Loading top gainers...</div>
@@ -364,7 +372,7 @@ export default function MarketData() {
                   <TrendingDown className="w-6 h-6 text-red-500" />
                   <h2 className="text-xl font-semibold text-krtext">🚨 Top Losers</h2>
                 </div>
-                <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[600px] overflow-y-auto">
+                <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[600px] overflow-y-auto scrollbar-custom">
                   {loading ? (
                     <div className="flex items-center justify-center h-full">
                       <div className="text-krmuted">Loading top losers...</div>
@@ -397,7 +405,7 @@ export default function MarketData() {
             <div className="text-xs text-krmuted text-center">
               <span className="font-semibold">Data Sources:</span> Market data powered by{' '}
               <span className="text-krgold font-medium">CoinGecko</span> &{' '}
-              <span className="text-krgold font-medium">TradingView</span> • Real-time updates every 60 seconds • Top 100 cryptocurrencies by market cap
+              <span className="text-krgold font-medium">TradingView</span> • Real-time updates every 30 seconds • Top 300 cryptocurrencies by market cap
             </div>
           </div>
         </div>
