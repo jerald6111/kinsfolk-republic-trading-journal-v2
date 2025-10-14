@@ -33,14 +33,15 @@ interface TrendingCoin {
 export default function MarketData() {
   const calendarRef = useRef<HTMLDivElement>(null)
   const heatmapRef = useRef<HTMLDivElement>(null)
-  const cryptoScreenerRef = useRef<HTMLDivElement>(null)
   const [heatmapMetric, setHeatmapMetric] = useState<'change' | 'volume' | 'open_interest'>('change')
   
   // CoinGecko data states
+  const [cryptoRankings, setCryptoRankings] = useState<CryptoData[]>([])
   const [trendingCoins, setTrendingCoins] = useState<TrendingCoin[]>([])
   const [topGainers, setTopGainers] = useState<CryptoData[]>([])
   const [topLosers, setTopLosers] = useState<CryptoData[]>([])
   const [loading, setLoading] = useState(true)
+  const [rankingLoading, setRankingLoading] = useState(true)
 
   // Economic Calendar Widget
   useEffect(() => {
@@ -91,35 +92,26 @@ export default function MarketData() {
     return () => { if (container) { container.innerHTML = '' } }
   }, [heatmapMetric])
 
-  // Crypto Screener Widget (Data Analysis) - Filtered by Binance, Bybit, OKX
+  // Fetch CoinGecko Crypto Rankings (Top 100 by Market Cap)
   useEffect(() => {
-    if (!cryptoScreenerRef.current) return
-    const container = cryptoScreenerRef.current
-    container.innerHTML = ''
-    const script = document.createElement('script')
-    script.type = 'text/javascript'
-    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-screener.js'
-    script.async = true
-    script.innerHTML = JSON.stringify({
-      width: "100%",
-      height: "100%",
-      defaultColumn: "overview",
-      screener_type: "crypto_mkt",
-      displayCurrency: "USD",
-      colorTheme: "dark",
-      locale: "en",
-      isTransparent: true,
-      showToolbar: true,
-      filter: [
-        { 
-          left: "exchange", 
-          operation: "match", 
-          right: "BINANCE|BYBIT|OKX"
-        }
-      ]
-    })
-    container.appendChild(script)
-    return () => { if (container) { container.innerHTML = '' } }
+    const fetchRankings = async () => {
+      try {
+        setRankingLoading(true)
+        const response = await fetch(
+          'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false&price_change_percentage=24h'
+        )
+        const data: CryptoData[] = await response.json()
+        setCryptoRankings(data)
+      } catch (error) {
+        console.error('Error fetching crypto rankings:', error)
+      } finally {
+        setRankingLoading(false)
+      }
+    }
+
+    fetchRankings()
+    const interval = setInterval(fetchRankings, 60000) // Update every 60 seconds
+    return () => clearInterval(interval)
   }, [])
 
   // Fetch CoinGecko Trending Coins
@@ -201,23 +193,66 @@ export default function MarketData() {
 
           {/* Main Content Grid */}
           <div className="space-y-6">
-            {/* Full Width: Cryptocurrency Data Analysis */}
+            {/* Full Width: Cryptocurrency by Ranking */}
             <div>
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
                   <span className="text-2xl">📈</span>
-                  <h2 className="text-xl font-semibold text-krtext">Cryptocurrency Data Analysis</h2>
+                  <h2 className="text-xl font-semibold text-krtext">Cryptocurrency by Ranking</h2>
                 </div>
                 <div className="flex items-center gap-2 px-3 py-1.5 bg-krgold/10 border border-krgold/30 rounded-lg">
-                  <span className="text-xs font-semibold text-krgold">Binance</span>
-                  <span className="text-xs text-krgold/50">•</span>
-                  <span className="text-xs font-semibold text-krgold">Bybit</span>
-                  <span className="text-xs text-krgold/50">•</span>
-                  <span className="text-xs font-semibold text-krgold">OKX</span>
+                  <span className="text-xs font-semibold text-krgold">Top 100 by Market Cap</span>
                 </div>
               </div>
-              <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[700px]">
-                <div ref={cryptoScreenerRef} className="h-full w-full"></div>
+              <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[700px] overflow-y-auto">
+                {rankingLoading ? (
+                  <div className="flex items-center justify-center h-full">
+                    <div className="text-krmuted">Loading cryptocurrency rankings...</div>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead className="sticky top-0 bg-krblack/90 backdrop-blur-sm z-10">
+                        <tr className="border-b border-krborder">
+                          <th className="text-left py-3 px-4 text-krmuted font-semibold">#</th>
+                          <th className="text-left py-3 px-4 text-krmuted font-semibold">Coin</th>
+                          <th className="text-right py-3 px-4 text-krmuted font-semibold">Price</th>
+                          <th className="text-right py-3 px-4 text-krmuted font-semibold">24h %</th>
+                          <th className="text-right py-3 px-4 text-krmuted font-semibold">Market Cap</th>
+                          <th className="text-right py-3 px-4 text-krmuted font-semibold">Volume (24h)</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {cryptoRankings.map((coin) => (
+                          <tr key={coin.id} className="border-b border-krborder/30 hover:bg-krgold/5 transition-colors">
+                            <td className="py-3 px-4 text-krmuted font-semibold">{coin.market_cap_rank}</td>
+                            <td className="py-3 px-4">
+                              <div className="flex items-center gap-3">
+                                <img src={coin.image} alt={coin.name} className="w-6 h-6 rounded-full" />
+                                <div>
+                                  <div className="font-semibold text-krtext">{coin.name}</div>
+                                  <div className="text-xs text-krmuted">{coin.symbol.toUpperCase()}</div>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="py-3 px-4 text-right font-semibold text-krtext">
+                              ${coin.current_price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            </td>
+                            <td className={`py-3 px-4 text-right font-bold ${coin.price_change_percentage_24h >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                              {coin.price_change_percentage_24h >= 0 ? '+' : ''}{coin.price_change_percentage_24h.toFixed(2)}%
+                            </td>
+                            <td className="py-3 px-4 text-right text-krtext">
+                              ${(coin.market_cap / 1e9).toFixed(2)}B
+                            </td>
+                            <td className="py-3 px-4 text-right text-krtext">
+                              ${(coin.total_volume / 1e9).toFixed(2)}B
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -361,8 +396,8 @@ export default function MarketData() {
           <div className="mt-8 pt-6 border-t border-krborder">
             <div className="text-xs text-krmuted text-center">
               <span className="font-semibold">Data Sources:</span> Market data powered by{' '}
-              <span className="text-krgold font-medium">TradingView</span> &{' '}
-              <span className="text-krgold font-medium">CoinGecko</span> • Real-time updates every 60 seconds • Screener filtered to Binance, Bybit & OKX exchanges
+              <span className="text-krgold font-medium">CoinGecko</span> &{' '}
+              <span className="text-krgold font-medium">TradingView</span> • Real-time updates every 60 seconds • Top 100 cryptocurrencies by market cap
             </div>
           </div>
         </div>
