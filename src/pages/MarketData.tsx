@@ -4,7 +4,6 @@ export default function MarketData() {
   const calendarRef = useRef<HTMLDivElement>(null)
   const heatmapRef = useRef<HTMLDivElement>(null)
   const cryptoScreenerRef = useRef<HTMLDivElement>(null)
-  const marketOverviewRef = useRef<HTMLDivElement>(null)
   const mostVolatileRef = useRef<HTMLDivElement>(null)
   const gainersRef = useRef<HTMLDivElement>(null)
   const losersRef = useRef<HTMLDivElement>(null)
@@ -83,56 +82,6 @@ export default function MarketData() {
           left: "exchange", 
           operation: "match", 
           right: "BINANCE|BYBIT|OKX"
-        }
-      ]
-    })
-    container.appendChild(script)
-    return () => { if (container) { container.innerHTML = '' } }
-  }, [])
-
-  // Market Overview Widget
-  useEffect(() => {
-    if (!marketOverviewRef.current) return
-    const container = marketOverviewRef.current
-    container.innerHTML = ''
-    const script = document.createElement('script')
-    script.type = 'text/javascript'
-    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js'
-    script.async = true
-    script.innerHTML = JSON.stringify({
-      colorTheme: "dark",
-      dateRange: "1D",
-      showChart: true,
-      locale: "en",
-      width: "100%",
-      height: "100%",
-      largeChartUrl: "",
-      isTransparent: true,
-      showSymbolLogo: true,
-      showFloatingTooltip: false,
-      plotLineColorGrowing: "rgba(41, 98, 255, 1)",
-      plotLineColorFalling: "rgba(41, 98, 255, 1)",
-      gridLineColor: "rgba(42, 46, 57, 0)",
-      scaleFontColor: "rgba(120, 123, 134, 1)",
-      belowLineFillColorGrowing: "rgba(41, 98, 255, 0.12)",
-      belowLineFillColorFalling: "rgba(41, 98, 255, 0.12)",
-      belowLineFillColorGrowingBottom: "rgba(41, 98, 255, 0)",
-      belowLineFillColorFallingBottom: "rgba(41, 98, 255, 0)",
-      symbolActiveColor: "rgba(41, 98, 255, 0.12)",
-      tabs: [
-        {
-          title: "Crypto",
-          symbols: [
-            { s: "BINANCE:BTCUSDT", d: "Bitcoin" },
-            { s: "BINANCE:ETHUSDT", d: "Ethereum" },
-            { s: "BINANCE:BNBUSDT", d: "BNB" },
-            { s: "BINANCE:SOLUSDT", d: "Solana" },
-            { s: "BINANCE:XRPUSDT", d: "XRP" },
-            { s: "BINANCE:ADAUSDT", d: "Cardano" },
-            { s: "BINANCE:DOTUSDT", d: "Polkadot" },
-            { s: "BINANCE:MATICUSDT", d: "Polygon" }
-          ],
-          originalTitle: "Crypto"
         }
       ]
     })
@@ -293,17 +242,6 @@ export default function MarketData() {
                 </div>
                 <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[500px]">
                   <div ref={heatmapRef} className="h-full w-full"></div>
-                </div>
-              </div>
-
-              {/* Crypto Market Overview */}
-              <div>
-                <div className="flex items-center gap-3 mb-6">
-                  <span className="text-2xl">📊</span>
-                  <h2 className="text-xl font-semibold text-krtext">Market Overview</h2>
-                </div>
-                <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[500px]">
-                  <div ref={marketOverviewRef} className="h-full w-full"></div>
                 </div>
               </div>
 
