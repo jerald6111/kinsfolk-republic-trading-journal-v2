@@ -475,11 +475,11 @@ export default function Journal() {
         </div>
 
         {/* Trade History - Right Side */}
-        <div className="bg-krcard/90 backdrop-blur-md rounded-2xl shadow-2xl border border-krborder/50 p-6 flex flex-col overflow-visible">
+        <div className="bg-krcard/90 backdrop-blur-md rounded-2xl shadow-2xl border border-krborder/50 p-6 flex flex-col">
           <h2 className="text-2xl font-bold mb-4 text-krtext flex items-center gap-2">
             <span className="text-krgold">📊</span> Recent Trades
           </h2>
-          <div className="space-y-3 overflow-y-auto overflow-x-visible pr-2 flex-1 max-h-[calc(100vh-16rem)] custom-scrollbar">
+          <div className="space-y-3 pr-2 flex-1 max-h-[calc(100vh-16rem)] custom-scrollbar" style={{ overflowY: 'auto', overflowX: 'visible' }}>
             {items.length === 0 && (
               <div className="text-center py-20">
                 <div className="text-6xl mb-4">📈</div>
