@@ -495,59 +495,68 @@ export default function Journal() {
               return (
                 <div 
                   key={it.id} 
+                  id={`trade-${it.id}`}
                   className="bg-krblack/40 backdrop-blur-sm rounded-xl border border-krborder/30 p-4 cursor-pointer hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 relative"
                   onClick={() => setViewingTrade(it)}
-                  onMouseEnter={(e) => setHoveredTrade(it.id)}
+                  onMouseEnter={(e) => {
+                    setHoveredTrade(it.id)
+                  }}
                   onMouseLeave={() => setHoveredTrade(null)}
                 >
                   {/* Hover Tooltip with PNL and Chart - Appears on Right with Fixed Positioning */}
-                  {isHovered && (
-                    <div 
-                      className="fixed w-80 bg-krcard/98 backdrop-blur-xl border border-krgold/50 rounded-xl shadow-2xl p-4 z-[9999] pointer-events-none animate-in fade-in duration-200"
-                      style={{
-                        left: `${(document.getElementById(`trade-${it.id}`)?.getBoundingClientRect().right || 0) + 16}px`,
-                        top: `${document.getElementById(`trade-${it.id}`)?.getBoundingClientRect().top || 0}px`
-                      }}
-                    >
-                      {/* PNL Summary */}
-                      <div className="mb-3 pb-3 border-b border-krborder/30">
-                        <div className="text-xs text-krmuted mb-2">Net P&L</div>
-                        <div className={`text-2xl font-bold ${isProfit ? 'text-green-400' : 'text-red-400'}`}>
-                          {formatAmount(netPnl)}
+                  {isHovered && (() => {
+                    const element = document.getElementById(`trade-${it.id}`)
+                    const rect = element?.getBoundingClientRect()
+                    if (!rect) return null
+                    
+                    return (
+                      <div 
+                        className="fixed w-80 bg-krcard/98 backdrop-blur-xl border border-krgold/50 rounded-xl shadow-2xl p-4 z-[9999] pointer-events-none"
+                        style={{
+                          left: `${rect.right + 16}px`,
+                          top: `${rect.top}px`
+                        }}
+                      >
+                        {/* PNL Summary */}
+                        <div className="mb-3 pb-3 border-b border-krborder/30">
+                          <div className="text-xs text-krmuted mb-2">Net P&L</div>
+                          <div className={`text-2xl font-bold ${isProfit ? 'text-green-400' : 'text-red-400'}`}>
+                            {formatAmount(netPnl)}
+                          </div>
+                          <div className={`text-sm font-medium ${isProfit ? 'text-green-400' : 'text-red-400'}`}>
+                            {isProfit ? '+' : ''}{it.pnlPercent.toFixed(2)}%
+                          </div>
                         </div>
-                        <div className={`text-sm font-medium ${isProfit ? 'text-green-400' : 'text-red-400'}`}>
-                          {isProfit ? '+' : ''}{it.pnlPercent.toFixed(2)}%
-                        </div>
+                        
+                        {/* Chart Image */}
+                        {it.chartImg && (
+                          <div className="mb-3">
+                            <div className="text-xs text-krmuted mb-2">Chart</div>
+                            <img 
+                              src={it.chartImg} 
+                              alt="Trade Chart" 
+                              className="w-full rounded-lg border border-krborder/50"
+                            />
+                          </div>
+                        )}
+                        
+                        {/* PNL Image */}
+                        {it.pnlImg && (
+                          <div>
+                            <div className="text-xs text-krmuted mb-2">PnL Screenshot</div>
+                            <img 
+                              src={it.pnlImg} 
+                              alt="PnL Screenshot" 
+                              className="w-full rounded-lg border border-krborder/50"
+                            />
+                          </div>
+                        )}
                       </div>
-                      
-                      {/* Chart Image */}
-                      {it.chartImg && (
-                        <div className="mb-3">
-                          <div className="text-xs text-krmuted mb-2">Chart</div>
-                          <img 
-                            src={it.chartImg} 
-                            alt="Trade Chart" 
-                            className="w-full rounded-lg border border-krborder/50"
-                          />
-                        </div>
-                      )}
-                      
-                      {/* PNL Image */}
-                      {it.pnlImg && (
-                        <div>
-                          <div className="text-xs text-krmuted mb-2">PnL Screenshot</div>
-                          <img 
-                            src={it.pnlImg} 
-                            alt="PnL Screenshot" 
-                            className="w-full rounded-lg border border-krborder/50"
-                          />
-                        </div>
-                      )}
-                    </div>
-                  )}
+                    )
+                  })()}
 
                   {/* Trade Card Content */}
-                  <div id={`trade-${it.id}`}>
+                  <div>
                     {/* Trade Header */}
                     <div className="flex items-start justify-between gap-2 mb-3">
                       <div className="flex-1 min-w-0">
