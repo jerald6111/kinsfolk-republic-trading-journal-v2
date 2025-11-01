@@ -355,7 +355,7 @@ export default function JournalOverview() {
       </div>
 
       {/* Insights Section */}
-      <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-5">
+      <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-5 mb-6">
         <div className="flex items-center gap-3 mb-4">
           <span className="text-2xl">💡</span>
           <h2 className="text-lg font-semibold">Quick Insights</h2>
