@@ -1,4 +1,5 @@
 ﻿import React, { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import FileUploader from '../components/FileUploader'
 import DateTimePicker from '../components/DateTimePicker'
 import Select from '../components/Select'
@@ -493,23 +494,59 @@ export default function Journal() {
               const isProfit = netPnl > 0
               const isHovered = hoveredTrade === it.id
               return (
-                <div 
-                  key={it.id} 
-                  id={`trade-${it.id}`}
-                  className="bg-krblack/40 backdrop-blur-sm rounded-xl border border-krborder/30 p-4 cursor-pointer hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 relative"
-                  onClick={() => setViewingTrade(it)}
-                  onMouseEnter={(e) => {
-                    setHoveredTrade(it.id)
-                  }}
-                  onMouseLeave={() => setHoveredTrade(null)}
-                >
-                  {/* Hover Tooltip with PNL and Chart - Appears on Right with Fixed Positioning */}
+                <React.Fragment key={it.id}>
+                  <div 
+                    id={`trade-${it.id}`}
+                    className="bg-krblack/40 backdrop-blur-sm rounded-xl border border-krborder/30 p-4 cursor-pointer hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200"
+                    onClick={() => setViewingTrade(it)}
+                    onMouseEnter={(e) => {
+                      setHoveredTrade(it.id)
+                    }}
+                    onMouseLeave={() => setHoveredTrade(null)}
+                  >
+                    {/* Trade Card Content */}
+                    <div>
+                      {/* Trade Header */}
+                      <div className="flex items-start justify-between gap-2 mb-3">
+                        <div className="flex-1 min-w-0">
+                          <div className="font-bold text-lg text-krtext hover:text-krgold transition-colors">{it.ticker}</div>
+                          <div className="text-xs text-krmuted flex items-center gap-2">
+                            <span>{it.date}</span>
+                            <span className="text-krborder">•</span>
+                            <span>{it.time}</span>
+                          </div>
+                        </div>
+                        <span className={`text-xs px-3 py-1.5 rounded-lg whitespace-nowrap font-bold ${isProfit ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'}`}>
+                          {isProfit ? <TrendingUp className="inline-block w-3 h-3 mr-1" /> : <TrendingDown className="inline-block w-3 h-3 mr-1" />}
+                          {it.pnlPercent.toFixed(2)}%
+                        </span>
+                      </div>
+
+                      {/* Trade Details */}
+                      <div className="text-xs space-y-2">
+                        <div className="flex items-center justify-between text-krmuted">
+                          <span className="flex items-center gap-1.5">
+                            <span className={`w-1.5 h-1.5 rounded-full ${it.position === 'Long' ? 'bg-green-400' : 'bg-red-400'}`}></span>
+                            {it.type} {it.type === 'Futures' ? `${it.leverage}x` : ''} • {it.position}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between pt-2 border-t border-krborder/20">
+                          <span className="text-krmuted">Net P&L</span>
+                          <span className={`font-bold text-sm ${isProfit ? 'text-green-400' : 'text-red-400'}`}>
+                            {formatAmount(netPnl)}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Hover Tooltip with PNL and Chart - Rendered via Portal */}
                   {isHovered && (() => {
                     const element = document.getElementById(`trade-${it.id}`)
                     const rect = element?.getBoundingClientRect()
                     if (!rect) return null
                     
-                    return (
+                    return createPortal(
                       <div 
                         className="fixed w-80 bg-krcard/98 backdrop-blur-xl border border-krgold/50 rounded-xl shadow-2xl p-4 z-[9999] pointer-events-none"
                         style={{
@@ -551,45 +588,11 @@ export default function Journal() {
                             />
                           </div>
                         )}
-                      </div>
+                      </div>,
+                      document.body
                     )
                   })()}
-
-                  {/* Trade Card Content */}
-                  <div>
-                    {/* Trade Header */}
-                    <div className="flex items-start justify-between gap-2 mb-3">
-                      <div className="flex-1 min-w-0">
-                        <div className="font-bold text-lg text-krtext hover:text-krgold transition-colors">{it.ticker}</div>
-                        <div className="text-xs text-krmuted flex items-center gap-2">
-                          <span>{it.date}</span>
-                          <span className="text-krborder">•</span>
-                          <span>{it.time}</span>
-                        </div>
-                      </div>
-                      <span className={`text-xs px-3 py-1.5 rounded-lg whitespace-nowrap font-bold ${isProfit ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'}`}>
-                        {isProfit ? <TrendingUp className="inline-block w-3 h-3 mr-1" /> : <TrendingDown className="inline-block w-3 h-3 mr-1" />}
-                        {it.pnlPercent.toFixed(2)}%
-                      </span>
-                    </div>
-
-                    {/* Trade Details */}
-                    <div className="text-xs space-y-2">
-                      <div className="flex items-center justify-between text-krmuted">
-                        <span className="flex items-center gap-1.5">
-                          <span className={`w-1.5 h-1.5 rounded-full ${it.position === 'Long' ? 'bg-green-400' : 'bg-red-400'}`}></span>
-                          {it.type} {it.type === 'Futures' ? `${it.leverage}x` : ''} • {it.position}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between pt-2 border-t border-krborder/20">
-                        <span className="text-krmuted">Net P&L</span>
-                        <span className={`font-bold text-sm ${isProfit ? 'text-green-400' : 'text-red-400'}`}>
-                          {formatAmount(netPnl)}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                </React.Fragment>
               )
             })}
           </div>
