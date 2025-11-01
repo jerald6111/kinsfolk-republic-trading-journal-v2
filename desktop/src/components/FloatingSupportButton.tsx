@@ -9,17 +9,17 @@ export default function FloatingSupportButton() {
   const cryptoAddresses = [
     {
       name: 'BNB (BSC)',
-      address: '0x1607a2dDdbC5FF3F680c9153594d066f890CD685',
+      address: '0xC7793F54Fc11C41Eb90E9AEE2f3bCAa81cDe7a7b',
       icon: '🟡'
     },
     {
-      name: 'USDT (TRON)',
-      address: 'TByh1rM1dSMAMBywRZMb1kpFTGhcvKURq2',
+      name: 'USDT (POLYGON)',
+      address: '0xC7793F54Fc11C41Eb90E9AEE2f3bCAa81cDe7a7b',
       icon: '🟢'
     },
     {
       name: 'SOL (SOLANA)',
-      address: '5EbXUm76McqfRGgH79RzsbzDZ3Z7jYu6JnmoM9BPHPAH',
+      address: 'FxArrcbcGTXw99nt1FjM7v8XQ3YiKodr1SiNyZ6eUY9G',
       icon: '🟣'
     }
   ]
