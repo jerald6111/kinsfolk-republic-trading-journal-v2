@@ -475,11 +475,11 @@ export default function Journal() {
         </div>
 
         {/* Trade History - Right Side */}
-        <div className="bg-krcard/90 backdrop-blur-md rounded-2xl shadow-2xl border border-krborder/50 p-6 flex flex-col">
+        <div className="bg-krcard/90 backdrop-blur-md rounded-2xl shadow-2xl border border-krborder/50 p-6 flex flex-col overflow-visible">
           <h2 className="text-2xl font-bold mb-4 text-krtext flex items-center gap-2">
             <span className="text-krgold">📊</span> Recent Trades
           </h2>
-          <div className="space-y-3 overflow-y-auto pr-2 flex-1 max-h-[calc(100vh-16rem)] custom-scrollbar">
+          <div className="space-y-3 overflow-y-auto overflow-x-visible pr-2 flex-1 max-h-[calc(100vh-16rem)] custom-scrollbar">
             {items.length === 0 && (
               <div className="text-center py-20">
                 <div className="text-6xl mb-4">📈</div>
@@ -493,58 +493,58 @@ export default function Journal() {
               return (
                 <div 
                   key={it.id} 
-                  className="bg-krblack/40 backdrop-blur-sm rounded-xl border border-krborder/30 p-4 cursor-pointer hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 group"
+                  className="bg-krblack/40 backdrop-blur-sm rounded-xl border border-krborder/30 p-4 cursor-pointer hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 group relative"
                   onClick={() => setViewingTrade(it)}
                 >
+                  {/* Hover Tooltip with PNL and Chart - Appears on Right */}
+                  {(it.chartImg || it.pnlImg) && (
+                    <div className="absolute left-full ml-4 top-0 w-80 bg-krcard/98 backdrop-blur-xl border border-krgold/50 rounded-xl shadow-2xl p-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[100] pointer-events-none">
+                      {/* PNL Summary */}
+                      <div className="mb-3 pb-3 border-b border-krborder/30">
+                        <div className="text-xs text-krmuted mb-2">Net P&L</div>
+                        <div className={`text-2xl font-bold ${isProfit ? 'text-green-400' : 'text-red-400'}`}>
+                          {formatAmount(netPnl)}
+                        </div>
+                        <div className={`text-sm font-medium ${isProfit ? 'text-green-400' : 'text-red-400'}`}>
+                          {isProfit ? '+' : ''}{it.pnlPercent.toFixed(2)}%
+                        </div>
+                      </div>
+                      
+                      {/* Chart Image */}
+                      {it.chartImg && (
+                        <div className="mb-3">
+                          <div className="text-xs text-krmuted mb-2">Chart</div>
+                          <img 
+                            src={it.chartImg} 
+                            alt="Trade Chart" 
+                            className="w-full rounded-lg border border-krborder/50"
+                          />
+                        </div>
+                      )}
+                      
+                      {/* PNL Image */}
+                      {it.pnlImg && (
+                        <div>
+                          <div className="text-xs text-krmuted mb-2">PnL Screenshot</div>
+                          <img 
+                            src={it.pnlImg} 
+                            alt="PnL Screenshot" 
+                            className="w-full rounded-lg border border-krborder/50"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   {/* Trade Header */}
                   <div className="flex items-start justify-between gap-2 mb-3">
-                    <div className="flex-1 min-w-0 relative group/tooltip">
+                    <div className="flex-1 min-w-0">
                       <div className="font-bold text-lg text-krtext group-hover:text-krgold transition-colors">{it.ticker}</div>
                       <div className="text-xs text-krmuted flex items-center gap-2">
                         <span>{it.date}</span>
                         <span className="text-krborder">•</span>
                         <span>{it.time}</span>
                       </div>
-                      
-                      {/* Hover Tooltip with PNL and Chart */}
-                      {(it.chartImg || it.pnlImg) && (
-                        <div className="absolute left-0 -top-2 -translate-y-full w-80 bg-krcard/98 backdrop-blur-xl border border-krgold/50 rounded-xl shadow-2xl p-4 opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all duration-300 z-[100] pointer-events-none">
-                          {/* PNL Summary */}
-                          <div className="mb-3 pb-3 border-b border-krborder/30">
-                            <div className="text-xs text-krmuted mb-2">Net P&L</div>
-                            <div className={`text-2xl font-bold ${isProfit ? 'text-green-400' : 'text-red-400'}`}>
-                              {formatAmount(netPnl)}
-                            </div>
-                            <div className={`text-sm font-medium ${isProfit ? 'text-green-400' : 'text-red-400'}`}>
-                              {isProfit ? '+' : ''}{it.pnlPercent.toFixed(2)}%
-                            </div>
-                          </div>
-                          
-                          {/* Chart Image */}
-                          {it.chartImg && (
-                            <div className="mb-3">
-                              <div className="text-xs text-krmuted mb-2">Chart</div>
-                              <img 
-                                src={it.chartImg} 
-                                alt="Trade Chart" 
-                                className="w-full rounded-lg border border-krborder/50"
-                              />
-                            </div>
-                          )}
-                          
-                          {/* PNL Image */}
-                          {it.pnlImg && (
-                            <div>
-                              <div className="text-xs text-krmuted mb-2">PnL Screenshot</div>
-                              <img 
-                                src={it.pnlImg} 
-                                alt="PnL Screenshot" 
-                                className="w-full rounded-lg border border-krborder/50"
-                              />
-                            </div>
-                          )}
-                        </div>
-                      )}
                     </div>
                     <span className={`text-xs px-3 py-1.5 rounded-lg whitespace-nowrap font-bold ${isProfit ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'}`}>
                       {isProfit ? <TrendingUp className="inline-block w-3 h-3 mr-1" /> : <TrendingDown className="inline-block w-3 h-3 mr-1" />}
