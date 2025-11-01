@@ -65,6 +65,10 @@ interface TrendingCoin {
     price_btc: number
     score: number
   }
+  data?: {
+    price: number
+    price_change_percentage_24h?: { usd?: number }
+  }
 }
 
 export default function MarketData() {
@@ -202,7 +206,7 @@ export default function MarketData() {
       try {
         setLoading(true)
         const response = await fetch(
-          'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=1&sparkline=false&price_change_percentage=24h'
+          'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=1&sparkline=false&price_change_percentage=1h,24h'
         )
         const data: CryptoData[] = await response.json()
         
@@ -272,20 +276,34 @@ export default function MarketData() {
                     </div>
                   ) : (
                     <div className="space-y-3">
-                      {trendingCoins.slice(0, 7).map((trending, index) => (
-                        <div key={trending.item.id} className="flex items-center gap-4 p-3 bg-krblack/40 rounded-lg border border-krborder/50 hover:border-krgold/30 transition-colors">
-                          <span className="text-krmuted font-semibold text-sm min-w-[24px]">#{index + 1}</span>
-                          <img src={trending.item.small} alt={trending.item.name} className="w-8 h-8 rounded-full" />
-                          <div className="flex-1">
-                            <div className="font-semibold text-krtext">{trending.item.name}</div>
-                            <div className="text-xs text-krmuted">{trending.item.symbol.toUpperCase()}</div>
+                      {trendingCoins.slice(0, 7).map((trending, index) => {
+                        const priceChange24h = trending.data?.price_change_percentage_24h?.usd
+                        return (
+                          <div key={trending.item.id} className="flex items-center gap-4 p-3 bg-krblack/40 rounded-lg border border-krborder/50 hover:border-krgold/30 transition-colors">
+                            <span className="text-krmuted font-semibold text-sm min-w-[24px]">#{index + 1}</span>
+                            <img src={trending.item.small} alt={trending.item.name} className="w-8 h-8 rounded-full" />
+                            <div className="flex-1">
+                              <div className="font-semibold text-krtext">{trending.item.name}</div>
+                              <div className="text-xs text-krmuted">{trending.item.symbol.toUpperCase()}</div>
+                            </div>
+                            <div className="text-right">
+                              {priceChange24h !== undefined && priceChange24h !== null ? (
+                                <>
+                                  <div className={`text-sm font-bold ${priceChange24h >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                                    {priceChange24h >= 0 ? '+' : ''}{priceChange24h.toFixed(2)}%
+                                  </div>
+                                  <div className="text-xs text-krmuted">24h</div>
+                                </>
+                              ) : (
+                                <>
+                                  <div className="text-xs text-krmuted">Rank</div>
+                                  <div className="text-sm font-semibold text-krgold">#{trending.item.market_cap_rank || 'N/A'}</div>
+                                </>
+                              )}
+                            </div>
                           </div>
-                          <div className="text-right">
-                            <div className="text-xs text-krmuted">Rank</div>
-                            <div className="text-sm font-semibold text-krgold">#{trending.item.market_cap_rank || 'N/A'}</div>
-                          </div>
-                        </div>
-                      ))}
+                        )
+                      })}
                     </div>
                   )}
                 </div>
