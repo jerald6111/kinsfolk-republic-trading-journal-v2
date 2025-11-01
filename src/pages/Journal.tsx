@@ -20,6 +20,7 @@ export default function Journal() {
   const [items, setItems] = useState<JournalEntry[]>(data.journal || [])
   const [strategies, setStrategies] = useState<string[]>([])
   const [viewingTrade, setViewingTrade] = useState<JournalEntry | null>(null)
+  const [hoveredTrade, setHoveredTrade] = useState<string | null>(null)
   const [form, setForm] = useState<Partial<JournalEntry>>({
     date: new Date().toISOString().split('T')[0],
     time: new Date().toLocaleTimeString('en-US', { hour12: false }).slice(0, 5),
@@ -490,79 +491,93 @@ export default function Journal() {
             {items.map((it) => {
               const netPnl = (it.pnlAmount || 0) - (it.fee || 0)
               const isProfit = netPnl > 0
+              const isHovered = hoveredTrade === it.id
               return (
                 <div 
                   key={it.id} 
-                  className="bg-krblack/40 backdrop-blur-sm rounded-xl border border-krborder/30 p-4 cursor-pointer hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 relative group/trade"
+                  className="bg-krblack/40 backdrop-blur-sm rounded-xl border border-krborder/30 p-4 cursor-pointer hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 relative"
                   onClick={() => setViewingTrade(it)}
+                  onMouseEnter={(e) => setHoveredTrade(it.id)}
+                  onMouseLeave={() => setHoveredTrade(null)}
                 >
-                  {/* Hover Tooltip with PNL and Chart - Appears on Right */}
-                  <div className="absolute left-full ml-4 top-0 w-80 bg-krcard/98 backdrop-blur-xl border border-krgold/50 rounded-xl shadow-2xl p-4 scale-0 group-hover/trade:scale-100 origin-left transition-transform duration-200 z-[100] pointer-events-none">
-                    {/* PNL Summary */}
-                    <div className="mb-3 pb-3 border-b border-krborder/30">
-                      <div className="text-xs text-krmuted mb-2">Net P&L</div>
-                      <div className={`text-2xl font-bold ${isProfit ? 'text-green-400' : 'text-red-400'}`}>
-                        {formatAmount(netPnl)}
+                  {/* Hover Tooltip with PNL and Chart - Appears on Right with Fixed Positioning */}
+                  {isHovered && (
+                    <div 
+                      className="fixed w-80 bg-krcard/98 backdrop-blur-xl border border-krgold/50 rounded-xl shadow-2xl p-4 z-[9999] pointer-events-none animate-in fade-in duration-200"
+                      style={{
+                        left: `${(document.getElementById(`trade-${it.id}`)?.getBoundingClientRect().right || 0) + 16}px`,
+                        top: `${document.getElementById(`trade-${it.id}`)?.getBoundingClientRect().top || 0}px`
+                      }}
+                    >
+                      {/* PNL Summary */}
+                      <div className="mb-3 pb-3 border-b border-krborder/30">
+                        <div className="text-xs text-krmuted mb-2">Net P&L</div>
+                        <div className={`text-2xl font-bold ${isProfit ? 'text-green-400' : 'text-red-400'}`}>
+                          {formatAmount(netPnl)}
+                        </div>
+                        <div className={`text-sm font-medium ${isProfit ? 'text-green-400' : 'text-red-400'}`}>
+                          {isProfit ? '+' : ''}{it.pnlPercent.toFixed(2)}%
+                        </div>
                       </div>
-                      <div className={`text-sm font-medium ${isProfit ? 'text-green-400' : 'text-red-400'}`}>
-                        {isProfit ? '+' : ''}{it.pnlPercent.toFixed(2)}%
-                      </div>
+                      
+                      {/* Chart Image */}
+                      {it.chartImg && (
+                        <div className="mb-3">
+                          <div className="text-xs text-krmuted mb-2">Chart</div>
+                          <img 
+                            src={it.chartImg} 
+                            alt="Trade Chart" 
+                            className="w-full rounded-lg border border-krborder/50"
+                          />
+                        </div>
+                      )}
+                      
+                      {/* PNL Image */}
+                      {it.pnlImg && (
+                        <div>
+                          <div className="text-xs text-krmuted mb-2">PnL Screenshot</div>
+                          <img 
+                            src={it.pnlImg} 
+                            alt="PnL Screenshot" 
+                            className="w-full rounded-lg border border-krborder/50"
+                          />
+                        </div>
+                      )}
                     </div>
-                    
-                    {/* Chart Image */}
-                    {it.chartImg && (
-                      <div className="mb-3">
-                        <div className="text-xs text-krmuted mb-2">Chart</div>
-                        <img 
-                          src={it.chartImg} 
-                          alt="Trade Chart" 
-                          className="w-full rounded-lg border border-krborder/50"
-                        />
-                      </div>
-                    )}
-                    
-                    {/* PNL Image */}
-                    {it.pnlImg && (
-                      <div>
-                        <div className="text-xs text-krmuted mb-2">PnL Screenshot</div>
-                        <img 
-                          src={it.pnlImg} 
-                          alt="PnL Screenshot" 
-                          className="w-full rounded-lg border border-krborder/50"
-                        />
-                      </div>
-                    )}
-                  </div>
+                  )}
 
-                  {/* Trade Header */}
-                  <div className="flex items-start justify-between gap-2 mb-3">
-                    <div className="flex-1 min-w-0">
-                      <div className="font-bold text-lg text-krtext group-hover:text-krgold transition-colors">{it.ticker}</div>
-                      <div className="text-xs text-krmuted flex items-center gap-2">
-                        <span>{it.date}</span>
-                        <span className="text-krborder">•</span>
-                        <span>{it.time}</span>
+                  {/* Trade Card Content */}
+                  <div id={`trade-${it.id}`}>
+                    {/* Trade Header */}
+                    <div className="flex items-start justify-between gap-2 mb-3">
+                      <div className="flex-1 min-w-0">
+                        <div className="font-bold text-lg text-krtext hover:text-krgold transition-colors">{it.ticker}</div>
+                        <div className="text-xs text-krmuted flex items-center gap-2">
+                          <span>{it.date}</span>
+                          <span className="text-krborder">•</span>
+                          <span>{it.time}</span>
+                        </div>
                       </div>
-                    </div>
-                    <span className={`text-xs px-3 py-1.5 rounded-lg whitespace-nowrap font-bold ${isProfit ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'}`}>
-                      {isProfit ? <TrendingUp className="inline-block w-3 h-3 mr-1" /> : <TrendingDown className="inline-block w-3 h-3 mr-1" />}
-                      {it.pnlPercent.toFixed(2)}%
-                    </span>
-                  </div>
-
-                  {/* Trade Details */}
-                  <div className="text-xs space-y-2">
-                    <div className="flex items-center justify-between text-krmuted">
-                      <span className="flex items-center gap-1.5">
-                        <span className={`w-1.5 h-1.5 rounded-full ${it.position === 'Long' ? 'bg-green-400' : 'bg-red-400'}`}></span>
-                        {it.type} {it.type === 'Futures' ? `${it.leverage}x` : ''} • {it.position}
+                      <span className={`text-xs px-3 py-1.5 rounded-lg whitespace-nowrap font-bold ${isProfit ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'}`}>
+                        {isProfit ? <TrendingUp className="inline-block w-3 h-3 mr-1" /> : <TrendingDown className="inline-block w-3 h-3 mr-1" />}
+                        {it.pnlPercent.toFixed(2)}%
                       </span>
                     </div>
-                    <div className="flex items-center justify-between pt-2 border-t border-krborder/20">
-                      <span className="text-krmuted">Net P&L</span>
-                      <span className={`font-bold text-sm ${isProfit ? 'text-green-400' : 'text-red-400'}`}>
-                        {formatAmount(netPnl)}
-                      </span>
+
+                    {/* Trade Details */}
+                    <div className="text-xs space-y-2">
+                      <div className="flex items-center justify-between text-krmuted">
+                        <span className="flex items-center gap-1.5">
+                          <span className={`w-1.5 h-1.5 rounded-full ${it.position === 'Long' ? 'bg-green-400' : 'bg-red-400'}`}></span>
+                          {it.type} {it.type === 'Futures' ? `${it.leverage}x` : ''} • {it.position}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between pt-2 border-t border-krborder/20">
+                        <span className="text-krmuted">Net P&L</span>
+                        <span className={`font-bold text-sm ${isProfit ? 'text-green-400' : 'text-red-400'}`}>
+                          {formatAmount(netPnl)}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
