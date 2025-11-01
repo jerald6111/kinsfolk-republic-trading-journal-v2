@@ -493,12 +493,12 @@ export default function Journal() {
               return (
                 <div 
                   key={it.id} 
-                  className="bg-krblack/40 backdrop-blur-sm rounded-xl border border-krborder/30 p-4 cursor-pointer hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 group relative"
+                  className="bg-krblack/40 backdrop-blur-sm rounded-xl border border-krborder/30 p-4 cursor-pointer hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 group/trade relative"
                   onClick={() => setViewingTrade(it)}
                 >
                   {/* Hover Tooltip with PNL and Chart - Appears on Right */}
                   {(it.chartImg || it.pnlImg) && (
-                    <div className="absolute left-full ml-4 top-0 w-80 bg-krcard/98 backdrop-blur-xl border border-krgold/50 rounded-xl shadow-2xl p-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[100] pointer-events-none">
+                    <div className="absolute left-full ml-4 top-0 w-80 bg-krcard/98 backdrop-blur-xl border border-krgold/50 rounded-xl shadow-2xl p-4 opacity-0 group-hover/trade:opacity-100 transition-opacity duration-300 z-[100] pointer-events-none">
                       {/* PNL Summary */}
                       <div className="mb-3 pb-3 border-b border-krborder/30">
                         <div className="text-xs text-krmuted mb-2">Net P&L</div>
