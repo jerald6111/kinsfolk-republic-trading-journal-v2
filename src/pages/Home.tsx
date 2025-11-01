@@ -116,9 +116,7 @@ export default function Home() {
             <div className="mt-8 inline-flex items-center gap-2 bg-krgold/10 border border-krgold/30 rounded-full px-4 py-2">
               <Monitor className="text-krgold" size={16} />
               <span className="text-sm text-krgold">
-                <Link to="/download" className="hover:underline font-medium">
-                  Windows desktop app now available! Download now →
-                </Link>
+                Desktop app coming soon with enhanced offline features!
               </span>
             </div>
           </div>
@@ -159,14 +157,11 @@ export default function Home() {
                     <span className="text-sm text-gray-300">Auto-Updates Included</span>
                   </div>
                 </div>
-                <Link
-                  to="/download"
-                  className="inline-flex items-center gap-2 bg-gradient-to-r from-krgold to-kryellow text-krblack px-6 py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-krgold/50 transition-all"
-                >
+                <div className="inline-flex items-center gap-2 bg-krgold/10 border border-krgold/30 text-krgold px-6 py-3 rounded-lg font-semibold">
                   <Download size={16} />
-                  Download for Windows
-                  <ArrowRight size={16} />
-                </Link>
+                  Coming Soon
+                </div>
+                <p className="text-sm text-gray-400 mt-2">Desktop app is being rebuilt with enhanced features</p>
               </div>
               
               <div className="relative">

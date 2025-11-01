@@ -102,8 +102,8 @@ export default function Navbar(){
               </Link>
             )
           })}
-          {/* Download Dropdown */}
-          <div 
+          {/* Download Dropdown - Hidden for now, coming soon */}
+          {/* <div 
             className="relative"
             onMouseEnter={() => handleMouseEnter('/download')}
             onMouseLeave={handleMouseLeave}
@@ -134,7 +134,7 @@ export default function Navbar(){
                 </div>
               </div>
             )}
-          </div>
+          </div> */}
           
           <Link to="/settings" className="p-2 rounded-md bg-krgray/60 hover:bg-krgold/20 transition-colors" title="Settings">
             <Settings size={20} className="text-krwhite" />

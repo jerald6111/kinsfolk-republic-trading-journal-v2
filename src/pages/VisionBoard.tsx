@@ -45,6 +45,66 @@ const congratsMessages = [
     title: 'Bullseye!',
     message: 'Perfect execution! You hit your target with precision. Onwards and upwards!',
     color: 'text-red-400'
+  },
+  {
+    emoji: '🌟',
+    title: 'Stellar Performance!',
+    message: 'You\'re absolutely shining! This achievement reflects your hard work and dedication.',
+    color: 'text-cyan-400'
+  },
+  {
+    emoji: '💎',
+    title: 'Diamond Standard!',
+    message: 'Flawless execution! You\'ve set a new benchmark for excellence.',
+    color: 'text-indigo-400'
+  },
+  {
+    emoji: '🎊',
+    title: 'Celebration Time!',
+    message: 'Pop the champagne! You\'ve earned this victory through persistence and skill.',
+    color: 'text-pink-400'
+  },
+  {
+    emoji: '🔥',
+    title: 'On Fire!',
+    message: 'You\'re unstoppable! This win is just the beginning of your success story.',
+    color: 'text-orange-400'
+  },
+  {
+    emoji: '👑',
+    title: 'Crowned Champion!',
+    message: 'Royalty in action! You\'ve proven what dedication and focus can achieve.',
+    color: 'text-amber-400'
+  },
+  {
+    emoji: '⚡',
+    title: 'Electric Success!',
+    message: 'Lightning strikes! Your energy and drive have paid off magnificently.',
+    color: 'text-yellow-300'
+  },
+  {
+    emoji: '🎖️',
+    title: 'Medal of Honor!',
+    message: 'Distinguished achievement! You\'ve earned your place among the best.',
+    color: 'text-emerald-400'
+  },
+  {
+    emoji: '🌈',
+    title: 'Rainbow Victory!',
+    message: 'After the storm comes the rainbow! Your perseverance has led to this beautiful moment.',
+    color: 'text-violet-400'
+  },
+  {
+    emoji: '🎨',
+    title: 'Masterpiece Created!',
+    message: 'You\'ve painted success with bold strokes! This is your work of art.',
+    color: 'text-rose-400'
+  },
+  {
+    emoji: '🏅',
+    title: 'Gold Medal Worthy!',
+    message: 'Olympic-level performance! You\'ve reached the podium of excellence.',
+    color: 'text-yellow-500'
   }
 ]
 
@@ -359,12 +419,17 @@ export default function VisionBoard(){
           </div>
 
           {/* Achievements (Completed Goals) */}
-          {completedGoals.length > 0 && (
-            <div className="mt-8">
-              <div className="flex items-center gap-2 mb-4">
-                <span className="text-2xl">ðŸ†</span>
-                <h2 className="text-xl font-semibold text-krtext">Achievements</h2>
+          <div className="mt-8">
+            <div className="flex items-center gap-2 mb-4">
+              <span className="text-2xl">🏆</span>
+              <h2 className="text-xl font-semibold text-krtext">Achievements</h2>
+            </div>
+            {completedGoals.length === 0 ? (
+              <div className="bg-gradient-to-br from-krgold/5 to-kryellow/5 backdrop-blur-sm rounded-xl border border-krgold/30 p-8 text-center">
+                <span className="text-6xl mb-4 block">🏆</span>
+                <p className="text-krmuted">No achievements yet. Complete your first goal to start your success journey!</p>
               </div>
+            ) : (
               <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {completedGoals.map((it:any)=> (
                   <div 
@@ -400,8 +465,8 @@ export default function VisionBoard(){
                   </div>
                 ))}
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
 

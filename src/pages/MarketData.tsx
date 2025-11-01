@@ -314,7 +314,14 @@ export default function MarketData() {
                           </div>
                           <div className="text-right">
                             <div className="text-sm font-semibold text-krtext">${coin.current_price.toLocaleString()}</div>
-                            <div className="text-sm font-bold text-green-500">+{coin.price_change_percentage_24h.toFixed(2)}%</div>
+                            <div className="flex flex-col gap-0.5">
+                              <div className={`text-xs font-bold ${(coin.price_change_percentage_1h_in_currency || 0) >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                                1h: {coin.price_change_percentage_1h_in_currency ? 
+                                  `${coin.price_change_percentage_1h_in_currency >= 0 ? '+' : ''}${coin.price_change_percentage_1h_in_currency.toFixed(2)}%` 
+                                  : 'N/A'}
+                              </div>
+                              <div className="text-xs font-bold text-green-500">24h: +{coin.price_change_percentage_24h.toFixed(2)}%</div>
+                            </div>
                           </div>
                         </div>
                       ))}
@@ -346,7 +353,14 @@ export default function MarketData() {
                           </div>
                           <div className="text-right">
                             <div className="text-sm font-semibold text-krtext">${coin.current_price.toLocaleString()}</div>
-                            <div className="text-sm font-bold text-red-500">{coin.price_change_percentage_24h.toFixed(2)}%</div>
+                            <div className="flex flex-col gap-0.5">
+                              <div className={`text-xs font-bold ${(coin.price_change_percentage_1h_in_currency || 0) >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                                1h: {coin.price_change_percentage_1h_in_currency ? 
+                                  `${coin.price_change_percentage_1h_in_currency >= 0 ? '+' : ''}${coin.price_change_percentage_1h_in_currency.toFixed(2)}%` 
+                                  : 'N/A'}
+                              </div>
+                              <div className="text-xs font-bold text-red-500">24h: {coin.price_change_percentage_24h.toFixed(2)}%</div>
+                            </div>
                           </div>
                         </div>
                       ))}
