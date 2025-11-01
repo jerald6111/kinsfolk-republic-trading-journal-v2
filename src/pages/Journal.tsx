@@ -496,7 +496,7 @@ export default function Journal() {
                   className="bg-krblack/40 backdrop-blur-sm rounded-xl border border-krborder/30 p-4 cursor-pointer hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 group relative"
                 >
                   {/* Hover Tooltip with PNL and Chart */}
-                  <div className="absolute left-0 right-0 top-full mt-2 bg-krcard/95 backdrop-blur-xl border border-krgold/50 rounded-xl shadow-2xl p-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 pointer-events-none max-w-md">
+                  <div className="absolute right-full mr-4 top-0 w-80 bg-krcard/95 backdrop-blur-xl border border-krgold/50 rounded-xl shadow-2xl p-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 pointer-events-none">
                     {/* PNL Summary */}
                     <div className="mb-3 pb-3 border-b border-krborder/30">
                       <div className="text-xs text-krmuted mb-2">Net P&L</div>
