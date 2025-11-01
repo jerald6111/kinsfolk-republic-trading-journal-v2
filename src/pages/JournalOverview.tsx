@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
 import { loadData } from '../utils/storage'
 import { useCurrency } from '../context/CurrencyContext'
@@ -14,6 +15,7 @@ export default function JournalOverview() {
   const [currentDate, setCurrentDate] = useState(new Date())
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
   const [showModal, setShowModal] = useState(false)
+  const [hoveredDate, setHoveredDate] = useState<string | null>(null)
   
   const totalTrades = journal.length
   const wins = journal.filter(j => ((j.pnlAmount || 0) - (j.fee || 0)) > 0).length
@@ -103,27 +105,89 @@ export default function JournalOverview() {
     // Days of the month
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day)
-      const { pnl, trades } = getPnlForDate(date)
+      const { pnl, trades, tradeData } = getPnlForDate(date)
       const isToday = date.toDateString() === new Date().toDateString()
+      const dateKey = date.toISOString().split('T')[0]
+      const isHovered = hoveredDate === dateKey
 
       days.push(
-        <div
-          key={day}
-          onClick={() => handleDayClick(date)}
-          className={`aspect-square border border-krborder rounded-lg p-2 ${
-            isToday ? 'ring-2 ring-krgold' : ''
-          } ${trades > 0 ? 'bg-krblack/50 cursor-pointer hover:bg-krblack/70 transition-colors' : 'bg-krcard/30'}`}
-        >
-          <div className="text-sm text-gray-400 mb-1">{day}</div>
-          {trades > 0 && (
-            <>
-              <div className={`text-xs font-semibold ${pnl >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                {pnl >= 0 ? '+' : ''}{pnl.toFixed(0)}
-              </div>
-              <div className="text-xs text-gray-500">{trades} trade{trades > 1 ? 's' : ''}</div>
-            </>
-          )}
-        </div>
+        <React.Fragment key={day}>
+          <div
+            id={`calendar-day-${dateKey}`}
+            onClick={() => handleDayClick(date)}
+            onMouseEnter={() => trades > 0 && setHoveredDate(dateKey)}
+            onMouseLeave={() => setHoveredDate(null)}
+            className={`aspect-square border border-krborder rounded-lg p-2 ${
+              isToday ? 'ring-2 ring-krgold' : ''
+            } ${trades > 0 ? 'bg-krblack/50 cursor-pointer hover:bg-krblack/70 transition-colors' : 'bg-krcard/30'}`}
+          >
+            <div className="text-sm text-gray-400 mb-1">{day}</div>
+            {trades > 0 && (
+              <>
+                <div className={`text-xs font-semibold ${pnl >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                  {pnl >= 0 ? '+' : ''}{pnl.toFixed(0)}
+                </div>
+                <div className="text-xs text-gray-500">{trades} trade{trades > 1 ? 's' : ''}</div>
+              </>
+            )}
+          </div>
+
+          {/* Hover Tooltip with Trade Summary */}
+          {isHovered && trades > 0 && (() => {
+            const element = document.getElementById(`calendar-day-${dateKey}`)
+            const rect = element?.getBoundingClientRect()
+            if (!rect) return null
+
+            return createPortal(
+              <div 
+                className="fixed w-96 bg-krcard/98 backdrop-blur-xl border border-krgold/50 rounded-xl shadow-2xl p-4 z-[9999] pointer-events-none max-h-96 overflow-y-auto custom-scrollbar"
+                style={{
+                  left: `${rect.right + 16}px`,
+                  top: `${rect.top}px`
+                }}
+              >
+                <div className="mb-3 pb-3 border-b border-krborder/30">
+                  <div className="text-sm text-krmuted mb-1">{date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</div>
+                  <div className={`text-2xl font-bold ${pnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                    {pnl >= 0 ? '+' : ''}{formatAmount(pnl)}
+                  </div>
+                  <div className="text-xs text-krmuted">{trades} trade{trades > 1 ? 's' : ''}</div>
+                </div>
+
+                {/* Trade List */}
+                <div className="space-y-2">
+                  {tradeData.map((trade: any, idx: number) => {
+                    const netPnl = (trade.pnlAmount || 0) - (trade.fee || 0)
+                    const isProfit = netPnl > 0
+                    return (
+                      <div key={idx} className="bg-krblack/40 rounded-lg p-3 border border-krborder/30">
+                        <div className="flex items-start justify-between mb-2">
+                          <div className="flex-1">
+                            <div className="font-bold text-krtext">{trade.ticker}</div>
+                            <div className="text-xs text-krmuted">{trade.time} → {trade.exitTime}</div>
+                          </div>
+                          <div className={`text-sm font-bold ${isProfit ? 'text-green-400' : 'text-red-400'}`}>
+                            {isProfit ? '+' : ''}{formatAmount(netPnl)}
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-krmuted flex items-center gap-1">
+                            <span className={`w-1.5 h-1.5 rounded-full ${trade.position === 'Long' ? 'bg-green-400' : 'bg-red-400'}`}></span>
+                            {trade.type} {trade.type === 'Futures' ? `${trade.leverage}x` : ''} • {trade.position}
+                          </span>
+                          <span className={`font-medium ${isProfit ? 'text-green-400' : 'text-red-400'}`}>
+                            {isProfit ? '+' : ''}{trade.pnlPercent.toFixed(2)}%
+                          </span>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>,
+              document.body
+            )
+          })()}
+        </React.Fragment>
       )
     }
 
@@ -198,19 +262,24 @@ export default function JournalOverview() {
         </div>
         <div className="grid grid-cols-7 gap-3">
           {weekDates.map((date, index) => {
-            const { pnl, trades } = getPnlForDate(date)
+            const { pnl, trades, tradeData } = getPnlForDate(date)
             const isToday = date.toDateString() === new Date().toDateString()
             const dayName = date.toLocaleDateString('en-US', { weekday: 'short' })
             const dayNum = date.getDate()
+            const dateKey = date.toISOString().split('T')[0]
+            const isHovered = hoveredDate === dateKey
 
             return (
-              <div
-                key={index}
-                onClick={() => handleDayClick(date)}
-                className={`border border-krborder rounded-lg p-4 ${
-                  isToday ? 'ring-2 ring-krgold' : ''
-                } ${trades > 0 ? 'bg-krblack/50 cursor-pointer hover:bg-krblack/70 transition-colors' : 'bg-krcard/30'}`}
-              >
+              <React.Fragment key={index}>
+                <div
+                  id={`calendar-day-${dateKey}`}
+                  onClick={() => handleDayClick(date)}
+                  onMouseEnter={() => trades > 0 && setHoveredDate(dateKey)}
+                  onMouseLeave={() => setHoveredDate(null)}
+                  className={`border border-krborder rounded-lg p-4 ${
+                    isToday ? 'ring-2 ring-krgold' : ''
+                  } ${trades > 0 ? 'bg-krblack/50 cursor-pointer hover:bg-krblack/70 transition-colors' : 'bg-krcard/30'}`}
+                >
                 <div className="text-center mb-3">
                   <div className="text-xs text-gray-400 mb-1">{dayName}</div>
                   <div className="text-2xl font-bold">{dayNum}</div>
@@ -224,6 +293,63 @@ export default function JournalOverview() {
                   </div>
                 )}
               </div>
+
+              {/* Hover Tooltip with Trade Summary */}
+              {isHovered && trades > 0 && (() => {
+                const element = document.getElementById(`calendar-day-${dateKey}`)
+                const rect = element?.getBoundingClientRect()
+                if (!rect) return null
+
+                return createPortal(
+                  <div 
+                    className="fixed w-96 bg-krcard/98 backdrop-blur-xl border border-krgold/50 rounded-xl shadow-2xl p-4 z-[9999] pointer-events-none max-h-96 overflow-y-auto custom-scrollbar"
+                    style={{
+                      left: `${rect.right + 16}px`,
+                      top: `${rect.top}px`
+                    }}
+                  >
+                    <div className="mb-3 pb-3 border-b border-krborder/30">
+                      <div className="text-sm text-krmuted mb-1">{date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</div>
+                      <div className={`text-2xl font-bold ${pnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                        {pnl >= 0 ? '+' : ''}{formatAmount(pnl)}
+                      </div>
+                      <div className="text-xs text-krmuted">{trades} trade{trades > 1 ? 's' : ''}</div>
+                    </div>
+
+                    {/* Trade List */}
+                    <div className="space-y-2">
+                      {tradeData.map((trade: any, idx: number) => {
+                        const netPnl = (trade.pnlAmount || 0) - (trade.fee || 0)
+                        const isProfit = netPnl > 0
+                        return (
+                          <div key={idx} className="bg-krblack/40 rounded-lg p-3 border border-krborder/30">
+                            <div className="flex items-start justify-between mb-2">
+                              <div className="flex-1">
+                                <div className="font-bold text-krtext">{trade.ticker}</div>
+                                <div className="text-xs text-krmuted">{trade.time} → {trade.exitTime}</div>
+                              </div>
+                              <div className={`text-sm font-bold ${isProfit ? 'text-green-400' : 'text-red-400'}`}>
+                                {isProfit ? '+' : ''}{formatAmount(netPnl)}
+                              </div>
+                            </div>
+                            <div className="flex items-center justify-between text-xs">
+                              <span className="text-krmuted flex items-center gap-1">
+                                <span className={`w-1.5 h-1.5 rounded-full ${trade.position === 'Long' ? 'bg-green-400' : 'bg-red-400'}`}></span>
+                                {trade.type} {trade.type === 'Futures' ? `${trade.leverage}x` : ''} • {trade.position}
+                              </span>
+                              <span className={`font-medium ${isProfit ? 'text-green-400' : 'text-red-400'}`}>
+                                {isProfit ? '+' : ''}{trade.pnlPercent.toFixed(2)}%
+                              </span>
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>,
+                  document.body
+                )
+              })()}
+            </React.Fragment>
             )
           })}
         </div>
