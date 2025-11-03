@@ -71,6 +71,10 @@ export default function Journal() {
       amount = form.marginCost ? (form.marginCost * percent) / 100 : diff * (form.leverage || 1)
     }
     
+    // Round to 2 decimal places
+    amount = Math.round(amount * 100) / 100
+    percent = Math.round(percent * 100) / 100
+    
     // DO NOT subtract fees here - fees are applied separately in balance calculations
     setForm({ ...form, pnlAmount: amount, pnlPercent: percent })
   }

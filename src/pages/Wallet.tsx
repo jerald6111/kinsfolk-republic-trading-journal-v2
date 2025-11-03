@@ -161,8 +161,8 @@ export default function Wallet() {
                 onChange={e=>setForm({...form, type: e.target.value})} 
                 className="w-full px-3 py-3 border border-krborder rounded-xl bg-krblack/30 text-krtext focus:border-krgold focus:ring-2 focus:ring-krgold/20 transition-all"
               >
-                <option value="deposit">💵 Deposit</option>
-                <option value="withdrawal">💸 Withdrawal</option>
+                <option value="deposit" className="bg-krblack text-krtext">💵 Deposit</option>
+                <option value="withdrawal" className="bg-krblack text-krtext">💸 Withdrawal</option>
               </select>
             </div>
             <div className="space-y-1">

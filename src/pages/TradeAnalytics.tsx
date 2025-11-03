@@ -10,7 +10,7 @@ export default function TradeAnalytics() {
   const journal = data.journal || []
   const wallet = data.wallet || []
   
-  const [calendarView, setCalendarView] = useState<'monthly' | 'weekly'>('monthly')
+  const [calendarView, setCalendarView] = useState<'monthly' | 'weekly' | 'yearly'>('monthly')
   const [currentDate, setCurrentDate] = useState(new Date())
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
   const [showModal, setShowModal] = useState(false)
@@ -247,6 +247,30 @@ export default function TradeAnalytics() {
     }).reduce((sum: number, w: any) => sum + Number(w.amount), 0)
     
     return { monthlyPnl, monthlyWithdrawals, netMonthly: monthlyPnl - monthlyWithdrawals }
+  }
+
+  const getYearlyProfitStats = (year: number) => {
+    const wallet = data.wallet || []
+    
+    // Calculate total PnL for the year
+    let yearlyPnl = 0
+    for (let month = 0; month < 12; month++) {
+      const daysInMonth = new Date(year, month + 1, 0).getDate()
+      for (let day = 1; day <= daysInMonth; day++) {
+        const date = new Date(year, month, day)
+        const { pnl } = getPnlForDate(date)
+        yearlyPnl += pnl
+      }
+    }
+    
+    // Calculate withdrawals for the year
+    const yearlyWithdrawals = wallet.filter((w: any) => {
+      if (w.type !== 'withdrawal') return false
+      const wDate = new Date(w.date)
+      return wDate.getFullYear() === year
+    }).reduce((sum: number, w: any) => sum + Number(w.amount), 0)
+    
+    return { yearlyPnl, yearlyWithdrawals, netYearly: yearlyPnl - yearlyWithdrawals }
   }
 
   const handleDayClick = (date: Date) => {
@@ -593,6 +617,125 @@ export default function TradeAnalytics() {
                   )
                 })()}
               </React.Fragment>
+            )
+          })}
+        </div>
+      </div>
+    )
+  }
+
+  const renderYearlyCalendar = () => {
+    const year = currentDate.getFullYear()
+    const months = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ]
+
+    const { yearlyPnl, yearlyWithdrawals, netYearly } = getYearlyProfitStats(year)
+
+    // Helper function to get PnL for a specific month
+    const getMonthPnl = (monthIndex: number) => {
+      const daysInMonth = new Date(year, monthIndex + 1, 0).getDate()
+      let monthPnl = 0
+      for (let day = 1; day <= daysInMonth; day++) {
+        const date = new Date(year, monthIndex, day)
+        const { pnl } = getPnlForDate(date)
+        monthPnl += pnl
+      }
+      return monthPnl
+    }
+
+    // Helper function to get withdrawals for a specific month
+    const getMonthWithdrawals = (monthIndex: number) => {
+      const wallet = data.wallet || []
+      return wallet.filter((w: any) => {
+        if (w.type !== 'withdrawal') return false
+        const wDate = new Date(w.date)
+        return wDate.getFullYear() === year && wDate.getMonth() === monthIndex
+      }).reduce((sum: number, w: any) => sum + Number(w.amount), 0)
+    }
+
+    return (
+      <div className="space-y-4">
+        {/* Year Navigation */}
+        <div className="flex items-center justify-between bg-krblack/30 rounded-lg p-3">
+          <button
+            onClick={() => setCurrentDate(new Date(year - 1, 0))}
+            className="p-2 hover:bg-krgold/20 rounded-lg transition-colors"
+          >
+            <ChevronLeft size={20} />
+          </button>
+          <h3 className="text-lg font-semibold">{year}</h3>
+          <button
+            onClick={() => setCurrentDate(new Date(year + 1, 0))}
+            className="p-2 hover:bg-krgold/20 rounded-lg transition-colors"
+          >
+            <ChevronRight size={20} />
+          </button>
+        </div>
+
+        {/* Yearly Summary Stats */}
+        <div className="grid grid-cols-3 gap-3 bg-krblack/30 rounded-lg p-4">
+          <div className="text-center">
+            <div className="text-xs text-krmuted mb-1">Total PnL</div>
+            <div className={`text-lg font-bold ${yearlyPnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+              {yearlyPnl >= 0 ? '+' : ''}{formatAmount(yearlyPnl)}
+            </div>
+          </div>
+          <div className="text-center">
+            <div className="text-xs text-krmuted mb-1">Withdrawals</div>
+            <div className="text-lg font-bold text-orange-400">
+              -{formatAmount(yearlyWithdrawals)}
+            </div>
+          </div>
+          <div className="text-center">
+            <div className="text-xs text-krmuted mb-1">Net Profit</div>
+            <div className={`text-lg font-bold ${netYearly >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+              {netYearly >= 0 ? '+' : ''}{formatAmount(netYearly)}
+            </div>
+          </div>
+        </div>
+
+        {/* Months Grid (3 columns x 4 rows) */}
+        <div className="grid grid-cols-3 gap-4">
+          {months.map((monthName, monthIndex) => {
+            const monthPnl = getMonthPnl(monthIndex)
+            const monthWithdrawals = getMonthWithdrawals(monthIndex)
+            const netMonthPnl = monthPnl - monthWithdrawals
+
+            return (
+              <div
+                key={monthIndex}
+                className={`
+                  bg-krblack/40 rounded-lg p-4 border transition-all duration-200
+                  ${monthPnl === 0 ? 'border-krborder/50' : monthPnl > 0 ? 'border-green-500/30 hover:border-green-500/50' : 'border-red-500/30 hover:border-red-500/50'}
+                  hover:shadow-lg cursor-pointer
+                `}
+              >
+                <div className="text-sm font-semibold text-krtext mb-2">{monthName}</div>
+                <div className="space-y-1">
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="text-krmuted">PnL:</span>
+                    <span className={`font-bold ${monthPnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                      {monthPnl >= 0 ? '+' : ''}{formatAmount(monthPnl)}
+                    </span>
+                  </div>
+                  {monthWithdrawals > 0 && (
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="text-krmuted">Withdrawals:</span>
+                      <span className="font-bold text-orange-400">
+                        -{formatAmount(monthWithdrawals)}
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex justify-between items-center text-xs pt-1 border-t border-krborder/30">
+                    <span className="text-krmuted">Net:</span>
+                    <span className={`font-bold ${netMonthPnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                      {netMonthPnl >= 0 ? '+' : ''}{formatAmount(netMonthPnl)}
+                    </span>
+                  </div>
+                </div>
+              </div>
             )
           })}
         </div>
@@ -1262,9 +1405,19 @@ export default function TradeAnalytics() {
             >
               Weekly
             </button>
+            <button
+              onClick={() => setCalendarView('yearly')}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                calendarView === 'yearly'
+                  ? 'bg-krgold text-krblack'
+                  : 'text-gray-400 hover:text-krtext'
+              }`}
+            >
+              Yearly
+            </button>
           </div>
         </div>
-        {calendarView === 'monthly' ? renderMonthlyCalendar() : renderWeeklyCalendar()}
+        {calendarView === 'monthly' ? renderMonthlyCalendar() : calendarView === 'weekly' ? renderWeeklyCalendar() : renderYearlyCalendar()}
       </div>
       </div>
 

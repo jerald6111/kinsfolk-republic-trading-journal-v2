@@ -400,9 +400,9 @@ export default function MarketData() {
                   onChange={(e) => setRankingLimit(Number(e.target.value) as 100 | 200 | 300)}
                   className="bg-krcard border border-krgold/30 rounded-lg px-3 py-1.5 text-xs text-krgold font-semibold focus:outline-none focus:border-krgold hover:bg-krgold/10 transition-colors cursor-pointer"
                 >
-                  <option value={100}>Top 100 by Market Cap</option>
-                  <option value={200}>Top 200 by Market Cap</option>
-                  <option value={300}>Top 300 by Market Cap</option>
+                  <option value={100} className="bg-krblack text-krtext">Top 100 by Market Cap</option>
+                  <option value={200} className="bg-krblack text-krtext">Top 200 by Market Cap</option>
+                  <option value={300} className="bg-krblack text-krtext">Top 300 by Market Cap</option>
                 </select>
               </div>
               <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[700px] overflow-y-auto scrollbar-custom">
@@ -497,9 +497,9 @@ export default function MarketData() {
                   onChange={(e) => setHeatmapMetric(e.target.value as 'change' | 'volume' | 'open_interest')}
                   className="bg-krcard border border-krborder rounded-lg px-2 py-1 text-xs text-krtext focus:outline-none focus:border-krgold"
                 >
-                  <option value="change">Change %</option>
-                  <option value="volume">Volume</option>
-                  <option value="open_interest">Open Interest</option>
+                  <option value="change" className="bg-krblack text-krtext">Change %</option>
+                  <option value="volume" className="bg-krblack text-krtext">Volume</option>
+                  <option value="open_interest" className="bg-krblack text-krtext">Open Interest</option>
                 </select>
               </div>
               <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[700px]">
