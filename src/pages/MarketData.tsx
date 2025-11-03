@@ -223,16 +223,16 @@ export default function MarketData() {
         if (!response.ok) throw new Error('Failed to fetch market data')
         const data: CryptoData[] = await response.json()
         
-        // Sort for top gainers (highest positive change)
+        // Sort for top gainers (highest positive change) - filter out null values
         const gainers = [...data]
-          .filter(coin => coin.price_change_percentage_24h > 0)
-          .sort((a, b) => b.price_change_percentage_24h - a.price_change_percentage_24h)
+          .filter(coin => coin.price_change_percentage_24h != null && coin.price_change_percentage_24h > 0)
+          .sort((a, b) => (b.price_change_percentage_24h || 0) - (a.price_change_percentage_24h || 0))
           .slice(0, 10)
         
-        // Sort for top losers (most negative change)
+        // Sort for top losers (most negative change) - filter out null values
         const losers = [...data]
-          .filter(coin => coin.price_change_percentage_24h < 0)
-          .sort((a, b) => a.price_change_percentage_24h - b.price_change_percentage_24h)
+          .filter(coin => coin.price_change_percentage_24h != null && coin.price_change_percentage_24h < 0)
+          .sort((a, b) => (a.price_change_percentage_24h || 0) - (b.price_change_percentage_24h || 0))
           .slice(0, 10)
         
         setTopGainers(gainers)
@@ -365,14 +365,16 @@ export default function MarketData() {
                             <div className="text-xs text-krmuted">{coin.symbol.toUpperCase()}</div>
                           </div>
                           <div className="text-right">
-                            <div className="text-sm font-semibold text-krtext">${coin.current_price.toLocaleString()}</div>
+                            <div className="text-sm font-semibold text-krtext">${coin.current_price?.toLocaleString() || 'N/A'}</div>
                             <div className="flex flex-col gap-0.5">
                               <div className={`text-xs font-bold ${(coin.price_change_percentage_1h_in_currency || 0) >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                                1h: {coin.price_change_percentage_1h_in_currency ? 
+                                1h: {coin.price_change_percentage_1h_in_currency != null ? 
                                   `${coin.price_change_percentage_1h_in_currency >= 0 ? '+' : ''}${coin.price_change_percentage_1h_in_currency.toFixed(2)}%` 
                                   : 'N/A'}
                               </div>
-                              <div className="text-xs font-bold text-green-500">24h: +{coin.price_change_percentage_24h.toFixed(2)}%</div>
+                              <div className="text-xs font-bold text-green-500">
+                                24h: {coin.price_change_percentage_24h != null ? `+${coin.price_change_percentage_24h.toFixed(2)}%` : 'N/A'}
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -414,14 +416,16 @@ export default function MarketData() {
                             <div className="text-xs text-krmuted">{coin.symbol.toUpperCase()}</div>
                           </div>
                           <div className="text-right">
-                            <div className="text-sm font-semibold text-krtext">${coin.current_price.toLocaleString()}</div>
+                            <div className="text-sm font-semibold text-krtext">${coin.current_price?.toLocaleString() || 'N/A'}</div>
                             <div className="flex flex-col gap-0.5">
                               <div className={`text-xs font-bold ${(coin.price_change_percentage_1h_in_currency || 0) >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                                1h: {coin.price_change_percentage_1h_in_currency ? 
+                                1h: {coin.price_change_percentage_1h_in_currency != null ? 
                                   `${coin.price_change_percentage_1h_in_currency >= 0 ? '+' : ''}${coin.price_change_percentage_1h_in_currency.toFixed(2)}%` 
                                   : 'N/A'}
                               </div>
-                              <div className="text-xs font-bold text-red-500">24h: {coin.price_change_percentage_24h.toFixed(2)}%</div>
+                              <div className="text-xs font-bold text-red-500">
+                                24h: {coin.price_change_percentage_24h != null ? `${coin.price_change_percentage_24h.toFixed(2)}%` : 'N/A'}
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -493,27 +497,29 @@ export default function MarketData() {
                               </div>
                             </td>
                             <td className="py-3 px-4 text-right font-semibold text-krtext">
-                              ${coin.current_price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 })}
+                              ${coin.current_price?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 }) || 'N/A'}
                             </td>
                             <td className={`py-3 px-4 text-right font-bold ${(coin.price_change_percentage_1h_in_currency || 0) >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                              {coin.price_change_percentage_1h_in_currency ? 
+                              {coin.price_change_percentage_1h_in_currency != null ? 
                                 `${coin.price_change_percentage_1h_in_currency >= 0 ? '+' : ''}${coin.price_change_percentage_1h_in_currency.toFixed(2)}%` 
                                 : 'N/A'}
                             </td>
-                            <td className={`py-3 px-4 text-right font-bold ${coin.price_change_percentage_24h >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                              {coin.price_change_percentage_24h >= 0 ? '+' : ''}{coin.price_change_percentage_24h.toFixed(2)}%
+                            <td className={`py-3 px-4 text-right font-bold ${(coin.price_change_percentage_24h || 0) >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                              {coin.price_change_percentage_24h != null ? 
+                                `${coin.price_change_percentage_24h >= 0 ? '+' : ''}${coin.price_change_percentage_24h.toFixed(2)}%` 
+                                : 'N/A'}
                             </td>
                             <td className="py-3 px-4 text-right text-krtext">
-                              ${(coin.total_volume / 1e9).toFixed(2)}B
+                              ${coin.total_volume ? (coin.total_volume / 1e9).toFixed(2) : '0.00'}B
                             </td>
                             <td className="py-3 px-4 text-right text-krtext">
-                              ${(coin.market_cap / 1e9).toFixed(2)}B
+                              ${coin.market_cap ? (coin.market_cap / 1e9).toFixed(2) : '0.00'}B
                             </td>
                             <td className="py-3 px-4 text-center">
                               {coin.sparkline_in_7d?.price ? (
                                 <MiniSparkline 
                                   data={coin.sparkline_in_7d.price} 
-                                  isPositive={coin.price_change_percentage_24h >= 0}
+                                  isPositive={(coin.price_change_percentage_24h || 0) >= 0}
                                 />
                               ) : (
                                 <div className="w-24 h-8 flex items-center justify-center text-krmuted text-xs">N/A</div>
