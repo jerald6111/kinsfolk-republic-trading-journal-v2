@@ -66,6 +66,50 @@ export default function JournalOverview() {
     return { pnl, trades: dayTrades.length, tradeData: dayTrades }
   }
 
+  const getWeeklyProfitStats = (weekDates: Date[]) => {
+    const wallet = data.wallet || []
+    const startDate = weekDates[0].toISOString().split('T')[0]
+    const endDate = weekDates[6].toISOString().split('T')[0]
+    
+    // Calculate total PnL for the week
+    let weeklyPnl = 0
+    weekDates.forEach(date => {
+      const { pnl } = getPnlForDate(date)
+      weeklyPnl += pnl
+    })
+    
+    // Calculate withdrawals for the week
+    const weeklyWithdrawals = wallet.filter((w: any) => {
+      if (w.type !== 'withdrawal') return false
+      const wDate = new Date(w.date).toISOString().split('T')[0]
+      return wDate >= startDate && wDate <= endDate
+    }).reduce((sum: number, w: any) => sum + Number(w.amount), 0)
+    
+    return { weeklyPnl, weeklyWithdrawals, netWeekly: weeklyPnl - weeklyWithdrawals }
+  }
+
+  const getMonthlyProfitStats = (year: number, month: number) => {
+    const wallet = data.wallet || []
+    const daysInMonth = getDaysInMonth(currentDate)
+    
+    // Calculate total PnL for the month
+    let monthlyPnl = 0
+    for (let day = 1; day <= daysInMonth; day++) {
+      const date = new Date(year, month, day)
+      const { pnl } = getPnlForDate(date)
+      monthlyPnl += pnl
+    }
+    
+    // Calculate withdrawals for the month
+    const monthlyWithdrawals = wallet.filter((w: any) => {
+      if (w.type !== 'withdrawal') return false
+      const wDate = new Date(w.date)
+      return wDate.getFullYear() === year && wDate.getMonth() === month
+    }).reduce((sum: number, w: any) => sum + Number(w.amount), 0)
+    
+    return { monthlyPnl, monthlyWithdrawals, netMonthly: monthlyPnl - monthlyWithdrawals }
+  }
+
   const handleDayClick = (date: Date) => {
     const { trades } = getPnlForDate(date)
     if (trades > 0) {
@@ -191,6 +235,8 @@ export default function JournalOverview() {
       )
     }
 
+    const { monthlyPnl, monthlyWithdrawals, netMonthly } = getMonthlyProfitStats(currentDate.getFullYear(), currentDate.getMonth())
+
     return (
       <div>
         <div className="flex items-center justify-between mb-4">
@@ -216,6 +262,31 @@ export default function JournalOverview() {
             </button>
           </div>
         </div>
+
+        {/* Monthly Profit Summary */}
+        <div className="bg-krblack/40 rounded-lg p-4 mb-4 border border-krborder/30">
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <div className="text-xs text-krmuted mb-1">Trading P&L</div>
+              <div className={`text-lg font-bold ${monthlyPnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                {monthlyPnl >= 0 ? '+' : ''}{formatAmount(monthlyPnl)}
+              </div>
+            </div>
+            <div>
+              <div className="text-xs text-krmuted mb-1">Withdrawals</div>
+              <div className="text-lg font-bold text-orange-400">
+                {monthlyWithdrawals > 0 ? '-' : ''}{formatAmount(monthlyWithdrawals)}
+              </div>
+            </div>
+            <div>
+              <div className="text-xs text-krmuted mb-1">Net Monthly</div>
+              <div className={`text-lg font-bold ${netMonthly >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                {netMonthly >= 0 ? '+' : ''}{formatAmount(netMonthly)}
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div className="grid grid-cols-7 gap-2 mb-2">
           {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
             <div key={day} className="text-center text-sm font-semibold text-gray-400 py-2">
@@ -234,6 +305,7 @@ export default function JournalOverview() {
     const weekDates = getWeekDates(currentDate)
     const weekStart = weekDates[0].toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
     const weekEnd = weekDates[6].toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+    const { weeklyPnl, weeklyWithdrawals, netWeekly } = getWeeklyProfitStats(weekDates)
 
     return (
       <div>
@@ -260,6 +332,31 @@ export default function JournalOverview() {
             </button>
           </div>
         </div>
+
+        {/* Weekly Profit Summary */}
+        <div className="bg-krblack/40 rounded-lg p-4 mb-4 border border-krborder/30">
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <div className="text-xs text-krmuted mb-1">Trading P&L</div>
+              <div className={`text-lg font-bold ${weeklyPnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                {weeklyPnl >= 0 ? '+' : ''}{formatAmount(weeklyPnl)}
+              </div>
+            </div>
+            <div>
+              <div className="text-xs text-krmuted mb-1">Withdrawals</div>
+              <div className="text-lg font-bold text-orange-400">
+                {weeklyWithdrawals > 0 ? '-' : ''}{formatAmount(weeklyWithdrawals)}
+              </div>
+            </div>
+            <div>
+              <div className="text-xs text-krmuted mb-1">Net Weekly</div>
+              <div className={`text-lg font-bold ${netWeekly >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                {netWeekly >= 0 ? '+' : ''}{formatAmount(netWeekly)}
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div className="grid grid-cols-7 gap-3">
           {weekDates.map((date, index) => {
             const { pnl, trades, tradeData } = getPnlForDate(date)
