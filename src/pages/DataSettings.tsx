@@ -421,12 +421,12 @@ export default function DataSettings(){
               onChange={(e) => setEmailFrequency(e.target.value as EmailFrequency)}
               className="w-full px-3 py-2 rounded-xl bg-krblack/30 border border-krborder text-krtext focus:ring-2 focus:ring-krgold/20 focus:border-krgold/50 transition-all"
             >
-              <option value="disabled">Disabled (Manual only)</option>
-              <option value="on-add">When Data is Added</option>
-              <option value="on-delete">When Data is Deleted</option>
-              <option value="on-change">On Any Change (Add/Delete/Update)</option>
-              <option value="daily">Once a Day</option>
-              <option value="weekly">Once a Week</option>
+              <option value="disabled" className="bg-krblack text-krtext">Disabled (Manual only)</option>
+              <option value="on-add" className="bg-krblack text-krtext">When Data is Added</option>
+              <option value="on-delete" className="bg-krblack text-krtext">When Data is Deleted</option>
+              <option value="on-change" className="bg-krblack text-krtext">On Any Change (Add/Delete/Update)</option>
+              <option value="daily" className="bg-krblack text-krtext">Once a Day</option>
+              <option value="weekly" className="bg-krblack text-krtext">Once a Week</option>
             </select>
             <p className="text-xs text-krmuted mt-1">
               {emailFrequency === 'disabled' && 'Automatic backups are disabled. Use manual send button.'}

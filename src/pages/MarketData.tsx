@@ -84,6 +84,8 @@ export default function MarketData() {
   const [topLosers, setTopLosers] = useState<CryptoData[]>([])
   const [loading, setLoading] = useState(true)
   const [rankingLoading, setRankingLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [rankingError, setRankingError] = useState<string | null>(null)
 
   // Economic Calendar Widget
   useEffect(() => {
@@ -139,12 +141,14 @@ export default function MarketData() {
     const fetchRankings = async () => {
       try {
         setRankingLoading(true)
+        setRankingError(null)
         
         if (rankingLimit === 100) {
           // Fetch only 100 coins for faster loading
           const response = await fetch(
             'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=true&price_change_percentage=1h,24h'
           )
+          if (!response.ok) throw new Error('Failed to fetch data')
           const data: CryptoData[] = await response.json()
           setCryptoRankings(data)
         } else if (rankingLimit === 200) {
@@ -152,6 +156,7 @@ export default function MarketData() {
           const response = await fetch(
             'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=200&page=1&sparkline=true&price_change_percentage=1h,24h'
           )
+          if (!response.ok) throw new Error('Failed to fetch data')
           const data: CryptoData[] = await response.json()
           setCryptoRankings(data)
         } else {
@@ -159,17 +164,20 @@ export default function MarketData() {
           const response = await fetch(
             'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=1&sparkline=true&price_change_percentage=1h,24h'
           )
+          if (!response.ok) throw new Error('Failed to fetch data')
           const data1: CryptoData[] = await response.json()
           
           const response2 = await fetch(
             'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=2&sparkline=true&price_change_percentage=1h,24h'
           )
+          if (!response2.ok) throw new Error('Failed to fetch data')
           const data2: CryptoData[] = await response2.json()
           
           setCryptoRankings([...data1, ...data2])
         }
       } catch (error) {
         console.error('Error fetching crypto rankings:', error)
+        setRankingError('Failed to load cryptocurrency data. Please try again later.')
       } finally {
         setRankingLoading(false)
       }
@@ -185,11 +193,14 @@ export default function MarketData() {
     const fetchTrending = async () => {
       try {
         setLoading(true)
+        setError(null)
         const response = await fetch('https://api.coingecko.com/api/v3/search/trending')
+        if (!response.ok) throw new Error('Failed to fetch trending data')
         const data = await response.json()
         setTrendingCoins(data.coins || [])
       } catch (error) {
         console.error('Error fetching trending coins:', error)
+        setError('Failed to load market data. Please try again later.')
       } finally {
         setLoading(false)
       }
@@ -205,9 +216,11 @@ export default function MarketData() {
     const fetchMarketData = async () => {
       try {
         setLoading(true)
+        setError(null)
         const response = await fetch(
           'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=1&sparkline=false&price_change_percentage=1h,24h'
         )
+        if (!response.ok) throw new Error('Failed to fetch market data')
         const data: CryptoData[] = await response.json()
         
         // Sort for top gainers (highest positive change)
@@ -226,6 +239,7 @@ export default function MarketData() {
         setTopLosers(losers)
       } catch (error) {
         console.error('Error fetching market data:', error)
+        setError('Failed to load market data. Please try again later.')
       } finally {
         setLoading(false)
       }
@@ -274,6 +288,16 @@ export default function MarketData() {
                     <div className="flex items-center justify-center h-full">
                       <div className="text-krmuted">Loading trending coins...</div>
                     </div>
+                  ) : error ? (
+                    <div className="flex flex-col items-center justify-center h-full gap-3">
+                      <div className="text-red-400 text-center">{error}</div>
+                      <button 
+                        onClick={() => window.location.reload()} 
+                        className="px-4 py-2 bg-krgold/20 hover:bg-krgold/30 text-krgold rounded-lg transition-colors"
+                      >
+                        Retry
+                      </button>
+                    </div>
                   ) : (
                     <div className="space-y-3">
                       {trendingCoins.slice(0, 7).map((trending, index) => {
@@ -320,6 +344,16 @@ export default function MarketData() {
                     <div className="flex items-center justify-center h-full">
                       <div className="text-krmuted">Loading top gainers...</div>
                     </div>
+                  ) : error ? (
+                    <div className="flex flex-col items-center justify-center h-full gap-3">
+                      <div className="text-red-400 text-center">{error}</div>
+                      <button 
+                        onClick={() => window.location.reload()} 
+                        className="px-4 py-2 bg-krgold/20 hover:bg-krgold/30 text-krgold rounded-lg transition-colors"
+                      >
+                        Retry
+                      </button>
+                    </div>
                   ) : (
                     <div className="space-y-3">
                       {topGainers.map((coin, index) => (
@@ -358,6 +392,16 @@ export default function MarketData() {
                   {loading ? (
                     <div className="flex items-center justify-center h-full">
                       <div className="text-krmuted">Loading top losers...</div>
+                    </div>
+                  ) : error ? (
+                    <div className="flex flex-col items-center justify-center h-full gap-3">
+                      <div className="text-red-400 text-center">{error}</div>
+                      <button 
+                        onClick={() => window.location.reload()} 
+                        className="px-4 py-2 bg-krgold/20 hover:bg-krgold/30 text-krgold rounded-lg transition-colors"
+                      >
+                        Retry
+                      </button>
                     </div>
                   ) : (
                     <div className="space-y-3">
@@ -409,6 +453,16 @@ export default function MarketData() {
                 {rankingLoading ? (
                   <div className="flex items-center justify-center h-full">
                     <div className="text-krmuted">Loading cryptocurrency rankings...</div>
+                  </div>
+                ) : rankingError ? (
+                  <div className="flex flex-col items-center justify-center h-full gap-3">
+                    <div className="text-red-400 text-center">{rankingError}</div>
+                    <button 
+                      onClick={() => window.location.reload()} 
+                      className="px-4 py-2 bg-krgold/20 hover:bg-krgold/30 text-krgold rounded-lg transition-colors"
+                    >
+                      Retry
+                    </button>
                   </div>
                 ) : (
                   <div className="overflow-x-auto">
