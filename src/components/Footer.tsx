@@ -35,7 +35,7 @@ export default function Footer() {
         <div className="container mx-auto px-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="text-gray-400 text-sm">
-              &copy; 2025 Created by Jerald L. All rights reserved.
+              &copy; 2026 Created by Jerald L. All rights reserved.
             </div>
             <button
               onClick={() => setShowDonateModal(true)}
