@@ -14,7 +14,8 @@ import {
 } from '../utils/storage'
 import { useCurrency } from '../context/CurrencyContext'
 import Modal from '../components/Modal'
-import { AlertTriangle, Save, Link2, Trash2, Mail, Shield, Download, Send, CheckCircle2, Info, Eye, EyeOff } from 'lucide-react'
+import SecuritySettings from '../components/SecuritySettings'
+import { AlertTriangle, Save, Link2, Trash2, Mail, Shield, Download, Send, CheckCircle2, Info, Eye, EyeOff, Settings, Bell, DollarSign, Lock, Database, Plug } from 'lucide-react'
 
 type EmailFrequency = 'disabled' | 'on-add' | 'on-delete' | 'on-change' | 'daily' | 'weekly'
 
@@ -271,6 +272,7 @@ export default function DataSettings(){
   }
 
   const [showHowToUse, setShowHowToUse] = useState(false)
+  const [tab, setTab] = useState<'general'|'security'|'data'|'integrations'>('security')
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-950 via-krblack to-gray-950 text-krtext relative overflow-hidden">
@@ -279,22 +281,64 @@ export default function DataSettings(){
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-kryellow/5 via-transparent to-transparent pointer-events-none"></div>
       
       <div className="relative z-10 p-4 md:p-6">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="mb-6">
           <div className="flex items-center gap-3">
-            <span className="text-4xl">⚙️</span>
+            <span className="flex h-11 w-11 items-center justify-center rounded-lg border border-krborder bg-krpanel text-krgold"><Settings size={22} /></span>
             <div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-krgold to-kryellow bg-clip-text text-transparent">Data Settings</h1>
+              <h1 className="text-3xl font-extrabold tracking-tight text-krwhite">Data <span className="text-krgold">Settings</span></h1>
               <p className="text-krmuted text-sm mt-1">Manage your data, backups, and preferences</p>
             </div>
           </div>
         </div>
-      
+
+        {/* Tabbed layout */}
+        <div className="flex flex-col md:flex-row gap-6">
+          {/* Left sub-nav */}
+          <nav className="md:w-52 shrink-0 flex md:flex-col gap-1 overflow-x-auto md:sticky md:top-6 md:self-start">
+            <button
+              onClick={() => setTab('general')}
+              className={`flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors whitespace-nowrap ${tab === 'general' ? 'bg-krgold text-krblack' : 'text-krmuted hover:bg-krcard hover:text-krwhite'}`}
+            >
+              <DollarSign size={18} />
+              General
+            </button>
+            <button
+              onClick={() => setTab('security')}
+              className={`flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors whitespace-nowrap ${tab === 'security' ? 'bg-krgold text-krblack' : 'text-krmuted hover:bg-krcard hover:text-krwhite'}`}
+            >
+              <Lock size={18} />
+              Security
+            </button>
+            <button
+              onClick={() => setTab('data')}
+              className={`flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors whitespace-nowrap ${tab === 'data' ? 'bg-krgold text-krblack' : 'text-krmuted hover:bg-krcard hover:text-krwhite'}`}
+            >
+              <Database size={18} />
+              Backup &amp; Data
+            </button>
+            <button
+              onClick={() => setTab('integrations')}
+              className={`flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors whitespace-nowrap ${tab === 'integrations' ? 'bg-krgold text-krblack' : 'text-krmuted hover:bg-krcard hover:text-krwhite'}`}
+            >
+              <Plug size={18} />
+              Integrations
+            </button>
+          </nav>
+
+          {/* Right content */}
+          <div className="flex-1 min-w-0 space-y-6">
+        {/* Security & Passcode */}
+        {tab === 'security' && (
+        <SecuritySettings />
+        )}
+
         {/* Currency Settings */}
-        <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-5 mb-6">
+        {tab === 'general' && (
+        <div className="bg-krcard shadow-soft rounded-xl border border-krborder p-5 mb-6">
           <div className="flex items-center gap-2 mb-4">
-            <span className="text-2xl">💱</span>
+            <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-krborder bg-krpanel text-krgold"><DollarSign size={18} /></span>
             <h2 className="text-lg font-semibold text-krtext">Currency Settings</h2>
           </div>
           <div className="space-y-4">
@@ -322,12 +366,16 @@ export default function DataSettings(){
             </div>
           </div>
         </div>
+        )}
 
+        {/* Backup & Data tab */}
+        {tab === 'data' && (
+        <>
         {/* Email Backup Settings */}
-        <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-5 mb-6">
+        <div className="bg-krcard shadow-soft rounded-xl border border-krborder transition-all duration-200 hover:border-krgold/40 p-5 mb-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <span className="text-3xl">📧</span>
+            <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-krborder bg-krpanel text-krgold"><Mail size={18} /></span>
             <div>
               <h2 className="text-lg font-semibold text-krtext">Email Backup & Security</h2>
               <p className="text-xs text-krmuted">Automated backup delivery and anti-phishing protection</p>
@@ -335,7 +383,7 @@ export default function DataSettings(){
           </div>
           <div className="flex items-center gap-3">
             {emailSaved && (
-              <span className="flex items-center gap-1 text-green-500 text-sm">
+              <span className="flex items-center gap-1 text-krsuccess text-sm">
                 <CheckCircle2 size={16} />
                 Saved!
               </span>
@@ -472,7 +520,7 @@ export default function DataSettings(){
               </div>
               <button
                 onClick={generateRandomPhishingCode}
-                className="px-4 py-2 bg-krgold/20 text-krgold rounded-xl hover:bg-krgold/30 hover:shadow-md hover:shadow-krgold/20 transition-all whitespace-nowrap"
+                className="px-4 py-2 bg-krgold/20 text-krgold rounded-xl hover:bg-krgold/30 transition-all whitespace-nowrap"
               >
                 Generate
               </button>
@@ -489,7 +537,7 @@ export default function DataSettings(){
           <div className="flex gap-3 pt-2">
             <button
               onClick={saveEmailSettings}
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-krgold text-krblack rounded-xl hover:bg-kryellow hover:shadow-lg hover:shadow-krgold/30 transition-all font-semibold"
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-krgold text-krblack rounded-xl hover:bg-kryellow transition-all font-semibold"
             >
               <Save size={18} />
               Save Email Settings
@@ -516,9 +564,9 @@ export default function DataSettings(){
       </div>
       
       {/* Data Management */}
-      <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-5 mb-6">
+      <div className="bg-krcard shadow-soft rounded-xl border border-krborder transition-all duration-200 hover:border-krgold/40 p-5 mb-6">
         <div className="flex items-center gap-3 mb-5">
-          <span className="text-3xl">💾</span>
+          <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-krborder bg-krpanel text-krgold"><Save size={18} /></span>
           <div>
             <h2 className="text-lg font-semibold text-krtext">Data Management</h2>
             <p className="text-xs text-krmuted">Export, import, or delete all your trading data</p>
@@ -548,11 +596,14 @@ export default function DataSettings(){
           </button>
         </div>
       </div>
+        </>
+        )}
 
       {/* Discord Integration */}
-      <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-5">
+      {tab === 'integrations' && (
+      <div className="bg-krcard shadow-soft rounded-xl border border-krborder transition-all duration-200 hover:border-krgold/40 p-5">
         <div className="flex items-center gap-3 mb-5">
-          <span className="text-3xl">🔔</span>
+          <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-krborder bg-krpanel text-krgold"><Bell size={18} /></span>
           <div>
             <h2 className="text-lg font-semibold text-krtext">Discord Integration</h2>
             <p className="text-xs text-krmuted">Connect webhooks to receive notifications</p>
@@ -590,7 +641,7 @@ export default function DataSettings(){
             </div>
             <button
               onClick={addWebhook}
-              className="w-full px-4 py-2 bg-krgold text-krblack rounded-xl hover:bg-kryellow hover:shadow-lg hover:shadow-krgold/30 transition-all font-semibold"
+              className="w-full px-4 py-2 bg-krgold text-krblack rounded-xl hover:bg-kryellow transition-all font-semibold"
             >
               Add Webhook
             </button>
@@ -624,7 +675,7 @@ export default function DataSettings(){
                       <div className="flex gap-2">
                         <button 
                           onClick={updateWebhook}
-                          className="px-3 py-1 bg-krgold text-krblack rounded-lg hover:bg-kryellow hover:shadow-md hover:shadow-krgold/20 transition-all text-sm font-semibold"
+                          className="px-3 py-1 bg-krgold text-krblack rounded-lg hover:bg-kryellow transition-all text-sm font-semibold"
                         >
                           Save
                         </button>
@@ -648,7 +699,7 @@ export default function DataSettings(){
                         ) : (
                           <button
                             onClick={() => handleSetActive(webhook.id)}
-                            className="px-3 py-1 border border-krgold text-krgold rounded-lg hover:bg-krgold hover:text-krblack hover:shadow-md hover:shadow-krgold/20 transition-all text-sm whitespace-nowrap"
+                            className="px-3 py-1 border border-krgold text-krgold rounded-lg hover:bg-krgold hover:text-krblack transition-all text-sm whitespace-nowrap"
                           >
                             Set Active
                           </button>
@@ -663,7 +714,7 @@ export default function DataSettings(){
                         </button>
                         <button 
                           onClick={() => removeWebhook(webhook.id)}
-                          className="p-1.5 text-red-500 hover:text-red-700 rounded transition-colors"
+                          className="p-1.5 text-krdanger hover:text-red-700 rounded transition-colors"
                         >
                           <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
                             <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
@@ -678,6 +729,9 @@ export default function DataSettings(){
           </div>
         </div>
       </div>
+      )}
+          </div>
+        </div>
 
       {/* Export Modal */}
       <Modal
@@ -746,7 +800,7 @@ export default function DataSettings(){
                   className="mb-4 text-krtext"
                 />
                 {selectedFile && (
-                  <p className="text-sm text-green-400 mt-2">
+                  <p className="text-sm text-krsuccess mt-2">
                     ✓ Selected: {selectedFile.name}
                   </p>
                 )}
@@ -804,7 +858,7 @@ export default function DataSettings(){
         title="🗑️ Delete All Data"
       >
         <div className="space-y-4">
-          <div className="flex items-center gap-3 p-3 bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl">
+          <div className="flex items-center gap-3 p-3 bg-krdanger/15 border border-krdanger/30 text-krdanger rounded-xl">
             <AlertTriangle className="flex-shrink-0" />
             <p>This action cannot be undone. All your data will be permanently deleted.</p>
           </div>

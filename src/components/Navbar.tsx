@@ -52,11 +52,11 @@ export default function Navbar(){
   }
   
   return (
-    <header className="w-full bg-krblack border-b border-krgray">
+    <header className="sticky top-0 z-40 w-full bg-krblack/70 backdrop-blur-xl border-b border-krborder">
       <div className="container mx-auto px-6 py-4 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-4 hover:opacity-80 transition-opacity">
-          <div className="w-10 h-10 rounded-md bg-gradient-to-br from-krgold to-kryellow flex items-center justify-center text-krblack font-bold">KR</div>
-          <div className="text-lg font-bold">Kinsfolk Republic</div>
+        <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+          <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-krgold to-kryellow flex items-center justify-center text-krblack font-extrabold shadow-btn">KR</div>
+          <div className="text-[15px] font-bold tracking-tight">Kinsfolk Republic</div>
         </Link>
         <nav className="hidden md:flex gap-4 items-center">
           {nav.map(n => {
@@ -70,9 +70,9 @@ export default function Navbar(){
                   onMouseEnter={() => handleMouseEnter(n.to)}
                   onMouseLeave={handleMouseLeave}
                 >
-                  <Link 
-                    to={n.to} 
-                    className={`px-3 py-2 rounded-md flex items-center gap-1 ${isActive ? 'bg-krgold text-krblack' : 'text-krwhite hover:bg-krgray/50'}`}
+                  <Link
+                    to={n.to}
+                    className={`px-3 py-2 rounded-lg flex items-center gap-1 text-sm font-medium transition-colors ${isActive ? 'bg-krgold text-krblack' : 'text-krmuted hover:text-krwhite'}`}
                   >
                     {n.label}
                     <ChevronDown size={16} className={`transition-transform ${hoveredDropdown === n.to ? 'rotate-180' : ''}`} />
@@ -97,7 +97,7 @@ export default function Navbar(){
             }
             
             return (
-              <Link key={n.to} to={n.to} className={`px-3 py-2 rounded-md ${loc.pathname===n.to? 'bg-krgold text-krblack' : 'text-krwhite hover:bg-krgray/50'}`}>
+              <Link key={n.to} to={n.to} className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${loc.pathname===n.to? 'bg-krgold text-krblack' : 'text-krmuted hover:text-krwhite'}`}>
                 {n.label}
               </Link>
             )

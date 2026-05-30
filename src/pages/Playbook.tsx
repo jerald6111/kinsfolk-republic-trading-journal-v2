@@ -3,7 +3,8 @@ import FileUploader from '../components/FileUploader'
 import { loadData, saveData, triggerAutoEmailBackup } from '../utils/storage'
 import { marked } from 'marked'
 import Modal from '../components/Modal'
-import { Trash2, Edit2, Eye, X, ChevronDown, ChevronUp } from 'lucide-react'
+import { Trash2, Edit2, Eye, X, ChevronDown, ChevronUp, BookOpen } from 'lucide-react'
+import EmptyState from '../components/EmptyState'
 
 interface Strategy {
   id: number
@@ -108,9 +109,9 @@ export default function Playbook(){
       {/* Header with Introduction */}
       <div className="mb-6">
         <div className="flex items-center gap-3 mb-4">
-          <span className="text-4xl">📖</span>
+          <span className="flex h-11 w-11 items-center justify-center rounded-lg border border-krborder bg-krpanel text-krgold"><BookOpen size={22} /></span>
           <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-krgold to-kryellow bg-clip-text text-transparent">Trading Playbook</h1>
+            <h1 className="text-3xl font-extrabold tracking-tight text-krwhite">Trading <span className="text-krgold">Playbook</span></h1>
             <p className="text-krmuted text-sm mt-1">Your personal collection of proven trading strategies</p>
           </div>
         </div>
@@ -241,19 +242,21 @@ export default function Playbook(){
         <div className="md:col-span-2">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-xl font-bold text-krtext flex items-center gap-2">
-              <span className="text-krgold">📚</span> My Strategies ({items.length})
+              <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-krborder bg-krpanel text-krgold"><BookOpen size={18} /></span> My Strategies ({items.length})
             </h2>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {items.length === 0 && (
-              <div className="col-span-full text-center py-20">
-                <div className="text-6xl mb-4">📖</div>
-                <p className="text-krmuted">No strategies yet</p>
-                <p className="text-xs text-krmuted/60 mt-2">Create your first trading strategy!</p>
+              <div className="col-span-full">
+                <EmptyState
+                  icon={<BookOpen size={26} />}
+                  title="No strategies yet"
+                  description="Document your first trading strategy with the form on the left to build out your playbook."
+                />
               </div>
             )}
             {items.map((it) => (
-              <div key={it.id} className="bg-krcard/90 backdrop-blur-md rounded-xl border border-krborder/50 overflow-hidden hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 group">
+              <div key={it.id} className="bg-krcard/90 backdrop-blur-md rounded-xl border border-krborder/50 overflow-hidden transition-all duration-200 hover:border-krgold/40 group">
                 {/* Image Grid - Show up to 4 images */}
                 {it.images.length > 0 && (
                   <div className={`grid ${it.images.length === 1 ? 'grid-cols-1' : 'grid-cols-2'} gap-1 bg-krblack/50`}>
@@ -293,7 +296,7 @@ export default function Playbook(){
                     </button>
                     <button
                       onClick={() => deleteStrategy(it.id)}
-                      className="px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 rounded-md transition-colors"
+                      className="px-3 py-1.5 bg-krdanger/15 hover:bg-krdanger/10 border border-krdanger/30 text-krdanger rounded-md transition-colors"
                       title="Delete Strategy"
                     >
                       <Trash2 size={14} />

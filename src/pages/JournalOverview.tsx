@@ -3,7 +3,8 @@ import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
 import { loadData } from '../utils/storage'
 import { useCurrency } from '../context/CurrencyContext'
-import { ArrowRight, ChevronLeft, ChevronRight, X, TrendingUp, TrendingDown } from 'lucide-react'
+import { ArrowRight, ChevronLeft, ChevronRight, X, TrendingUp, TrendingDown, BookOpen, BarChart3, FileText, Lightbulb, CalendarDays } from 'lucide-react'
+import { Reveal } from '../components/Motion'
 
 export default function JournalOverview() {
   const data = loadData()
@@ -192,7 +193,7 @@ export default function JournalOverview() {
             <div className="text-sm text-gray-400 mb-1">{day}</div>
             {trades > 0 && (
               <>
-                <div className={`text-xs font-semibold ${pnl >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                <div className={`text-xs font-semibold ${pnl >= 0 ? 'text-krsuccess' : 'text-krdanger'}`}>
                   {pnl >= 0 ? '+' : ''}{pnl.toFixed(0)}
                 </div>
                 <div className="text-xs text-gray-500">{trades} trade{trades > 1 ? 's' : ''}</div>
@@ -216,7 +217,7 @@ export default function JournalOverview() {
               >
                 <div className="mb-3 pb-3 border-b border-krborder/30">
                   <div className="text-sm text-krmuted mb-1">{date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</div>
-                  <div className={`text-2xl font-bold ${pnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                  <div className={`text-2xl font-bold ${pnl >= 0 ? 'text-krsuccess' : 'text-krdanger'}`}>
                     {pnl >= 0 ? '+' : ''}{formatAmount(pnl)}
                   </div>
                   <div className="text-xs text-krmuted">{trades} trade{trades > 1 ? 's' : ''}</div>
@@ -234,7 +235,7 @@ export default function JournalOverview() {
                             <div className="font-bold text-krtext">{trade.ticker}</div>
                             <div className="text-xs text-krmuted">{trade.time} → {trade.exitTime}</div>
                           </div>
-                          <div className={`text-sm font-bold ${isProfit ? 'text-green-400' : 'text-red-400'}`}>
+                          <div className={`text-sm font-bold ${isProfit ? 'text-krsuccess' : 'text-krdanger'}`}>
                             {isProfit ? '+' : ''}{formatAmount(netPnl)}
                           </div>
                         </div>
@@ -243,7 +244,7 @@ export default function JournalOverview() {
                             <span className={`w-1.5 h-1.5 rounded-full ${trade.position === 'Long' ? 'bg-green-400' : 'bg-red-400'}`}></span>
                             {trade.type} {trade.type === 'Futures' ? `${trade.leverage}x` : ''} • {trade.position}
                           </span>
-                          <span className={`font-medium ${isProfit ? 'text-green-400' : 'text-red-400'}`}>
+                          <span className={`font-medium ${isProfit ? 'text-krsuccess' : 'text-krdanger'}`}>
                             {isProfit ? '+' : ''}{trade.pnlPercent.toFixed(2)}%
                           </span>
                         </div>
@@ -292,7 +293,7 @@ export default function JournalOverview() {
           <div className="grid grid-cols-3 gap-4">
             <div>
               <div className="text-xs text-krmuted mb-1">Trading P&L</div>
-              <div className={`text-lg font-bold ${monthlyPnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+              <div className={`text-lg font-bold ${monthlyPnl >= 0 ? 'text-krsuccess' : 'text-krdanger'}`}>
                 {monthlyPnl >= 0 ? '+' : ''}{formatAmount(monthlyPnl)}
               </div>
             </div>
@@ -304,7 +305,7 @@ export default function JournalOverview() {
             </div>
             <div>
               <div className="text-xs text-krmuted mb-1">Net Monthly</div>
-              <div className={`text-lg font-bold ${netMonthly >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+              <div className={`text-lg font-bold ${netMonthly >= 0 ? 'text-krsuccess' : 'text-krdanger'}`}>
                 {netMonthly >= 0 ? '+' : ''}{formatAmount(netMonthly)}
               </div>
             </div>
@@ -362,7 +363,7 @@ export default function JournalOverview() {
           <div className="grid grid-cols-3 gap-4">
             <div>
               <div className="text-xs text-krmuted mb-1">Trading P&L</div>
-              <div className={`text-lg font-bold ${weeklyPnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+              <div className={`text-lg font-bold ${weeklyPnl >= 0 ? 'text-krsuccess' : 'text-krdanger'}`}>
                 {weeklyPnl >= 0 ? '+' : ''}{formatAmount(weeklyPnl)}
               </div>
             </div>
@@ -374,7 +375,7 @@ export default function JournalOverview() {
             </div>
             <div>
               <div className="text-xs text-krmuted mb-1">Net Weekly</div>
-              <div className={`text-lg font-bold ${netWeekly >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+              <div className={`text-lg font-bold ${netWeekly >= 0 ? 'text-krsuccess' : 'text-krdanger'}`}>
                 {netWeekly >= 0 ? '+' : ''}{formatAmount(netWeekly)}
               </div>
             </div>
@@ -407,7 +408,7 @@ export default function JournalOverview() {
                 </div>
                 {trades > 0 && (
                   <div className="text-center">
-                    <div className={`text-sm font-semibold ${pnl >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                    <div className={`text-sm font-semibold ${pnl >= 0 ? 'text-krsuccess' : 'text-krdanger'}`}>
                       {pnl >= 0 ? '+' : ''}{pnl.toFixed(0)}
                     </div>
                     <div className="text-xs text-gray-500">{trades} trade{trades > 1 ? 's' : ''}</div>
@@ -431,7 +432,7 @@ export default function JournalOverview() {
                   >
                     <div className="mb-3 pb-3 border-b border-krborder/30">
                       <div className="text-sm text-krmuted mb-1">{date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</div>
-                      <div className={`text-2xl font-bold ${pnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                      <div className={`text-2xl font-bold ${pnl >= 0 ? 'text-krsuccess' : 'text-krdanger'}`}>
                         {pnl >= 0 ? '+' : ''}{formatAmount(pnl)}
                       </div>
                       <div className="text-xs text-krmuted">{trades} trade{trades > 1 ? 's' : ''}</div>
@@ -449,7 +450,7 @@ export default function JournalOverview() {
                                 <div className="font-bold text-krtext">{trade.ticker}</div>
                                 <div className="text-xs text-krmuted">{trade.time} → {trade.exitTime}</div>
                               </div>
-                              <div className={`text-sm font-bold ${isProfit ? 'text-green-400' : 'text-red-400'}`}>
+                              <div className={`text-sm font-bold ${isProfit ? 'text-krsuccess' : 'text-krdanger'}`}>
                                 {isProfit ? '+' : ''}{formatAmount(netPnl)}
                               </div>
                             </div>
@@ -458,7 +459,7 @@ export default function JournalOverview() {
                                 <span className={`w-1.5 h-1.5 rounded-full ${trade.position === 'Long' ? 'bg-green-400' : 'bg-red-400'}`}></span>
                                 {trade.type} {trade.type === 'Futures' ? `${trade.leverage}x` : ''} • {trade.position}
                               </span>
-                              <span className={`font-medium ${isProfit ? 'text-green-400' : 'text-red-400'}`}>
+                              <span className={`font-medium ${isProfit ? 'text-krsuccess' : 'text-krdanger'}`}>
                                 {isProfit ? '+' : ''}{trade.pnlPercent.toFixed(2)}%
                               </span>
                             </div>
@@ -532,7 +533,7 @@ export default function JournalOverview() {
         <div className="grid grid-cols-3 gap-3 bg-krblack/30 rounded-lg p-4">
           <div className="text-center">
             <div className="text-xs text-krmuted mb-1">Total PnL</div>
-            <div className={`text-lg font-bold ${yearlyPnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+            <div className={`text-lg font-bold ${yearlyPnl >= 0 ? 'text-krsuccess' : 'text-krdanger'}`}>
               {yearlyPnl >= 0 ? '+' : ''}{formatAmount(yearlyPnl)}
             </div>
           </div>
@@ -544,7 +545,7 @@ export default function JournalOverview() {
           </div>
           <div className="text-center">
             <div className="text-xs text-krmuted mb-1">Net Profit</div>
-            <div className={`text-lg font-bold ${netYearly >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+            <div className={`text-lg font-bold ${netYearly >= 0 ? 'text-krsuccess' : 'text-krdanger'}`}>
               {netYearly >= 0 ? '+' : ''}{formatAmount(netYearly)}
             </div>
           </div>
@@ -570,7 +571,7 @@ export default function JournalOverview() {
                 <div className="space-y-1">
                   <div className="flex justify-between items-center text-xs">
                     <span className="text-krmuted">PnL:</span>
-                    <span className={`font-bold ${monthPnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                    <span className={`font-bold ${monthPnl >= 0 ? 'text-krsuccess' : 'text-krdanger'}`}>
                       {monthPnl >= 0 ? '+' : ''}{formatAmount(monthPnl)}
                     </span>
                   </div>
@@ -584,7 +585,7 @@ export default function JournalOverview() {
                   )}
                   <div className="flex justify-between items-center text-xs pt-1 border-t border-krborder/30">
                     <span className="text-krmuted">Net:</span>
-                    <span className={`font-bold ${netMonthPnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                    <span className={`font-bold ${netMonthPnl >= 0 ? 'text-krsuccess' : 'text-krdanger'}`}>
                       {netMonthPnl >= 0 ? '+' : ''}{formatAmount(netMonthPnl)}
                     </span>
                   </div>
@@ -606,53 +607,135 @@ export default function JournalOverview() {
       <div className="relative z-10 p-4 md:p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-6">
+        <Reveal className="mb-8">
           <div className="flex items-center gap-3 mb-2">
-            <span className="text-4xl">📓</span>
-            <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-krgold to-kryellow bg-clip-text text-transparent">
-              Trading Journal
+            <span className="flex h-11 w-11 items-center justify-center rounded-lg border border-krborder bg-krpanel text-krgold">
+              <BookOpen size={22} />
+            </span>
+            <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-krwhite">
+              Trading <span className="text-krgold">Journal</span>
             </h1>
           </div>
           <p className="text-krmuted text-sm md:text-base ml-14">
             Your complete trading record and performance analytics
           </p>
-        </div>
+        </Reveal>
 
-        {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-5">
-            <div className="text-krmuted text-sm mb-1">Total Trades</div>
-            <div className="text-3xl font-bold text-krgold">{totalTrades}</div>
-          </div>
-          <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-5">
-            <div className="text-krmuted text-sm mb-1">Win Rate</div>
-            <div className="text-3xl font-bold text-green-400">{winRate}%</div>
-            <div className="text-xs text-krmuted mt-1">{wins}W / {losses}L</div>
-          </div>
-          <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-5">
-            <div className="text-krmuted text-sm mb-1">Total PnL</div>
-            <div className={`text-3xl font-bold ${totalPnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+        {/* Bento Grid */}
+        <div className="grid grid-cols-12 gap-4 mb-6">
+          {/* Quick Stats */}
+          <Reveal className="col-span-6 md:col-span-3 bg-krcard rounded-xl border border-krborder shadow-soft lift hover:border-krgold/40 p-5">
+            <div className="text-xs uppercase tracking-[0.14em] text-krmuted mb-2">Total Trades</div>
+            <div className="text-3xl font-extrabold text-krgold tnum">{totalTrades}</div>
+          </Reveal>
+          <Reveal delay={1} className="col-span-6 md:col-span-3 bg-krcard rounded-xl border border-krborder shadow-soft lift hover:border-krgold/40 p-5">
+            <div className="text-xs uppercase tracking-[0.14em] text-krmuted mb-2">Win Rate</div>
+            <div className="text-3xl font-extrabold text-krsuccess tnum">{winRate}%</div>
+            <div className="text-xs text-krmuted mt-1 tnum">{wins}W / {losses}L</div>
+          </Reveal>
+          <Reveal delay={2} className="col-span-6 md:col-span-3 bg-krcard rounded-xl border border-krborder shadow-soft lift hover:border-krgold/40 p-5">
+            <div className="text-xs uppercase tracking-[0.14em] text-krmuted mb-2">Total PnL</div>
+            <div className={`text-3xl font-extrabold tnum ${totalPnl >= 0 ? 'text-krsuccess' : 'text-krdanger'}`}>
               {formatAmount(totalPnl)}
             </div>
-          </div>
-          <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-5">
-            <div className="text-krmuted text-sm mb-1">Active Positions</div>
-            <div className="text-3xl font-bold text-krtext">
+          </Reveal>
+          <Reveal delay={3} className="col-span-6 md:col-span-3 bg-krcard rounded-xl border border-krborder shadow-soft lift hover:border-krgold/40 p-5">
+            <div className="text-xs uppercase tracking-[0.14em] text-krmuted mb-2">Active Positions</div>
+            <div className="text-3xl font-extrabold text-krtext tnum">
               {journal.filter(j => !j.exitPrice || j.exitPrice === 0).length}
             </div>
-          </div>
-        </div>
+          </Reveal>
 
-        {/* Main Sections */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          {/* Trade Analytics Section */}
-          <Link 
-            to="/journal/analytics"
-            className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-5 group"
+          {/* PNL Calendar Section (hero tile) */}
+          <div className="col-span-12 lg:col-span-8 order-last lg:order-none bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder transition-all duration-200 hover:border-krgold/40 p-5">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-krborder bg-krpanel text-krgold"><CalendarDays size={18} /></span>
+                <h2 className="text-xl font-semibold">PNL Calendar</h2>
+              </div>
+              <div className="flex gap-2 bg-krblack/30 rounded-lg p-1">
+                <button
+                  onClick={() => setCalendarView('monthly')}
+                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                    calendarView === 'monthly'
+                      ? 'bg-krgold text-krblack'
+                      : 'text-gray-400 hover:text-krtext'
+                  }`}
+                >
+                  Monthly
+                </button>
+                <button
+                  onClick={() => setCalendarView('weekly')}
+                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                    calendarView === 'weekly'
+                      ? 'bg-krgold text-krblack'
+                      : 'text-gray-400 hover:text-krtext'
+                  }`}
+                >
+                  Weekly
+                </button>
+                <button
+                  onClick={() => setCalendarView('yearly')}
+                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                    calendarView === 'yearly'
+                      ? 'bg-krgold text-krblack'
+                      : 'text-gray-400 hover:text-krtext'
+                  }`}
+                >
+                  Yearly
+                </button>
+              </div>
+            </div>
+            {calendarView === 'monthly' ? renderMonthlyCalendar() : calendarView === 'weekly' ? renderWeeklyCalendar() : renderYearlyCalendar()}
+          </div>
+
+          {/* Right column: Recent Entries + Trade Analytics */}
+          <div className="col-span-12 lg:col-span-4 flex flex-col gap-4">
+          {/* Recent Entries Section */}
+          <Link
+            to="/journal/entries"
+            className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder transition-all duration-200 hover:border-krgold/40 p-5 group"
           >
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center gap-3">
-                <span className="text-3xl">📊</span>
+                <span className="flex h-10 w-10 items-center justify-center rounded-lg border border-krborder bg-krpanel text-krgold"><FileText size={20} /></span>
+                <div>
+                  <h2 className="text-lg font-semibold group-hover:text-krgold transition-colors">Recent Entries</h2>
+                  <p className="text-xs text-krmuted">Your latest trade logs</p>
+                </div>
+              </div>
+              <ArrowRight className="text-krmuted group-hover:text-krgold transition-colors" size={20} />
+            </div>
+            <div className="space-y-2">
+              {recentEntries.length === 0 ? (
+                <div className="text-center py-4 text-krmuted">No entries yet</div>
+              ) : (
+                recentEntries.slice(0, 3).map(entry => {
+                  const netPnl = (entry.pnlAmount || 0) - (entry.fee || 0)
+                  return (
+                    <div key={entry.id} className="bg-krblack/30 rounded-lg p-3 flex items-center justify-between">
+                      <div>
+                        <div className="font-medium">{entry.ticker}</div>
+                        <div className="text-xs text-krmuted">{entry.date}</div>
+                      </div>
+                      <div className={`font-semibold ${netPnl >= 0 ? 'text-krsuccess' : 'text-krdanger'}`}>
+                        ${netPnl.toFixed(2)}
+                      </div>
+                    </div>
+                  )
+                })
+              )}
+            </div>
+          </Link>
+
+          {/* Trade Analytics Section */}
+          <Link
+            to="/journal/analytics"
+            className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder transition-all duration-200 hover:border-krgold/40 p-5 group"
+          >
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <span className="flex h-10 w-10 items-center justify-center rounded-lg border border-krborder bg-krpanel text-krgold"><BarChart3 size={20} /></span>
                 <div>
                   <h2 className="text-lg font-semibold group-hover:text-krgold transition-colors">Trade Analytics</h2>
                   <p className="text-xs text-krmuted">Performance metrics & insights</p>
@@ -663,13 +746,13 @@ export default function JournalOverview() {
           <div className="grid grid-cols-3 gap-3">
             <div className="bg-krblack/30 rounded-lg p-3">
               <div className="text-xs text-krmuted">Avg Win</div>
-              <div className="text-base font-semibold text-green-400">
+              <div className="text-base font-semibold text-krsuccess">
                 {wins > 0 ? formatAmount(journal.filter(j => ((j.pnlAmount || 0) - (j.fee || 0)) > 0).reduce((s, j) => s + (j.pnlAmount || 0) - (j.fee || 0), 0) / wins) : formatAmount(0)}
               </div>
             </div>
             <div className="bg-krblack/30 rounded-lg p-3">
               <div className="text-xs text-krmuted">Avg Loss</div>
-              <div className="text-base font-semibold text-red-400">
+              <div className="text-base font-semibold text-krdanger">
                 {losses > 0 ? formatAmount(journal.filter(j => ((j.pnlAmount || 0) - (j.fee || 0)) < 0).reduce((s, j) => s + (j.pnlAmount || 0) - (j.fee || 0), 0) / losses) : formatAmount(0)}
               </div>
             </div>
@@ -681,49 +764,12 @@ export default function JournalOverview() {
             </div>
           </div>
         </Link>
-
-        {/* Recent Entries Section */}
-        <Link 
-          to="/journal/entries"
-          className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-5 group"
-        >
-          <div className="flex items-start justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <span className="text-3xl">📝</span>
-              <div>
-                <h2 className="text-lg font-semibold group-hover:text-krgold transition-colors">Recent Entries</h2>
-                <p className="text-xs text-krmuted">Your latest trade logs</p>
-              </div>
-            </div>
-            <ArrowRight className="text-krmuted group-hover:text-krgold transition-colors" size={20} />
           </div>
-          <div className="space-y-2">
-            {recentEntries.length === 0 ? (
-              <div className="text-center py-4 text-krmuted">No entries yet</div>
-            ) : (
-              recentEntries.slice(0, 3).map(entry => {
-                const netPnl = (entry.pnlAmount || 0) - (entry.fee || 0)
-                return (
-                  <div key={entry.id} className="bg-krblack/30 rounded-lg p-3 flex items-center justify-between">
-                    <div>
-                      <div className="font-medium">{entry.ticker}</div>
-                      <div className="text-xs text-krmuted">{entry.date}</div>
-                    </div>
-                    <div className={`font-semibold ${netPnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                      ${netPnl.toFixed(2)}
-                    </div>
-                  </div>
-                )
-              })
-            )}
-          </div>
-        </Link>
-      </div>
 
       {/* Insights Section */}
-      <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-5 mb-6">
+      <div className="col-span-12 bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder transition-all duration-200 hover:border-krgold/40 p-5">
         <div className="flex items-center gap-3 mb-4">
-          <span className="text-2xl">💡</span>
+          <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-krborder bg-krpanel text-krgold"><Lightbulb size={18} /></span>
           <h2 className="text-lg font-semibold">Quick Insights</h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -738,7 +784,7 @@ export default function JournalOverview() {
           </div>
           <div className="bg-krblack/30 rounded-lg p-4">
             <div className="text-sm text-krmuted mb-2">Best Performing Day</div>
-            <div className="text-lg font-semibold text-green-400">
+            <div className="text-lg font-semibold text-krsuccess">
               $
               {journal.length > 0
                 ? (Object.entries(journal.reduce((acc: any, j) => {
@@ -767,48 +813,6 @@ export default function JournalOverview() {
           </div>
         </div>
       </div>
-
-      {/* PNL Calendar Section */}
-      <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-5 mb-6">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <span className="text-2xl">📅</span>
-            <h2 className="text-xl font-semibold">PNL Calendar</h2>
-          </div>
-          <div className="flex gap-2 bg-krblack/30 rounded-lg p-1">
-            <button
-              onClick={() => setCalendarView('monthly')}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                calendarView === 'monthly'
-                  ? 'bg-krgold text-krblack'
-                  : 'text-gray-400 hover:text-krtext'
-              }`}
-            >
-              Monthly
-            </button>
-            <button
-              onClick={() => setCalendarView('weekly')}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                calendarView === 'weekly'
-                  ? 'bg-krgold text-krblack'
-                  : 'text-gray-400 hover:text-krtext'
-              }`}
-            >
-              Weekly
-            </button>
-            <button
-              onClick={() => setCalendarView('yearly')}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                calendarView === 'yearly'
-                  ? 'bg-krgold text-krblack'
-                  : 'text-gray-400 hover:text-krtext'
-              }`}
-            >
-              Yearly
-            </button>
-          </div>
-        </div>
-        {calendarView === 'monthly' ? renderMonthlyCalendar() : calendarView === 'weekly' ? renderWeeklyCalendar() : renderYearlyCalendar()}
       </div>
 
       {/* Trade Details Modal */}
@@ -842,7 +846,7 @@ export default function JournalOverview() {
                     <div className="grid grid-cols-3 gap-3 mb-5">
                       <div className="bg-krblack/40 rounded-lg p-3 text-center border border-krborder/30">
                         <p className="text-xs text-krmuted mb-1">Total PnL</p>
-                        <p className={`text-xl font-bold ${pnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                        <p className={`text-xl font-bold ${pnl >= 0 ? 'text-krsuccess' : 'text-krdanger'}`}>
                           {formatAmount(pnl)}
                         </p>
                       </div>
@@ -852,7 +856,7 @@ export default function JournalOverview() {
                       </div>
                       <div className="bg-krblack/40 rounded-lg p-3 text-center border border-krborder/30">
                         <p className="text-xs text-krmuted mb-1">Win Rate</p>
-                        <p className={`text-xl font-bold ${dayWins / trades >= 0.5 ? 'text-green-400' : 'text-red-400'}`}>
+                        <p className={`text-xl font-bold ${dayWins / trades >= 0.5 ? 'text-krsuccess' : 'text-krdanger'}`}>
                           {((dayWins / trades) * 100).toFixed(0)}%
                         </p>
                       </div>
@@ -870,9 +874,9 @@ export default function JournalOverview() {
                                 <div className="flex items-center gap-2">
                                   <h4 className="text-base font-semibold text-krtext">{trade.ticker}</h4>
                                   {netPnl >= 0 ? (
-                                    <TrendingUp className="text-green-400" size={18} />
+                                    <TrendingUp className="text-krsuccess" size={18} />
                                   ) : (
-                                    <TrendingDown className="text-red-500" size={20} />
+                                    <TrendingDown className="text-krdanger" size={20} />
                                   )}
                                 </div>
                                 <div className="text-sm text-gray-400 mt-1">
@@ -880,7 +884,7 @@ export default function JournalOverview() {
                                 </div>
                               </div>
                               <div className="text-right">
-                                <div className={`text-xl font-bold ${netPnl >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                                <div className={`text-xl font-bold ${netPnl >= 0 ? 'text-krsuccess' : 'text-krdanger'}`}>
                                   {netPnl >= 0 ? '+' : ''}{formatAmount(netPnl)}
                                 </div>
                                 <div className="text-xs text-gray-400 mt-1">

@@ -25,7 +25,22 @@ export type JournalEntry = {
   pnlImg: string;
   reasonIn: string;
   reasonOut: string;
+  tags?: string[];
 };
+
+/** Preset trading-psychology / discipline tags. */
+export const PSYCH_TAGS = [
+  'Plan followed',
+  'FOMO',
+  'Revenge trade',
+  'Overtrading',
+  'Patience',
+  'Early exit',
+  'Late entry',
+  'Broke rules',
+  'Hesitation',
+  'Disciplined',
+] as const;
 
 export type VisionGoal = {
   id: number;

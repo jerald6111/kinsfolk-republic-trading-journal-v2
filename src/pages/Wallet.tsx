@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
 import { loadData, saveData, triggerAutoEmailBackup } from '../utils/storage'
 import { useCurrency } from '../context/CurrencyContext'
-import { Trash2, Edit2 } from 'lucide-react'
+import { Trash2, Edit2, Wallet as WalletIcon, Plus, ScrollText } from 'lucide-react'
+import EmptyState from '../components/EmptyState'
 
 interface Transaction {
   id: number
@@ -97,9 +98,9 @@ export default function Wallet() {
       <div className="mb-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <span className="text-4xl">💰</span>
+            <span className="flex h-11 w-11 items-center justify-center rounded-lg border border-krborder bg-krpanel text-krgold"><WalletIcon size={22} /></span>
             <div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-krgold to-kryellow bg-clip-text text-transparent">Wallet</h1>
+              <h1 className="text-3xl font-extrabold tracking-tight text-krwhite"><span className="text-krgold">Wallet</span></h1>
               <p className="text-krmuted text-sm mt-1">Manage deposits, withdrawals, and track your balance</p>
             </div>
           </div>
@@ -107,23 +108,23 @@ export default function Wallet() {
 
         {/* Balance Stats Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4">
+          <div className="bg-krcard shadow-soft rounded-xl border border-krborder p-4">
             <p className="text-xs text-krmuted mb-1">Current Balance</p>
-            <p className={`text-2xl font-bold ${balance >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+            <p className={`text-2xl font-bold tnum ${balance >= 0 ? 'text-krsuccess' : 'text-krdanger'}`}>
               {formatAmount(balance)}
             </p>
           </div>
-          <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4">
+          <div className="bg-krcard shadow-soft rounded-xl border border-krborder p-4">
             <p className="text-xs text-krmuted mb-1">Total Deposits</p>
-            <p className="text-2xl font-bold text-blue-400">{formatAmount(totalDeposits)}</p>
+            <p className="text-2xl font-bold tnum text-blue-400">{formatAmount(totalDeposits)}</p>
           </div>
-          <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4">
+          <div className="bg-krcard shadow-soft rounded-xl border border-krborder p-4">
             <p className="text-xs text-krmuted mb-1">Total Withdrawals</p>
-            <p className="text-2xl font-bold text-orange-400">{formatAmount(totalWithdrawals)}</p>
+            <p className="text-2xl font-bold tnum text-orange-400">{formatAmount(totalWithdrawals)}</p>
           </div>
-          <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4">
+          <div className="bg-krcard shadow-soft rounded-xl border border-krborder p-4">
             <p className="text-xs text-krmuted mb-1">Trading P&L</p>
-            <p className={`text-2xl font-bold ${totalTradingPnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+            <p className={`text-2xl font-bold tnum ${totalTradingPnl >= 0 ? 'text-krsuccess' : 'text-krdanger'}`}>
               {formatAmount(totalTradingPnl)}
             </p>
           </div>
@@ -136,11 +137,11 @@ export default function Wallet() {
           <h2 className="text-2xl font-bold mb-4 text-krtext flex items-center gap-2">
             {editingId ? (
               <>
-                <span className="text-blue-400">✏️</span> Edit Transaction
+                <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-krborder bg-krpanel text-krgold"><Edit2 size={18} /></span> Edit Transaction
               </>
             ) : (
               <>
-                <span className="text-krgold">➕</span> New Transaction
+                <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-krborder bg-krpanel text-krgold"><Plus size={18} /></span> New Transaction
               </>
             )}
           </h2>
@@ -188,7 +189,7 @@ export default function Wallet() {
             <div className="flex gap-2">
               <button 
                 onClick={save}
-                className="flex-1 px-4 py-3 bg-krgold hover:bg-kryellow text-krblack rounded-xl font-bold transition-colors shadow-lg shadow-krgold/20"
+                className="flex-1 px-4 py-3 bg-krgold hover:bg-kryellow text-krblack rounded-xl font-bold transition-colors"
               >
                 {editingId ? 'Update Transaction' : 'Save Transaction'}
               </button>
@@ -207,24 +208,24 @@ export default function Wallet() {
         {/* Transactions List */}
         <div className="md:col-span-2">
           <h2 className="text-2xl font-bold mb-4 text-krtext flex items-center gap-2">
-            <span className="text-krgold">📜</span> Transaction History ({items.length})
+            <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-krborder bg-krpanel text-krgold"><ScrollText size={18} /></span> Transaction History ({items.length})
           </h2>
           
           <div className="space-y-3 max-h-[calc(100vh-16rem)] overflow-y-auto pr-2 custom-scrollbar">
             {items.length === 0 && (
-              <div className="text-center py-20">
-                <div className="text-6xl mb-4">💰</div>
-                <p className="text-krmuted">No transactions yet</p>
-                <p className="text-xs text-krmuted/60 mt-2">Add your first transaction!</p>
-              </div>
+              <EmptyState
+                icon={<WalletIcon size={26} />}
+                title="No transactions yet"
+                description="Record your first deposit or withdrawal using the form on the left to start tracking your balance."
+              />
             )}
             {items.slice().reverse().map((it)=> (
-              <div key={it.id} className="bg-krcard/90 backdrop-blur-md rounded-xl border border-krborder/50 p-4 hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 group">
+              <div key={it.id} className="bg-krcard/90 backdrop-blur-md rounded-xl border border-krborder/50 p-4 transition-all duration-200 hover:border-krgold/40 group">
                 <div className="flex justify-between items-start gap-4">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
                       <div className="font-semibold text-krtext group-hover:text-krgold transition-colors">{it.date}</div>
-                      <span className={`px-3 py-1 rounded-lg text-xs font-bold border ${it.type === 'deposit' ? 'bg-green-500/20 text-green-400 border-green-500/30' : 'bg-red-500/20 text-red-400 border-red-500/30'}`}>
+                      <span className={`px-3 py-1 rounded-lg text-xs font-bold border ${it.type === 'deposit' ? 'bg-krsuccess/15 text-krsuccess border-krsuccess/30' : 'bg-krdanger/15 text-krdanger border-krdanger/30'}`}>
                         {it.type === 'deposit' ? '💵 Deposit' : '💸 Withdrawal'}
                       </span>
                     </div>
@@ -236,7 +237,7 @@ export default function Wallet() {
                   </div>
                   
                   <div className="flex items-start gap-3">
-                    <div className={`text-xl font-bold ${it.type === 'deposit' ? 'text-green-400' : 'text-red-400'}`}>
+                    <div className={`text-xl font-bold ${it.type === 'deposit' ? 'text-krsuccess' : 'text-krdanger'}`}>
                       {it.type === 'deposit' ? '+' : '-'}{formatAmount(Number(it.amount))}
                     </div>
                     
@@ -250,7 +251,7 @@ export default function Wallet() {
                       </button>
                       <button
                         onClick={() => deleteTransaction(it.id)}
-                        className="px-3 py-2 bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 text-red-400 rounded-lg transition-all font-semibold"
+                        className="px-3 py-2 bg-krdanger/15 hover:bg-red-500/30 border border-krdanger/30 text-krdanger rounded-lg transition-all font-semibold"
                         title="Delete Transaction"
                       >
                         <Trash2 size={14} />

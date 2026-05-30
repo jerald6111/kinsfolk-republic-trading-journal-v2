@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom'
 import { loadData, saveData } from '../utils/storage'
 import Modal from '../components/Modal'
 import FileUploader from '../components/FileUploader'
-import { TrendingUp, TrendingDown, Calendar, DollarSign, Percent, Filter, X, Upload, Info } from 'lucide-react'
+import { TrendingUp, TrendingDown, Calendar, DollarSign, Percent, Filter, X, Upload, Info, BarChart3, Coins } from 'lucide-react'
 import { useCurrency } from '../context/CurrencyContext'
 
 interface UploadedChart {
@@ -126,10 +126,10 @@ export default function Charts(){
       <div className="mb-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="text-4xl">{activeTab === 'Charts' ? '📊' : '💰'}</span>
+            <span className="flex h-11 w-11 items-center justify-center rounded-lg border border-krborder bg-krpanel text-krgold">{activeTab === 'Charts' ? <BarChart3 size={22} /> : <Coins size={22} />}</span>
             <div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-krgold to-kryellow bg-clip-text text-transparent">
-                Snapshots - {activeTab === 'Charts' ? 'Charts' : 'PNL Overview'}
+              <h1 className="text-3xl font-extrabold tracking-tight text-krwhite">
+                <span className="text-krgold">Snapshots</span> - {activeTab === 'Charts' ? 'Charts' : 'PNL Overview'}
               </h1>
               <p className="text-krmuted text-sm mt-1">Visual trading documentation</p>
             </div>
@@ -157,7 +157,7 @@ export default function Charts(){
       </div>
 
       {/* Filters Section */}
-      <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4 mb-6">
+      <div className="bg-krcard shadow-soft rounded-xl border border-krborder p-4 mb-6">
         <div className="flex items-center gap-2 mb-3">
           <Filter size={18} className="text-krgold" />
           <h2 className="text-base font-semibold text-krtext">Filters</h2>
@@ -252,7 +252,7 @@ export default function Charts(){
                           {chart.date}
                         </div>
                       </div>
-                      <span className={`px-2 py-1 rounded-lg text-xs font-semibold ${isProfit ? 'bg-green-400/20 text-green-400' : 'bg-red-400/20 text-red-400'}`}>
+                      <span className={`px-2 py-1 rounded-lg text-xs font-semibold tnum ${isProfit ? 'bg-krsuccess/15 text-krsuccess' : 'bg-krdanger/15 text-krdanger'}`}>
                         {isProfit ? <TrendingUp className="inline-block w-3 h-3" /> : <TrendingDown className="inline-block w-3 h-3" />}
                         {pnlPercent.toFixed(2)}%
                       </span>
@@ -293,8 +293,8 @@ export default function Charts(){
       {/* Snapshots Grid */}
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredItems.length === 0 && (
-          <div className="col-span-full text-center bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-12">
-            <span className="text-6xl mb-3 block">{activeTab === 'Charts' ? '📊' : '💰'}</span>
+          <div className="col-span-full text-center bg-krcard shadow-soft rounded-xl border border-krborder p-12">
+            <span className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-lg border border-krborder bg-krpanel text-krgold">{activeTab === 'Charts' ? <BarChart3 size={28} /> : <Coins size={28} />}</span>
             <p className="text-krmuted">
               {hasActiveFilters ? `No ${activeTab.toLowerCase()} snapshots match the selected filters.` : `No ${activeTab.toLowerCase()} snapshots available.`}
             </p>
@@ -310,7 +310,7 @@ export default function Charts(){
             <div 
               key={it.id} 
               onClick={() => setViewingTrade(it)}
-              className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder overflow-hidden hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 cursor-pointer group"
+              className="bg-krcard shadow-soft rounded-xl border border-krborder overflow-hidden transition-all duration-200 hover:border-krgold/40 cursor-pointer group"
             >
               <div className="relative overflow-hidden">
                 <img src={displayImage} className="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-200" alt={`${it.ticker} ${activeTab.toLowerCase()}`} />
@@ -328,7 +328,7 @@ export default function Charts(){
                       </div>
                     )}
                   </div>
-                  <span className={`px-2 py-1 rounded-lg text-xs font-semibold ${isProfit ? 'bg-green-400/20 text-green-400' : 'bg-red-400/20 text-red-400'}`}>
+                  <span className={`px-2 py-1 rounded-lg text-xs font-semibold tnum ${isProfit ? 'bg-krsuccess/15 text-krsuccess' : 'bg-krdanger/15 text-krdanger'}`}>
                     {isProfit ? <TrendingUp className="inline-block w-3 h-3" /> : <TrendingDown className="inline-block w-3 h-3" />}
                     {pnlPercent.toFixed(2)}%
                   </span>
@@ -377,7 +377,7 @@ export default function Charts(){
                 <h2 className="text-2xl font-bold text-krtext">{viewingTrade.ticker}</h2>
                 <p className="text-sm text-gray-400">{viewingTrade.date} {viewingTrade.time}</p>
               </div>
-              <span className={`text-lg px-3 py-1.5 rounded font-semibold ${viewingTrade.pnlAmount > 0 ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
+              <span className={`text-lg px-3 py-1.5 rounded font-semibold tnum ${viewingTrade.pnlAmount > 0 ? 'bg-krsuccess/15 text-krsuccess' : 'bg-krdanger/15 text-krdanger'}`}>
                 {viewingTrade.pnlAmount > 0 ? <TrendingUp className="inline-block w-5 h-5 mr-1" /> : <TrendingDown className="inline-block w-5 h-5 mr-1" />}
                 {(viewingTrade.pnlPercent || (((viewingTrade.exitPrice - viewingTrade.entryPrice) / viewingTrade.entryPrice) * 100)).toFixed(2)}%
               </span>
@@ -435,7 +435,7 @@ export default function Charts(){
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-400 mb-1">P&L</label>
-                  <div className={`font-semibold ${(viewingTrade.pnlAmount || (viewingTrade.exitPrice - viewingTrade.entryPrice)) > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                  <div className={`font-semibold tnum ${(viewingTrade.pnlAmount || (viewingTrade.exitPrice - viewingTrade.entryPrice)) > 0 ? 'text-krsuccess' : 'text-krdanger'}`}>
                     {formatAmount(viewingTrade.pnlAmount || (viewingTrade.exitPrice - viewingTrade.entryPrice))} ({(viewingTrade.pnlPercent || (((viewingTrade.exitPrice - viewingTrade.entryPrice) / viewingTrade.entryPrice) * 100)).toFixed(2)}%)
                   </div>
                 </div>
@@ -508,7 +508,7 @@ export default function Charts(){
               </div>
               <div>
                 <label className="block text-sm font-medium text-krtext mb-2">Potential P&L</label>
-                <div className={`px-3 py-2 rounded-lg ${uploadEntry && uploadExit ? (parseFloat(uploadExit) > parseFloat(uploadEntry) ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400') : 'bg-krblack/30 text-krmuted'} font-semibold`}>
+                <div className={`px-3 py-2 rounded-lg tnum ${uploadEntry && uploadExit ? (parseFloat(uploadExit) > parseFloat(uploadEntry) ? 'bg-krsuccess/15 text-krsuccess' : 'bg-krdanger/15 text-krdanger') : 'bg-krblack/30 text-krmuted'} font-semibold`}>
                   {uploadEntry && uploadExit ? `${(((parseFloat(uploadExit) - parseFloat(uploadEntry)) / parseFloat(uploadEntry)) * 100).toFixed(2)}%` : 'N/A'}
                 </div>
               </div>
@@ -579,7 +579,7 @@ export default function Charts(){
                 <p className="text-sm text-gray-400">{viewingUploadedChart.date}</p>
                 <p className="text-xs text-krmuted mt-1 italic">This chart is not counted as a trade entry</p>
               </div>
-              <span className={`text-lg px-3 py-1.5 rounded font-semibold ${viewingUploadedChart.exitPrice > viewingUploadedChart.entryPrice ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
+              <span className={`text-lg px-3 py-1.5 rounded font-semibold tnum ${viewingUploadedChart.exitPrice > viewingUploadedChart.entryPrice ? 'bg-krsuccess/15 text-krsuccess' : 'bg-krdanger/15 text-krdanger'}`}>
                 {viewingUploadedChart.exitPrice > viewingUploadedChart.entryPrice ? <TrendingUp className="inline-block w-5 h-5 mr-1" /> : <TrendingDown className="inline-block w-5 h-5 mr-1" />}
                 {(((viewingUploadedChart.exitPrice - viewingUploadedChart.entryPrice) / viewingUploadedChart.entryPrice) * 100).toFixed(2)}%
               </span>
@@ -616,7 +616,7 @@ export default function Charts(){
                   </div>
                   <div className="flex justify-between items-center pt-2 border-t border-krborder">
                     <span className="text-krmuted text-sm">Potential P&L:</span>
-                    <span className={`font-bold ${viewingUploadedChart.exitPrice > viewingUploadedChart.entryPrice ? 'text-green-400' : 'text-red-400'}`}>
+                    <span className={`font-bold tnum ${viewingUploadedChart.exitPrice > viewingUploadedChart.entryPrice ? 'text-krsuccess' : 'text-krdanger'}`}>
                       {(((viewingUploadedChart.exitPrice - viewingUploadedChart.entryPrice) / viewingUploadedChart.entryPrice) * 100).toFixed(2)}%
                     </span>
                   </div>
