@@ -107,7 +107,7 @@ export default function WebhookSelectorModal({ isOpen, onClose, onSelect }: Webh
                   <div className="flex items-center gap-2 mb-1">
                     <div className="font-medium text-krwhite">{webhook.name}</div>
                     {webhook.id === activeWebhookId && (
-                      <span className="px-2 py-0.5 bg-green-500/20 text-green-500 text-xs rounded-full whitespace-nowrap">
+                      <span className="px-2 py-0.5 bg-krsuccess/15 text-krsuccess text-xs rounded-full whitespace-nowrap">
                         Default
                       </span>
                     )}
@@ -133,7 +133,7 @@ export default function WebhookSelectorModal({ isOpen, onClose, onSelect }: Webh
           <button
             onClick={handleConfirm}
             disabled={!selectedWebhookId}
-            className="px-6 py-2 bg-gradient-to-r from-krgold to-kryellow text-krblack rounded-lg font-semibold hover:shadow-lg hover:shadow-krgold/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-6 py-2 bg-krgold text-krblack rounded-lg font-semibold shadow-btn hover:bg-kryellow transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Confirm & Send
           </button>

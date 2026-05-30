@@ -34,12 +34,12 @@ export default function Footer() {
       <footer className="bg-krblack border-t border-krborder py-8 mt-auto">
         <div className="container mx-auto px-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="text-gray-400 text-sm">
-              &copy; 2026 Created by Jerald L. All rights reserved.
+            <div className="text-krmuted text-sm">
+              &copy; 2025 Created by Jerald L. All rights reserved.
             </div>
             <button
               onClick={() => setShowDonateModal(true)}
-              className="bg-gradient-to-r from-krgold to-kryellow text-krblack px-6 py-2 rounded-lg font-semibold hover:shadow-lg hover:shadow-krgold/50 transition-all flex items-center gap-2"
+              className="shine bg-krgold text-krblack px-6 py-2 rounded-lg font-semibold shadow-btn hover:bg-kryellow transition-all flex items-center gap-2"
             >
               <Wallet size={18} />
               Support This Project

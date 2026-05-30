@@ -35,34 +35,34 @@ export default function SnapshotsOverview() {
       {/* Header with Gradient */}
       <div className="mb-6">
         <div className="flex items-center gap-3 mb-4">
-          <span className="text-4xl">📸</span>
+          <span className="flex h-11 w-11 items-center justify-center rounded-lg border border-krborder bg-krpanel text-krgold"><Camera size={22} /></span>
           <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-krgold to-kryellow bg-clip-text text-transparent">Snapshots</h1>
+            <h1 className="text-3xl font-extrabold tracking-tight text-krwhite"><span className="text-krgold">Snap</span>shots</h1>
             <p className="text-krmuted text-sm mt-1">Visual documentation of your trading journey</p>
           </div>
         </div>
 
         {/* Quick Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4 hover:border-krgold/50 transition-all">
+          <div className="bg-krcard shadow-soft rounded-xl border border-krborder p-4 hover:border-krgold/50 transition-all">
             <p className="text-xs text-krmuted mb-1">Total Snapshots</p>
-            <p className="text-2xl font-bold text-krgold">{totalSnapshots}</p>
+            <p className="text-2xl font-bold text-krgold tnum">{totalSnapshots}</p>
           </div>
-          <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4 hover:border-krgold/50 transition-all">
+          <div className="bg-krcard shadow-soft rounded-xl border border-krborder p-4 hover:border-krgold/50 transition-all">
             <p className="text-xs text-krmuted mb-1">Win Rate</p>
-            <p className={`text-2xl font-bold ${winRate >= 50 ? 'text-green-400' : 'text-red-400'}`}>
+            <p className={`text-2xl font-bold tnum ${winRate >= 50 ? 'text-krsuccess' : 'text-krdanger'}`}>
               {winRate}%
             </p>
           </div>
-          <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4 hover:border-krgold/50 transition-all">
+          <div className="bg-krcard shadow-soft rounded-xl border border-krborder p-4 hover:border-krgold/50 transition-all">
             <p className="text-xs text-krmuted mb-1">Total PnL</p>
-            <p className={`text-2xl font-bold ${totalPnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+            <p className={`text-2xl font-bold tnum ${totalPnl >= 0 ? 'text-krsuccess' : 'text-krdanger'}`}>
               {formatAmount(totalPnl)}
             </p>
           </div>
-          <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4 hover:border-krgold/50 transition-all">
+          <div className="bg-krcard shadow-soft rounded-xl border border-krborder p-4 hover:border-krgold/50 transition-all">
             <p className="text-xs text-krmuted mb-1">Chart/PNL</p>
-            <p className="text-2xl font-bold text-krtext">
+            <p className="text-2xl font-bold text-krtext tnum">
               {chartSnapshots}/{pnlSnapshots}
             </p>
           </div>
@@ -74,7 +74,7 @@ export default function SnapshotsOverview() {
         {/* Charts Section */}
         <Link 
           to="/snapshots/charts"
-          className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-5 hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 group"
+          className="bg-krcard shadow-soft rounded-xl border border-krborder p-5 transition-all duration-200 hover:border-krgold/40 group"
         >
           <div className="flex items-start justify-between mb-4">
             <div className="flex items-center gap-3">
@@ -91,11 +91,11 @@ export default function SnapshotsOverview() {
           <div className="grid grid-cols-2 gap-3">
             <div className="bg-krblack/40 rounded-lg p-3 border border-krborder/30">
               <p className="text-xs text-krmuted">Chart Images</p>
-              <p className="text-xl font-semibold text-krgold">{chartSnapshots}</p>
+              <p className="text-xl font-semibold text-krgold tnum">{chartSnapshots}</p>
             </div>
             <div className="bg-krblack/40 rounded-lg p-3 border border-krborder/30">
               <p className="text-xs text-krmuted">Documented</p>
-              <p className="text-xl font-semibold text-krtext">
+              <p className="text-xl font-semibold text-krtext tnum">
                 {chartsData.filter((j: any) => j.chartImg && (j.reasonIn || j.reasonOut)).length}
               </p>
             </div>
@@ -105,7 +105,7 @@ export default function SnapshotsOverview() {
         {/* PNL Overview Section */}
         <Link 
           to="/snapshots/pnl"
-          className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-5 hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 group"
+          className="bg-krcard shadow-soft rounded-xl border border-krborder p-5 transition-all duration-200 hover:border-krgold/40 group"
         >
           <div className="flex items-start justify-between mb-4">
             <div className="flex items-center gap-3">
@@ -122,11 +122,11 @@ export default function SnapshotsOverview() {
           <div className="grid grid-cols-2 gap-3">
             <div className="bg-krblack/40 rounded-lg p-3 border border-krborder/30">
               <p className="text-xs text-krmuted">PNL Images</p>
-              <p className="text-xl font-semibold text-krgold">{pnlSnapshots}</p>
+              <p className="text-xl font-semibold text-krgold tnum">{pnlSnapshots}</p>
             </div>
             <div className="bg-krblack/40 rounded-lg p-3 border border-krborder/30">
               <p className="text-xs text-krmuted">Avg PnL</p>
-              <p className={`text-xl font-semibold ${totalPnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+              <p className={`text-xl font-semibold tnum ${totalPnl >= 0 ? 'text-krsuccess' : 'text-krdanger'}`}>
                 ${totalSnapshots > 0 ? (totalPnl / totalSnapshots).toFixed(0) : '0'}
               </p>
             </div>
@@ -135,14 +135,14 @@ export default function SnapshotsOverview() {
       </div>
 
       {/* Recent Snapshots Grid */}
-      <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-5">
+      <div className="bg-krcard shadow-soft rounded-xl border border-krborder p-5">
         <div className="flex items-center gap-2 mb-4">
-          <span className="text-2xl">📸</span>
+          <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-krborder bg-krpanel text-krgold"><Camera size={18} /></span>
           <h2 className="text-lg font-semibold text-krtext">Recent Snapshots</h2>
         </div>
         {recentSnapshots.length === 0 ? (
           <div className="text-center py-12 bg-krblack/40 rounded-lg border border-krborder/30">
-            <span className="text-6xl mb-3 block">📸</span>
+            <span className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-lg border border-krborder bg-krpanel text-krgold"><Camera size={28} /></span>
             <p className="text-krmuted">No snapshots yet. Start documenting your trades!</p>
           </div>
         ) : (
@@ -155,7 +155,7 @@ export default function SnapshotsOverview() {
                 <div 
                   key={snapshot.id} 
                   onClick={() => setViewingTrade(snapshot)}
-                  className="bg-krblack/40 rounded-lg overflow-hidden border border-krborder/30 hover:border-krgold/50 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 cursor-pointer group"
+                  className="bg-krblack/40 rounded-lg overflow-hidden border border-krborder/30 hover:border-krgold/50 transition-all duration-200 cursor-pointer group"
                 >
                   {displayImage && (
                     <div className="aspect-video bg-krblack/50 relative overflow-hidden">
@@ -170,14 +170,14 @@ export default function SnapshotsOverview() {
                     <div className="flex items-center justify-between mb-2">
                       <div className="font-semibold text-krtext">{snapshot.ticker}</div>
                       {isProfit ? (
-                        <TrendingUp className="text-green-400" size={16} />
+                        <TrendingUp className="text-krsuccess" size={16} />
                       ) : (
-                        <TrendingDown className="text-red-400" size={16} />
+                        <TrendingDown className="text-krdanger" size={16} />
                       )}
                     </div>
                     <div className="flex items-center justify-between text-sm">
                       <div className="text-krmuted">{snapshot.date}</div>
-                      <div className={`font-semibold ${isProfit ? 'text-green-400' : 'text-red-400'}`}>
+                      <div className={`font-semibold tnum ${isProfit ? 'text-krsuccess' : 'text-krdanger'}`}>
                         {isProfit ? '+' : ''}${snapshot.pnlAmount?.toFixed(2) || '0.00'}
                       </div>
                     </div>
@@ -202,7 +202,7 @@ export default function SnapshotsOverview() {
                   <span>{viewingTrade.date} {viewingTrade.time}</span>
                 </div>
               </div>
-              <span className={`text-lg px-3 py-1.5 rounded-lg font-semibold ${(viewingTrade.pnlAmount || 0) > 0 ? 'bg-green-400/20 text-green-400' : 'bg-red-400/20 text-red-400'}`}>
+              <span className={`text-lg px-3 py-1.5 rounded-lg font-semibold tnum ${(viewingTrade.pnlAmount || 0) > 0 ? 'bg-krsuccess/15 text-krsuccess' : 'bg-krdanger/15 text-krdanger'}`}>
                 {(viewingTrade.pnlAmount || 0) > 0 ? <TrendingUp className="inline-block w-5 h-5 mr-1" /> : <TrendingDown className="inline-block w-5 h-5 mr-1" />}
                 {(viewingTrade.pnlPercent || (((viewingTrade.exitPrice - viewingTrade.entryPrice) / viewingTrade.entryPrice) * 100)).toFixed(2)}%
               </span>
@@ -242,7 +242,7 @@ export default function SnapshotsOverview() {
               </div>
               <div className="bg-krblack/40 rounded-lg p-3 border border-krborder/30">
                 <div className="text-xs text-krmuted mb-1">P&L</div>
-                <div className={`font-semibold ${(viewingTrade.pnlAmount || 0) > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                <div className={`font-semibold tnum ${(viewingTrade.pnlAmount || 0) > 0 ? 'text-krsuccess' : 'text-krdanger'}`}>
                   {formatAmount(viewingTrade.pnlAmount || 0)}
                 </div>
               </div>

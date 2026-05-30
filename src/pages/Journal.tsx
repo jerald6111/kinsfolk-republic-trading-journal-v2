@@ -7,8 +7,9 @@ import Modal from '../components/Modal'
 import SendToDiscordButton from '../components/SendToDiscordButton'
 import { loadData, saveData, triggerAutoEmailBackup } from '../utils/storage'
 import { useCurrency } from '../context/CurrencyContext'
-import { JournalEntry, TradeObjective, TradeType, TradePosition } from '../types'
-import { TrendingUp, TrendingDown, Link, X } from 'lucide-react'
+import { JournalEntry, TradeObjective, TradeType, TradePosition, PSYCH_TAGS } from '../types'
+import { TrendingUp, TrendingDown, Link, X, LineChart } from 'lucide-react'
+import EmptyState from '../components/EmptyState'
 
 const OBJECTIVES: TradeObjective[] = ['Scalping', 'Day Trade', 'Swing Trade', 'Position']
 const TYPES: TradeType[] = ['Spot', 'Futures']
@@ -123,7 +124,8 @@ export default function Journal() {
       chartImg: '',
       pnlImg: '',
       reasonIn: '',
-      reasonOut: ''
+      reasonOut: '',
+      tags: []
     })
   }
 
@@ -148,44 +150,44 @@ export default function Journal() {
       <div className="mb-6">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-krgold to-kryellow bg-clip-text text-transparent">Trading Journal</h1>
+            <h1 className="text-3xl font-extrabold tracking-tight text-krwhite">Trade <span className="text-krgold">Entries</span></h1>
             <p className="text-krmuted text-sm mt-1">Track and analyze your trading performance</p>
           </div>
-          
+
           {/* Total Trades */}
           <div className="flex items-center gap-3">
-            <div className="bg-krcard/50 backdrop-blur-sm rounded-xl border border-krborder px-4 py-2">
-              <p className="text-xs text-krmuted">Total Trades</p>
-              <p className="text-2xl font-bold text-krgold">{items.length}</p>
+            <div className="bg-krcard rounded-xl border border-krborder shadow-soft px-4 py-2">
+              <p className="text-xs uppercase tracking-[0.14em] text-krmuted">Total Trades</p>
+              <p className="text-2xl font-extrabold text-krgold tnum">{items.length}</p>
             </div>
           </div>
         </div>
 
         {/* Quick Stats Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-          <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4">
-            <p className="text-xs text-krmuted mb-1">Win Rate</p>
-            <p className="text-xl font-bold text-green-500">
+          <div className="bg-krcard rounded-xl border border-krborder shadow-soft lift hover:border-krgold/40 p-4">
+            <p className="text-xs uppercase tracking-[0.14em] text-krmuted mb-1.5">Win Rate</p>
+            <p className="text-xl font-extrabold text-krsuccess tnum">
               {items.length > 0 ? `${((items.filter(t => (t.pnlAmount - (t.fee || 0)) > 0).length / items.length) * 100).toFixed(1)}%` : '0%'}
             </p>
           </div>
-          <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4">
-            <p className="text-xs text-krmuted mb-1">Total P&L</p>
-            <p className={`text-xl font-bold ${items.reduce((sum, t) => sum + (t.pnlAmount - (t.fee || 0)), 0) >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+          <div className="bg-krcard rounded-xl border border-krborder shadow-soft lift hover:border-krgold/40 p-4">
+            <p className="text-xs uppercase tracking-[0.14em] text-krmuted mb-1.5">Total P&L</p>
+            <p className={`text-xl font-extrabold tnum ${items.reduce((sum, t) => sum + (t.pnlAmount - (t.fee || 0)), 0) >= 0 ? 'text-krsuccess' : 'text-krdanger'}`}>
               {formatAmount(items.reduce((sum, t) => sum + (t.pnlAmount - (t.fee || 0)), 0))}
             </p>
           </div>
-          <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4">
-            <p className="text-xs text-krmuted mb-1">Avg Win</p>
-            <p className="text-xl font-bold text-green-500">
-              {items.filter(t => (t.pnlAmount - (t.fee || 0)) > 0).length > 0 
+          <div className="bg-krcard rounded-xl border border-krborder shadow-soft lift hover:border-krgold/40 p-4">
+            <p className="text-xs uppercase tracking-[0.14em] text-krmuted mb-1.5">Avg Win</p>
+            <p className="text-xl font-extrabold text-krsuccess tnum">
+              {items.filter(t => (t.pnlAmount - (t.fee || 0)) > 0).length > 0
                 ? formatAmount(items.filter(t => (t.pnlAmount - (t.fee || 0)) > 0).reduce((sum, t) => sum + (t.pnlAmount - (t.fee || 0)), 0) / items.filter(t => (t.pnlAmount - (t.fee || 0)) > 0).length)
                 : formatAmount(0)}
             </p>
           </div>
-          <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4">
-            <p className="text-xs text-krmuted mb-1">Avg Loss</p>
-            <p className="text-xl font-bold text-red-500">
+          <div className="bg-krcard rounded-xl border border-krborder shadow-soft lift hover:border-krgold/40 p-4">
+            <p className="text-xs uppercase tracking-[0.14em] text-krmuted mb-1.5">Avg Loss</p>
+            <p className="text-xl font-extrabold text-krdanger tnum">
               {items.filter(t => (t.pnlAmount - (t.fee || 0)) < 0).length > 0 
                 ? formatAmount(Math.abs(items.filter(t => (t.pnlAmount - (t.fee || 0)) < 0).reduce((sum, t) => sum + (t.pnlAmount - (t.fee || 0)), 0) / items.filter(t => (t.pnlAmount - (t.fee || 0)) < 0).length))
                 : formatAmount(0)}
@@ -470,8 +472,35 @@ export default function Journal() {
               />
             </div>
 
+            {/* Psychology tags */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-krtext">Psychology / discipline tags</label>
+              <div className="flex flex-wrap gap-2">
+                {PSYCH_TAGS.map(tag => {
+                  const selected = (form.tags || []).includes(tag)
+                  return (
+                    <button
+                      key={tag}
+                      type="button"
+                      onClick={() => {
+                        const cur = form.tags || []
+                        setForm({ ...form, tags: selected ? cur.filter(t => t !== tag) : [...cur, tag] })
+                      }}
+                      className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
+                        selected
+                          ? 'bg-krgold text-krblack border-krgold'
+                          : 'border-krborder text-krmuted hover:text-krwhite hover:border-krgold/40'
+                      }`}
+                    >
+                      {tag}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+
             {/* Save Button */}
-            <button 
+            <button
               className="w-full px-4 py-2 bg-krgold text-krblack rounded-md font-semibold hover:bg-kryellow transition-colors"
               onClick={save}
             >
@@ -487,11 +516,12 @@ export default function Journal() {
           </h2>
           <div className="space-y-3 pr-2 flex-1 max-h-[calc(100vh-16rem)] custom-scrollbar" style={{ overflowY: 'auto', overflowX: 'visible' }}>
             {items.length === 0 && (
-              <div className="text-center py-20">
-                <div className="text-6xl mb-4">📈</div>
-                <p className="text-krmuted">No trades yet</p>
-                <p className="text-xs text-krmuted/60 mt-2">Add your first trade to start tracking!</p>
-              </div>
+              <EmptyState
+                icon={<LineChart size={26} />}
+                title="No trades yet"
+                description="Log your first trade with the form on the left to start tracking your performance, or load a sample dataset to explore the app."
+                showSampleButton
+              />
             )}
             {items.map((it) => {
               const netPnl = (it.pnlAmount || 0) - (it.fee || 0)
@@ -501,7 +531,7 @@ export default function Journal() {
                 <React.Fragment key={it.id}>
                   <div 
                     id={`trade-${it.id}`}
-                    className="bg-krblack/40 backdrop-blur-sm rounded-xl border border-krborder/30 p-4 cursor-pointer hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200"
+                    className="bg-krblack/40 backdrop-blur-sm rounded-xl border border-krborder/30 p-4 cursor-pointer transition-all duration-200 hover:border-krgold/40"
                     onClick={() => setViewingTrade(it)}
                     onMouseEnter={(e) => {
                       setHoveredTrade(it.id)
@@ -520,7 +550,7 @@ export default function Journal() {
                             <span>{it.time}</span>
                           </div>
                         </div>
-                        <span className={`text-xs px-3 py-1.5 rounded-lg whitespace-nowrap font-bold ${isProfit ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'}`}>
+                        <span className={`text-xs px-3 py-1.5 rounded-lg whitespace-nowrap font-bold ${isProfit ? 'bg-krsuccess/15 text-krsuccess border border-krsuccess/30' : 'bg-krdanger/15 text-krdanger border border-krdanger/30'}`}>
                           {isProfit ? <TrendingUp className="inline-block w-3 h-3 mr-1" /> : <TrendingDown className="inline-block w-3 h-3 mr-1" />}
                           {it.pnlPercent.toFixed(2)}%
                         </span>
@@ -536,7 +566,7 @@ export default function Journal() {
                         </div>
                         <div className="flex items-center justify-between pt-2 border-t border-krborder/20">
                           <span className="text-krmuted">Net P&L</span>
-                          <span className={`font-bold text-sm ${isProfit ? 'text-green-400' : 'text-red-400'}`}>
+                          <span className={`font-bold text-sm ${isProfit ? 'text-krsuccess' : 'text-krdanger'}`}>
                             {formatAmount(netPnl)}
                           </span>
                         </div>
@@ -561,10 +591,10 @@ export default function Journal() {
                         {/* PNL Summary */}
                         <div className="mb-3 pb-3 border-b border-krborder/30">
                           <div className="text-xs text-krmuted mb-2">Net P&L</div>
-                          <div className={`text-2xl font-bold ${isProfit ? 'text-green-400' : 'text-red-400'}`}>
+                          <div className={`text-2xl font-bold ${isProfit ? 'text-krsuccess' : 'text-krdanger'}`}>
                             {formatAmount(netPnl)}
                           </div>
-                          <div className={`text-sm font-medium ${isProfit ? 'text-green-400' : 'text-red-400'}`}>
+                          <div className={`text-sm font-medium ${isProfit ? 'text-krsuccess' : 'text-krdanger'}`}>
                             {isProfit ? '+' : ''}{it.pnlPercent.toFixed(2)}%
                           </div>
                         </div>
@@ -620,10 +650,10 @@ export default function Journal() {
                       </p>
                     </div>
                     <div className="text-right">
-                      <div className={`text-3xl font-bold ${netPnl > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                      <div className={`text-3xl font-bold ${netPnl > 0 ? 'text-krsuccess' : 'text-krdanger'}`}>
                         {netPnl > 0 ? '+' : ''}{formatAmount(netPnl)}
                       </div>
-                      <div className={`text-sm font-medium ${netPnl > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                      <div className={`text-sm font-medium ${netPnl > 0 ? 'text-krsuccess' : 'text-krdanger'}`}>
                         {netPnl > 0 ? <TrendingUp className="inline-block w-4 h-4" /> : <TrendingDown className="inline-block w-4 h-4" />}
                         {viewingTrade.pnlPercent.toFixed(2)}%
                       </div>
@@ -684,17 +714,17 @@ export default function Journal() {
                     )}
                     <div className="bg-krblack/30 backdrop-blur-sm rounded-xl p-4 border border-krborder">
                       <label className="block text-sm text-gray-400 mb-2">Gross P&L</label>
-                      <div className={`text-xl font-semibold ${viewingTrade.pnlAmount > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                      <div className={`text-xl font-semibold ${viewingTrade.pnlAmount > 0 ? 'text-krsuccess' : 'text-krdanger'}`}>
                         {formatAmount(viewingTrade.pnlAmount)}
                       </div>
                     </div>
                     <div className="bg-krblack/30 backdrop-blur-sm rounded-xl p-4 border border-krborder">
                       <label className="block text-sm text-gray-400 mb-2">Fee</label>
-                      <div className="text-xl font-semibold text-red-400">{formatAmount(viewingTrade.fee || 0)}</div>
+                      <div className="text-xl font-semibold text-krdanger">{formatAmount(viewingTrade.fee || 0)}</div>
                     </div>
                     <div className="bg-krblack/30 backdrop-blur-sm rounded-xl p-4 border border-krborder">
                       <label className="block text-sm text-gray-400 mb-2">Net P&L</label>
-                      <div className={`text-xl font-bold ${netPnl > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                      <div className={`text-xl font-bold ${netPnl > 0 ? 'text-krsuccess' : 'text-krdanger'}`}>
                         {formatAmount(netPnl)}
                       </div>
                     </div>
@@ -750,7 +780,7 @@ export default function Journal() {
                           setViewingTrade(null);
                         }
                       }}
-                      className="px-4 py-2 text-red-400 hover:bg-red-500/10 border border-red-500/30 rounded-lg transition-colors font-medium"
+                      className="px-4 py-2 text-krdanger hover:bg-krdanger/10 border border-krdanger/30 rounded-lg transition-colors font-medium"
                     >
                       Delete
                     </button>

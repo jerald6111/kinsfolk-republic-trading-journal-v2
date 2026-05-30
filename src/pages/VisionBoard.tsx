@@ -3,8 +3,9 @@ import React, { useState } from 'react'
 import FileUploader from '../components/FileUploader'
 import Modal from '../components/Modal'
 import { loadData, saveData, triggerAutoEmailBackup } from '../utils/storage'
-import { Trash2, Edit2, CheckCircle2, X, Image as ImageIcon } from 'lucide-react'
+import { Trash2, Edit2, CheckCircle2, X, Image as ImageIcon, Target, Plus, Trophy } from 'lucide-react'
 import { useCurrency } from '../context/CurrencyContext'
+import EmptyState from '../components/EmptyState'
 
 
 type GoalTimeline = 'Short Term (3-6 months)' | 'Mid Term (6-12 months)' | 'Long Term (1-3 years)'
@@ -26,7 +27,7 @@ const congratsMessages = [
     emoji: '⭐',
     title: 'Goal Crushed!',
     message: 'Amazing! You\'re one step closer to your dreams. Keep up the momentum!',
-    color: 'text-green-400'
+    color: 'text-krsuccess'
   },
   {
     emoji: '💪',
@@ -44,7 +45,7 @@ const congratsMessages = [
     emoji: '🎯',
     title: 'Bullseye!',
     message: 'Perfect execution! You hit your target with precision. Onwards and upwards!',
-    color: 'text-red-400'
+    color: 'text-krgold'
   },
   {
     emoji: '🌟',
@@ -256,9 +257,9 @@ export default function VisionBoard(){
       <div className="mb-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <span className="text-4xl">🎯</span>
+            <span className="flex h-11 w-11 items-center justify-center rounded-lg border border-krborder bg-krpanel text-krgold"><Target size={22} /></span>
             <div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-krgold to-kryellow bg-clip-text text-transparent">Vision Board</h1>
+              <h1 className="text-3xl font-extrabold tracking-tight text-krwhite">Vision <span className="text-krgold">Board</span></h1>
               <p className="text-krmuted text-sm mt-1">Visualize your goals and track achievements</p>
             </div>
           </div>
@@ -266,21 +267,21 @@ export default function VisionBoard(){
 
         {/* Quick Stats Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4">
+          <div className="bg-krcard shadow-soft rounded-xl border border-krborder p-4">
             <p className="text-xs text-krmuted mb-1">Active Goals</p>
-            <p className="text-2xl font-bold text-blue-400">{activeGoals.length}</p>
+            <p className="text-2xl font-bold tnum text-blue-400">{activeGoals.length}</p>
           </div>
-          <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4">
+          <div className="bg-krcard shadow-soft rounded-xl border border-krborder p-4">
             <p className="text-xs text-krmuted mb-1">Completed</p>
-            <p className="text-2xl font-bold text-green-400">{completedGoals.length}</p>
+            <p className="text-2xl font-bold tnum text-krsuccess">{completedGoals.length}</p>
           </div>
-          <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4">
+          <div className="bg-krcard shadow-soft rounded-xl border border-krborder p-4">
             <p className="text-xs text-krmuted mb-1">Total Goals</p>
-            <p className="text-2xl font-bold text-krgold">{items.length}</p>
+            <p className="text-2xl font-bold tnum text-krgold">{items.length}</p>
           </div>
-          <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4">
+          <div className="bg-krcard shadow-soft rounded-xl border border-krborder p-4">
             <p className="text-xs text-krmuted mb-1">Success Rate</p>
-            <p className="text-2xl font-bold text-purple-400">
+            <p className="text-2xl font-bold tnum text-purple-400">
               {items.length > 0 ? `${((completedGoals.length / items.length) * 100).toFixed(0)}%` : '0%'}
             </p>
           </div>
@@ -292,7 +293,7 @@ export default function VisionBoard(){
       <div className="grid md:grid-cols-[350px,1fr] gap-4 mb-6">
         <div className="p-6 bg-krcard/90 backdrop-blur-md rounded-2xl shadow-2xl border border-krborder/50 self-start">
           <div className="flex items-center gap-2 mb-4">
-            <span className="text-2xl">{editingGoal ? '✏️' : '➤'}</span>
+            <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-krborder bg-krpanel text-krgold">{editingGoal ? <Edit2 size={18} /> : <Plus size={18} />}</span>
             <h2 className="text-lg font-semibold text-krtext">{editingGoal ? 'Edit Goal' : 'Add New Goal'}</h2>
           </div>
           
@@ -334,7 +335,7 @@ export default function VisionBoard(){
             </div>
             
             <button 
-              className="w-full px-4 py-3 bg-gradient-to-r from-krgold to-kryellow text-krblack rounded-xl font-bold hover:shadow-lg hover:shadow-krgold/30 transition-all duration-200" 
+              className="w-full px-4 py-3 bg-gradient-to-r from-krgold to-kryellow text-krblack rounded-xl font-bold transition-all duration-200"
               onClick={add}
             >
               {editingGoal ? '🎯 Update Goal' : '✨ Add Goal'}
@@ -358,21 +359,22 @@ export default function VisionBoard(){
           {/* Active Goals */}
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <span className="text-2xl">🎯</span>
+              <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-krborder bg-krpanel text-krgold"><Target size={18} /></span>
               <h2 className="text-xl font-semibold text-krtext">Active Goals</h2>
             </div>
             
             {activeGoals.length === 0 ? (
-              <div className="bg-krcard/50 backdrop-blur-sm rounded-xl border border-krborder/30 p-8 text-center">
-                <span className="text-6xl mb-4 block">🎯</span>
-                <p className="text-krmuted">No active goals yet. Create your first goal to start visualizing your success!</p>
-              </div>
+              <EmptyState
+                icon={<Target size={26} />}
+                title="No active goals yet"
+                description="Use the form on the left to add your first goal and start visualizing your success."
+              />
             ) : (
               <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {activeGoals.map((it:any)=> (
                   <div 
                     key={it.id} 
-                    className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-4 cursor-pointer group"
+                    className="bg-krcard shadow-soft rounded-xl border border-krborder transition-all duration-200 hover:border-krgold/40 p-4 cursor-pointer group"
                     onClick={() => setViewingGoal(it)}
                   >
                     {it.img && <img src={it.img} alt={it.title} className="w-full h-40 object-cover rounded-lg mb-3 group-hover:scale-[1.02] transition-transform" />}
@@ -406,7 +408,7 @@ export default function VisionBoard(){
                       </button>
                       <button 
                         onClick={() => deleteGoal(it.id)}
-                        className="px-3 py-2 bg-red-500/20 text-red-400 rounded-lg text-sm hover:bg-red-500 hover:text-white transition-colors border border-red-500/30"
+                        className="px-3 py-2 bg-krdanger/15 text-krdanger rounded-lg text-sm hover:bg-red-500 hover:text-white transition-colors border border-krdanger/30"
                         title="Delete"
                       >
                         <Trash2 size={14} />
@@ -421,7 +423,7 @@ export default function VisionBoard(){
           {/* Achievements (Completed Goals) */}
           <div className="mt-8">
             <div className="flex items-center gap-2 mb-4">
-              <span className="text-2xl">🏆</span>
+              <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-krborder bg-krpanel text-krgold"><Trophy size={18} /></span>
               <h2 className="text-xl font-semibold text-krtext">Achievements</h2>
             </div>
             {completedGoals.length === 0 ? (
@@ -434,7 +436,7 @@ export default function VisionBoard(){
                 {completedGoals.map((it:any)=> (
                   <div 
                     key={it.id} 
-                    className="bg-gradient-to-br from-krgold/10 to-kryellow/5 backdrop-blur-sm rounded-xl border border-krgold/50 p-4 hover:shadow-lg hover:shadow-krgold/20 transition-all duration-200 cursor-pointer group"
+                    className="bg-gradient-to-br from-krgold/10 to-kryellow/5 backdrop-blur-sm rounded-xl border border-krgold/50 p-4 transition-all duration-200 cursor-pointer group"
                     onClick={() => setViewingGoal(it)}
                   >
                     {it.img && <img src={it.img} alt={it.title} className="w-full h-40 object-cover rounded-lg mb-3 group-hover:scale-[1.02] transition-transform" />}
@@ -456,7 +458,7 @@ export default function VisionBoard(){
                     )}
                     <button
                       onClick={(e) => handleDeleteAchievement(it, e)}
-                      className="mt-3 w-full px-3 py-2 bg-red-500/10 text-red-400 rounded-lg text-sm hover:bg-red-500 hover:text-white transition-colors flex items-center justify-center gap-1 border border-red-500/20"
+                      className="mt-3 w-full px-3 py-2 bg-red-500/10 text-krdanger rounded-lg text-sm hover:bg-red-500 hover:text-white transition-colors flex items-center justify-center gap-1 border border-red-500/20"
                       title="Delete achievement"
                     >
                       <Trash2 size={14} />

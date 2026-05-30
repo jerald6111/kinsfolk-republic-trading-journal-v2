@@ -163,7 +163,7 @@ export default function CryptoConverter() {
             </div>
             <div className="flex justify-between">
               <span>24h Change:</span>
-              <span className={`flex items-center gap-1 font-semibold ${priceChange >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+              <span className={`flex items-center gap-1 font-semibold tnum ${priceChange >= 0 ? 'text-krsuccess' : 'text-krdanger'}`}>
                 {priceChange >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
                 {priceChange >= 0 ? '+' : ''}{priceChange.toFixed(2)}%
               </span>

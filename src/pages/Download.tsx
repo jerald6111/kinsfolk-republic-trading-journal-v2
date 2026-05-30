@@ -75,15 +75,15 @@ export default function Download() {
                 <span className="text-sm text-krgold font-semibold">Windows Desktop Application</span>
               </div>
               
-              <h1 className="text-4xl md:text-5xl font-bold text-krwhite mb-6">
-                Take Your Trading <span className="bg-gradient-to-r from-krgold to-kryellow bg-clip-text text-transparent">Offline</span>
+              <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-krwhite mb-6">
+                Take Your Trading <span className="text-krgold">Offline</span>
               </h1>
               
               <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
                 Download our professional Windows desktop app for enhanced performance, complete offline functionality, and superior security. Production-ready trading journal software.
               </p>
               
-              <div className="bg-krcard/80 backdrop-blur-sm border border-krborder rounded-xl p-8 mb-8">
+              <div className="bg-krcard shadow-soft border border-krborder rounded-xl p-8 mb-8">
                 <div className="flex items-center justify-center gap-4 mb-4">
                   <Monitor className="text-krgold" size={32} />
                   <div className="text-left">
@@ -96,7 +96,7 @@ export default function Download() {
                   href="https://drive.google.com/file/d/1EUvANrppgmUlMhrRmyrSQ7_TwTNmxU75/view?usp=sharing"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full bg-gradient-to-r from-krgold to-kryellow text-krblack px-8 py-4 rounded-xl font-semibold hover:shadow-lg hover:shadow-krgold/50 transition-all flex items-center justify-center gap-2"
+                  className="w-full bg-gradient-to-r from-krgold to-kryellow text-krblack px-8 py-4 rounded-xl font-semibold transition-all flex items-center justify-center gap-2"
                 >
                   <DownloadIcon size={20} />
                   Download for Windows (FREE)
@@ -166,8 +166,8 @@ export default function Download() {
         <section className="py-20 bg-krblack/20">
           <div className="container mx-auto px-6">
             <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold text-krwhite mb-4">
-                Why Go <span className="bg-gradient-to-r from-krgold to-kryellow bg-clip-text text-transparent">Desktop?</span>
+              <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-krwhite mb-4">
+                Why Go <span className="text-krgold">Desktop?</span>
               </h2>
               <p className="text-gray-400 max-w-2xl mx-auto">
                 Experience the power of offline trading analysis with enhanced performance and security
@@ -178,7 +178,7 @@ export default function Download() {
               {benefits.map((benefit, index) => (
                 <div
                   key={index}
-                  className="bg-krcard/80 backdrop-blur-sm border border-krborder rounded-xl p-6 hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200"
+                  className="bg-krcard shadow-soft border border-krborder rounded-xl p-6 transition-all duration-200 hover:border-krgold/40"
                 >
                   <div className="mb-4">{benefit.icon}</div>
                   <h3 className="text-xl font-bold text-krwhite mb-2">{benefit.title}</h3>
@@ -194,8 +194,8 @@ export default function Download() {
           <div className="container mx-auto px-6">
             <div className="max-w-4xl mx-auto">
               <div className="text-center mb-12">
-                <h2 className="text-3xl md:text-4xl font-bold text-krwhite mb-4">
-                  Full Feature <span className="bg-gradient-to-r from-krgold to-kryellow bg-clip-text text-transparent">Parity</span>
+                <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-krwhite mb-4">
+                  Full Feature <span className="text-krgold">Parity</span>
                 </h2>
                 <p className="text-gray-400">
                   Get the complete KRTJ experience with all features available offline
@@ -223,7 +223,7 @@ export default function Download() {
             <div className="max-w-2xl mx-auto text-center">
               <h2 className="text-3xl font-bold text-krwhite mb-8">System Requirements</h2>
               
-              <div className="bg-krcard/80 backdrop-blur-sm border border-krborder rounded-xl p-8">
+              <div className="bg-krcard shadow-soft border border-krborder rounded-xl p-8">
                 <div className="grid gap-4 text-left">
                   <div className="flex justify-between">
                     <span className="text-gray-400">Operating System:</span>
@@ -302,14 +302,14 @@ export default function Download() {
                     link.click()
                     document.body.removeChild(link)
                   }}
-                  className="bg-gradient-to-r from-krgold to-kryellow text-krblack px-8 py-3 rounded-xl font-semibold hover:shadow-lg hover:shadow-krgold/50 transition-all flex items-center gap-2"
+                  className="bg-gradient-to-r from-krgold to-kryellow text-krblack px-8 py-3 rounded-xl font-semibold transition-all flex items-center gap-2"
                 >
                   <DownloadIcon size={20} />
                   Download Beta
                 </button>
                 <Link
                   to="/"
-                  className="bg-krcard/80 backdrop-blur-sm border border-krborder text-krwhite px-8 py-3 rounded-xl font-semibold hover:border-krgold hover:shadow-lg hover:shadow-krgold/10 transition-all flex items-center gap-2"
+                  className="bg-krcard shadow-soft border border-krborder text-krwhite px-8 py-3 rounded-xl font-semibold hover:border-krgold/40 transition-all flex items-center gap-2"
                 >
                   Try Web Version
                   <ArrowRight size={16} />

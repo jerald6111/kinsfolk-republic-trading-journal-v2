@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="Kinsfolk Republic">
+  <rect width="512" height="512" fill="#0A0B0D"/>
+  <rect x="116" y="116" width="280" height="280" rx="56" fill="#E8B341"/>
+  <text x="256" y="256" fill="#0A0B0D" font-family="Georgia, 'Times New Roman', serif" font-size="160" font-weight="700" text-anchor="middle" dominant-baseline="central" letter-spacing="-6">KR</text>
+</svg>

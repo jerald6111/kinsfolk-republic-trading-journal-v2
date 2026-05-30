@@ -67,8 +67,8 @@ export default function SendToDiscordButton({ trade }: { trade: any }) {
           <div className="bg-krcard backdrop-blur-xl border border-krborder rounded-xl max-w-sm w-full p-6 animate-fade-in">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center">
-                  <Check className="text-green-500" size={24} />
+                <div className="w-12 h-12 bg-krsuccess/15 rounded-full flex items-center justify-center">
+                  <Check className="text-krsuccess" size={24} />
                 </div>
                 <h3 className="text-lg font-semibold text-krwhite">Success!</h3>
               </div>

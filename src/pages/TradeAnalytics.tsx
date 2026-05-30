@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { loadData } from '../utils/storage'
 import { BarChart3, TrendingUp, TrendingDown, Activity, DollarSign, Percent, Target, Calendar, ChevronLeft, ChevronRight, X, Info, Clock, Flame, Shield } from 'lucide-react'
 import { useCurrency } from '../context/CurrencyContext'
+import PsychologyBreakdown from '../components/PsychologyBreakdown'
 
 export default function TradeAnalytics() {
   const data = loadData()
@@ -57,7 +58,7 @@ export default function TradeAnalytics() {
   const getTraderType = (hours: number) => {
     if (hours < 1) return { type: 'Scalper', color: 'text-purple-400' }
     if (hours < 24) return { type: 'Day Trader', color: 'text-blue-400' }
-    if (hours < 168) return { type: 'Swing Trader', color: 'text-green-400' }
+    if (hours < 168) return { type: 'Swing Trader', color: 'text-krsuccess' }
     return { type: 'Position Trader', color: 'text-orange-400' }
   }
   const traderType = getTraderType(avgDurationHours)
@@ -331,7 +332,7 @@ export default function TradeAnalytics() {
             <div className="text-sm text-gray-400 mb-1">{day}</div>
             {trades > 0 && (
               <>
-                <div className={`text-xs font-semibold ${pnl >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                <div className={`text-xs font-semibold ${pnl >= 0 ? 'text-krsuccess' : 'text-krdanger'}`}>
                   {pnl >= 0 ? '+' : ''}{pnl.toFixed(0)}
                 </div>
                 <div className="text-xs text-gray-500">{trades} trade{trades > 1 ? 's' : ''}</div>
@@ -355,7 +356,7 @@ export default function TradeAnalytics() {
               >
                 <div className="mb-3 pb-3 border-b border-krborder/30">
                   <div className="text-sm text-krmuted mb-1">{date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</div>
-                  <div className={`text-2xl font-bold ${pnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                  <div className={`text-2xl font-bold ${pnl >= 0 ? 'text-krsuccess' : 'text-krdanger'}`}>
                     {pnl >= 0 ? '+' : ''}{formatAmount(pnl)}
                   </div>
                   <div className="text-xs text-krmuted">{trades} trade{trades > 1 ? 's' : ''}</div>
@@ -373,7 +374,7 @@ export default function TradeAnalytics() {
                             <div className="font-bold text-krtext">{trade.ticker}</div>
                             <div className="text-xs text-krmuted">{trade.time} → {trade.exitTime}</div>
                           </div>
-                          <div className={`text-sm font-bold ${isProfit ? 'text-green-400' : 'text-red-400'}`}>
+                          <div className={`text-sm font-bold ${isProfit ? 'text-krsuccess' : 'text-krdanger'}`}>
                             {isProfit ? '+' : ''}{formatAmount(netPnl)}
                           </div>
                         </div>
@@ -382,7 +383,7 @@ export default function TradeAnalytics() {
                             <span className={`w-1.5 h-1.5 rounded-full ${trade.position === 'Long' ? 'bg-green-400' : 'bg-red-400'}`}></span>
                             {trade.type} {trade.type === 'Futures' ? `${trade.leverage}x` : ''} • {trade.position}
                           </span>
-                          <span className={`font-medium ${isProfit ? 'text-green-400' : 'text-red-400'}`}>
+                          <span className={`font-medium ${isProfit ? 'text-krsuccess' : 'text-krdanger'}`}>
                             {isProfit ? '+' : ''}{trade.pnlPercent.toFixed(2)}%
                           </span>
                         </div>
@@ -431,7 +432,7 @@ export default function TradeAnalytics() {
           <div className="grid grid-cols-3 gap-4">
             <div>
               <div className="text-xs text-krmuted mb-1">Trading P&L</div>
-              <div className={`text-lg font-bold ${monthlyPnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+              <div className={`text-lg font-bold ${monthlyPnl >= 0 ? 'text-krsuccess' : 'text-krdanger'}`}>
                 {monthlyPnl >= 0 ? '+' : ''}{formatAmount(monthlyPnl)}
               </div>
             </div>
@@ -443,7 +444,7 @@ export default function TradeAnalytics() {
             </div>
             <div>
               <div className="text-xs text-krmuted mb-1">Net Monthly</div>
-              <div className={`text-lg font-bold ${netMonthly >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+              <div className={`text-lg font-bold ${netMonthly >= 0 ? 'text-krsuccess' : 'text-krdanger'}`}>
                 {netMonthly >= 0 ? '+' : ''}{formatAmount(netMonthly)}
               </div>
             </div>
@@ -501,7 +502,7 @@ export default function TradeAnalytics() {
           <div className="grid grid-cols-3 gap-4">
             <div>
               <div className="text-xs text-krmuted mb-1">Trading P&L</div>
-              <div className={`text-lg font-bold ${weeklyPnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+              <div className={`text-lg font-bold ${weeklyPnl >= 0 ? 'text-krsuccess' : 'text-krdanger'}`}>
                 {weeklyPnl >= 0 ? '+' : ''}{formatAmount(weeklyPnl)}
               </div>
             </div>
@@ -513,7 +514,7 @@ export default function TradeAnalytics() {
             </div>
             <div>
               <div className="text-xs text-krmuted mb-1">Net Weekly</div>
-              <div className={`text-lg font-bold ${netWeekly >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+              <div className={`text-lg font-bold ${netWeekly >= 0 ? 'text-krsuccess' : 'text-krdanger'}`}>
                 {netWeekly >= 0 ? '+' : ''}{formatAmount(netWeekly)}
               </div>
             </div>
@@ -546,7 +547,7 @@ export default function TradeAnalytics() {
                   </div>
                   {trades > 0 ? (
                     <div className="space-y-1">
-                      <div className={`text-lg font-bold text-center ${pnl >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                      <div className={`text-lg font-bold text-center ${pnl >= 0 ? 'text-krsuccess' : 'text-krdanger'}`}>
                         {pnl >= 0 ? '+' : ''}{formatAmount(pnl)}
                       </div>
                       <div className="text-xs text-center text-gray-400">
@@ -577,7 +578,7 @@ export default function TradeAnalytics() {
                     >
                       <div className="mb-3 pb-3 border-b border-krborder/30">
                         <div className="text-sm text-krmuted mb-1">{date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</div>
-                        <div className={`text-2xl font-bold ${pnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                        <div className={`text-2xl font-bold ${pnl >= 0 ? 'text-krsuccess' : 'text-krdanger'}`}>
                           {pnl >= 0 ? '+' : ''}{formatAmount(pnl)}
                         </div>
                         <div className="text-xs text-krmuted">{trades} trade{trades > 1 ? 's' : ''}</div>
@@ -595,7 +596,7 @@ export default function TradeAnalytics() {
                                   <div className="font-bold text-krtext">{trade.ticker}</div>
                                   <div className="text-xs text-krmuted">{trade.time} → {trade.exitTime}</div>
                                 </div>
-                                <div className={`text-sm font-bold ${isProfit ? 'text-green-400' : 'text-red-400'}`}>
+                                <div className={`text-sm font-bold ${isProfit ? 'text-krsuccess' : 'text-krdanger'}`}>
                                   {isProfit ? '+' : ''}{formatAmount(netPnl)}
                                 </div>
                               </div>
@@ -604,7 +605,7 @@ export default function TradeAnalytics() {
                                   <span className={`w-1.5 h-1.5 rounded-full ${trade.position === 'Long' ? 'bg-green-400' : 'bg-red-400'}`}></span>
                                   {trade.type} {trade.type === 'Futures' ? `${trade.leverage}x` : ''} • {trade.position}
                                 </span>
-                                <span className={`font-medium ${isProfit ? 'text-green-400' : 'text-red-400'}`}>
+                                <span className={`font-medium ${isProfit ? 'text-krsuccess' : 'text-krdanger'}`}>
                                   {isProfit ? '+' : ''}{trade.pnlPercent.toFixed(2)}%
                                 </span>
                               </div>
@@ -678,7 +679,7 @@ export default function TradeAnalytics() {
         <div className="grid grid-cols-3 gap-3 bg-krblack/30 rounded-lg p-4">
           <div className="text-center">
             <div className="text-xs text-krmuted mb-1">Total PnL</div>
-            <div className={`text-lg font-bold ${yearlyPnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+            <div className={`text-lg font-bold ${yearlyPnl >= 0 ? 'text-krsuccess' : 'text-krdanger'}`}>
               {yearlyPnl >= 0 ? '+' : ''}{formatAmount(yearlyPnl)}
             </div>
           </div>
@@ -690,7 +691,7 @@ export default function TradeAnalytics() {
           </div>
           <div className="text-center">
             <div className="text-xs text-krmuted mb-1">Net Profit</div>
-            <div className={`text-lg font-bold ${netYearly >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+            <div className={`text-lg font-bold ${netYearly >= 0 ? 'text-krsuccess' : 'text-krdanger'}`}>
               {netYearly >= 0 ? '+' : ''}{formatAmount(netYearly)}
             </div>
           </div>
@@ -716,7 +717,7 @@ export default function TradeAnalytics() {
                 <div className="space-y-1">
                   <div className="flex justify-between items-center text-xs">
                     <span className="text-krmuted">PnL:</span>
-                    <span className={`font-bold ${monthPnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                    <span className={`font-bold ${monthPnl >= 0 ? 'text-krsuccess' : 'text-krdanger'}`}>
                       {monthPnl >= 0 ? '+' : ''}{formatAmount(monthPnl)}
                     </span>
                   </div>
@@ -730,7 +731,7 @@ export default function TradeAnalytics() {
                   )}
                   <div className="flex justify-between items-center text-xs pt-1 border-t border-krborder/30">
                     <span className="text-krmuted">Net:</span>
-                    <span className={`font-bold ${netMonthPnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                    <span className={`font-bold ${netMonthPnl >= 0 ? 'text-krsuccess' : 'text-krdanger'}`}>
                       {netMonthPnl >= 0 ? '+' : ''}{formatAmount(netMonthPnl)}
                     </span>
                   </div>
@@ -752,12 +753,12 @@ export default function TradeAnalytics() {
       <div className="relative z-10 p-4 md:p-6">
         <div className="max-w-7xl mx-auto">
       {/* Header with Gradient */}
-      <div className="mb-6">
+      <div id="sec-overview" className="mb-6 scroll-mt-20">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <span className="text-4xl">📊</span>
+            <span className="flex h-11 w-11 items-center justify-center rounded-lg border border-krborder bg-krpanel text-krgold"><BarChart3 size={22} /></span>
             <div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-krgold to-kryellow bg-clip-text text-transparent">Trade Analytics</h1>
+              <h1 className="text-3xl font-extrabold tracking-tight text-krwhite">Trade <span className="text-krgold">Analytics</span></h1>
               <p className="text-krmuted text-sm mt-1">Comprehensive analysis of your trading performance</p>
             </div>
           </div>
@@ -779,7 +780,7 @@ export default function TradeAnalytics() {
               <Percent className="text-purple-400" size={16} />
               <p className="text-xs text-krmuted">Win Rate</p>
             </div>
-            <p className={`text-2xl font-bold ${winRate >= 50 ? 'text-green-400' : 'text-red-400'}`}>
+            <p className={`text-2xl font-bold ${winRate >= 50 ? 'text-krsuccess' : 'text-krdanger'}`}>
               {winRate}%
             </p>
             <p className="text-xs text-krmuted mt-1">
@@ -792,7 +793,7 @@ export default function TradeAnalytics() {
               <DollarSign className="text-krgold" size={16} />
               <p className="text-xs text-krmuted">Total PnL</p>
             </div>
-            <p className={`text-2xl font-bold ${totalPnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+            <p className={`text-2xl font-bold ${totalPnl >= 0 ? 'text-krsuccess' : 'text-krdanger'}`}>
               {formatAmount(totalPnl)}
             </p>
             <p className="text-xs text-krmuted mt-1">
@@ -802,10 +803,10 @@ export default function TradeAnalytics() {
 
           <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4 hover:border-krgold/50 transition-all">
             <div className="flex items-center gap-2 mb-2">
-              <TrendingUp className="text-green-400" size={16} />
+              <TrendingUp className="text-krsuccess" size={16} />
               <p className="text-xs text-krmuted">ROI</p>
             </div>
-            <p className={`text-2xl font-bold ${roi >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+            <p className={`text-2xl font-bold ${roi >= 0 ? 'text-krsuccess' : 'text-krdanger'}`}>
               {roi >= 0 ? '+' : ''}{roi.toFixed(1)}%
             </p>
             <p className="text-xs text-krmuted mt-1">
@@ -818,7 +819,7 @@ export default function TradeAnalytics() {
               <Target className="text-orange-400" size={16} />
               <p className="text-xs text-krmuted">Profit Factor</p>
             </div>
-            <p className={`text-2xl font-bold ${profitFactor >= 1.5 ? 'text-green-400' : profitFactor >= 1 ? 'text-yellow-400' : 'text-red-400'}`}>
+            <p className={`text-2xl font-bold ${profitFactor >= 1.5 ? 'text-krsuccess' : profitFactor >= 1 ? 'text-yellow-400' : 'text-krdanger'}`}>
               {profitFactor === Infinity ? '∞' : profitFactor.toFixed(2)}
             </p>
             <p className="text-xs text-krmuted mt-1">
@@ -831,10 +832,10 @@ export default function TradeAnalytics() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3">
           <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4">
             <div className="flex items-center gap-2 mb-2">
-              <TrendingUp className="text-green-400" size={18} />
+              <TrendingUp className="text-krsuccess" size={18} />
               <h3 className="text-sm font-semibold text-krtext">Average Win</h3>
             </div>
-            <p className="text-xl font-bold text-green-400 mb-1">
+            <p className="text-xl font-bold text-krsuccess mb-1">
               {formatAmount(avgWin)}
             </p>
             <p className="text-xs text-krmuted">
@@ -844,10 +845,10 @@ export default function TradeAnalytics() {
 
           <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4">
             <div className="flex items-center gap-2 mb-2">
-              <TrendingDown className="text-red-400" size={18} />
+              <TrendingDown className="text-krdanger" size={18} />
               <h3 className="text-sm font-semibold text-krtext">Average Loss</h3>
             </div>
-            <p className="text-xl font-bold text-red-400 mb-1">
+            <p className="text-xl font-bold text-krdanger mb-1">
               {formatAmount(avgLoss)}
             </p>
             <p className="text-xs text-krmuted">
@@ -870,10 +871,22 @@ export default function TradeAnalytics() {
         </div>
       </div>
 
+      {/* Sticky Section Tabs */}
+      <div className="sticky top-0 z-20 -mx-4 md:-mx-6 px-4 md:px-6 py-2 mb-4 bg-krbg/85 backdrop-blur border-b border-krborder flex gap-1 overflow-x-auto">
+        <a href="#sec-overview" className="px-3 py-1.5 rounded-md text-sm bg-krcard text-krwhite whitespace-nowrap">Overview</a>
+        <a href="#sec-behavior" className="px-3 py-1.5 rounded-md text-sm text-krmuted hover:text-krwhite whitespace-nowrap">Behavior</a>
+        <a href="#sec-psychology" className="px-3 py-1.5 rounded-md text-sm text-krmuted hover:text-krwhite whitespace-nowrap">Psychology</a>
+        <a href="#sec-strategy" className="px-3 py-1.5 rounded-md text-sm text-krmuted hover:text-krwhite whitespace-nowrap">Strategy</a>
+        <a href="#sec-risk" className="px-3 py-1.5 rounded-md text-sm text-krmuted hover:text-krwhite whitespace-nowrap">Risk</a>
+        <a href="#sec-pairs" className="px-3 py-1.5 rounded-md text-sm text-krmuted hover:text-krwhite whitespace-nowrap">Pairs</a>
+        <a href="#sec-equity" className="px-3 py-1.5 rounded-md text-sm text-krmuted hover:text-krwhite whitespace-nowrap">Equity</a>
+        <a href="#sec-calendar" className="px-3 py-1.5 rounded-md text-sm text-krmuted hover:text-krwhite whitespace-nowrap">Calendar</a>
+      </div>
+
       {/* ========== SECTION 2: TRADING BEHAVIOR & STREAKS ========== */}
-      <div className="mb-6">
+      <div id="sec-behavior" className="mb-6 scroll-mt-20">
         <div className="flex items-center gap-2 mb-4">
-          <span className="text-2xl">🔥</span>
+          <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-krborder bg-krpanel text-krgold"><Flame size={18} /></span>
           <h2 className="text-xl font-semibold text-krtext">Trading Behavior & Streaks</h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
@@ -899,7 +912,7 @@ export default function TradeAnalytics() {
             <div className="mt-3 p-2 bg-krblack/50 rounded-lg text-xs space-y-1 border border-krborder/30">
               <div><strong className="text-purple-400">Scalper:</strong> &lt;1h</div>
               <div><strong className="text-blue-400">Day Trader:</strong> &lt;24h</div>
-              <div><strong className="text-green-400">Swing:</strong> 1-7d</div>
+              <div><strong className="text-krsuccess">Swing:</strong> 1-7d</div>
               <div><strong className="text-orange-400">Position:</strong> &gt;7d</div>
             </div>
           )}
@@ -908,10 +921,10 @@ export default function TradeAnalytics() {
         {/* Current Streak */}
         <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4 hover:border-krgold/50 transition-all">
           <div className="flex items-center gap-2 mb-2">
-            <Flame className={streaks.currentStreak > 0 ? 'text-green-400' : 'text-red-400'} size={18} />
+            <Flame className={streaks.currentStreak > 0 ? 'text-krsuccess' : 'text-krdanger'} size={18} />
             <h3 className="text-sm font-semibold text-krtext">Current Streak</h3>
           </div>
-          <p className={`text-xl font-bold mb-1 ${streaks.currentStreak > 0 ? 'text-green-400' : streaks.currentStreak < 0 ? 'text-red-400' : 'text-krmuted'}`}>
+          <p className={`text-xl font-bold mb-1 ${streaks.currentStreak > 0 ? 'text-krsuccess' : streaks.currentStreak < 0 ? 'text-krdanger' : 'text-krmuted'}`}>
             {streaks.currentStreak > 0 ? `+${streaks.currentStreak}` : streaks.currentStreak}
           </p>
           <p className="text-xs text-krmuted">
@@ -922,10 +935,10 @@ export default function TradeAnalytics() {
         {/* Longest Win Streak */}
         <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4 hover:border-krgold/50 transition-all">
           <div className="flex items-center gap-2 mb-2">
-            <TrendingUp className="text-green-400" size={18} />
+            <TrendingUp className="text-krsuccess" size={18} />
             <h3 className="text-sm font-semibold text-krtext">Best Win Streak</h3>
           </div>
-          <p className="text-xl font-bold text-green-400 mb-1">
+          <p className="text-xl font-bold text-krsuccess mb-1">
             {streaks.longestWinStreak}
           </p>
           <p className="text-xs text-krmuted">Consecutive wins</p>
@@ -934,10 +947,10 @@ export default function TradeAnalytics() {
         {/* Longest Loss Streak */}
         <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-4 hover:border-krgold/50 transition-all">
           <div className="flex items-center gap-2 mb-2">
-            <TrendingDown className="text-red-400" size={18} />
+            <TrendingDown className="text-krdanger" size={18} />
             <h3 className="text-sm font-semibold text-krtext">Worst Loss Streak</h3>
           </div>
-          <p className="text-xl font-bold text-red-400 mb-1">
+          <p className="text-xl font-bold text-krdanger mb-1">
             {streaks.longestLossStreak}
           </p>
           <p className="text-xs text-krmuted">Consecutive losses</p>
@@ -945,11 +958,16 @@ export default function TradeAnalytics() {
         </div>
       </div>
 
+      {/* ========== TRADING PSYCHOLOGY ========== */}
+      <div id="sec-psychology" className="mb-6 scroll-mt-20">
+        <PsychologyBreakdown journal={journal} />
+      </div>
+
       {/* ========== SECTION 3: STRATEGY PERFORMANCE ========== */}
       {topSetups.length > 0 && (
-        <div className="mb-6">
+        <div id="sec-strategy" className="mb-6 scroll-mt-20">
           <div className="flex items-center gap-2 mb-4">
-            <span className="text-2xl">🎯</span>
+            <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-krborder bg-krpanel text-krgold"><Target size={18} /></span>
             <h2 className="text-xl font-semibold text-krtext">Strategy Performance</h2>
           </div>
           <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-5">
@@ -958,7 +976,7 @@ export default function TradeAnalytics() {
               <div key={index} className="bg-krblack/40 rounded-lg p-4 border border-krborder/30 hover:border-krgold/50 transition-all">
                 <div className="flex items-center justify-between mb-3">
                   <div className="font-semibold text-base text-krtext">{setup.setup}</div>
-                  <div className={`text-lg font-bold ${setup.totalPnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                  <div className={`text-lg font-bold ${setup.totalPnl >= 0 ? 'text-krsuccess' : 'text-krdanger'}`}>
                     {formatAmount(setup.totalPnl)}
                   </div>
                 </div>
@@ -969,13 +987,13 @@ export default function TradeAnalytics() {
                   </div>
                   <div>
                     <div className="text-gray-400">Win Rate</div>
-                    <div className={`font-medium ${setup.winRate >= 50 ? 'text-green-400' : 'text-red-400'}`}>
+                    <div className={`font-medium ${setup.winRate >= 50 ? 'text-krsuccess' : 'text-krdanger'}`}>
                       {setup.winRate.toFixed(1)}%
                     </div>
                   </div>
                   <div>
                     <div className="text-gray-400">Avg P&L</div>
-                    <div className={`font-medium ${setup.avgPnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                    <div className={`font-medium ${setup.avgPnl >= 0 ? 'text-krsuccess' : 'text-krdanger'}`}>
                       {formatAmount(setup.avgPnl)}
                     </div>
                   </div>
@@ -992,9 +1010,9 @@ export default function TradeAnalytics() {
       )}
 
       {/* ========== SECTION 4: RISK MANAGEMENT ========== */}
-      <div className="mb-6">
+      <div id="sec-risk" className="mb-6 scroll-mt-20">
         <div className="flex items-center gap-2 mb-4">
-          <span className="text-2xl">🛡️</span>
+          <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-krborder bg-krpanel text-krgold"><Shield size={18} /></span>
           <h2 className="text-xl font-semibold text-krtext">Risk Management</h2>
         </div>
         <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder p-5">
@@ -1088,9 +1106,9 @@ export default function TradeAnalytics() {
       </div>
 
       {/* ========== SECTION 5: PAIR ANALYSIS ========== */}
-      <div className="mb-6">
+      <div id="sec-pairs" className="mb-6 scroll-mt-20">
         <div className="flex items-center gap-2 mb-4">
-          <span className="text-2xl">📈</span>
+          <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-krborder bg-krpanel text-krgold"><TrendingUp size={18} /></span>
           <h2 className="text-xl font-semibold text-krtext">Pair & Market Analysis</h2>
         </div>
         {/* Exposure by Pair and Top 5 Performing Pairs - Side by Side */}
@@ -1184,7 +1202,7 @@ export default function TradeAnalytics() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className={`text-xl font-bold ${stats.pnl >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                    <div className={`text-xl font-bold ${stats.pnl >= 0 ? 'text-krsuccess' : 'text-krdanger'}`}>
                       {formatAmount(stats.pnl)}
                     </div>
                     <div className="text-sm text-gray-400">
@@ -1200,7 +1218,7 @@ export default function TradeAnalytics() {
       </div>
 
       {/* ========== SECTION 6: EQUITY CURVE ========== */}
-      <div className="mb-6">
+      <div id="sec-equity" className="mb-6 scroll-mt-20">
         <div className="flex items-center gap-2 mb-4">
           <span className="text-2xl">💹</span>
           <h2 className="text-xl font-semibold text-krtext">Performance Over Time</h2>
@@ -1352,11 +1370,11 @@ export default function TradeAnalytics() {
                         <div className="grid grid-cols-2 gap-3 mt-3">
                           <div className="bg-krblack/40 rounded-lg p-3 border border-krborder/30">
                             <p className="text-xs text-krmuted mb-1">Max Drawdown</p>
-                            <p className="text-sm font-bold text-red-400">-{maxDrawdown.toFixed(2)}%</p>
+                            <p className="text-sm font-bold text-krdanger">-{maxDrawdown.toFixed(2)}%</p>
                           </div>
                           <div className="bg-krblack/40 rounded-lg p-3 border border-krborder/30">
                             <p className="text-xs text-krmuted mb-1">Current Drawdown</p>
-                            <p className={`text-sm font-bold ${currentDD > 0 ? 'text-red-400' : 'text-green-400'}`}>
+                            <p className={`text-sm font-bold ${currentDD > 0 ? 'text-krdanger' : 'text-krsuccess'}`}>
                               {currentDD > 0 ? `-${currentDD.toFixed(2)}%` : '0.00%'}
                             </p>
                           </div>
@@ -1373,7 +1391,7 @@ export default function TradeAnalytics() {
       </div>
 
       {/* ========== SECTION 7: PNL CALENDAR ========== */}
-      <div className="mb-6">
+      <div id="sec-calendar" className="mb-6 scroll-mt-20">
         <div className="flex items-center gap-2 mb-4">
           <span className="text-2xl">📅</span>
           <h2 className="text-xl font-semibold text-krtext">PNL Calendar</h2>
@@ -1452,7 +1470,7 @@ export default function TradeAnalytics() {
                     <div className="grid grid-cols-3 gap-3 mb-5">
                       <div className="bg-krblack/40 rounded-lg p-3 text-center border border-krborder/30">
                         <p className="text-xs text-krmuted mb-1">Total PnL</p>
-                        <p className={`text-xl font-bold ${pnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                        <p className={`text-xl font-bold ${pnl >= 0 ? 'text-krsuccess' : 'text-krdanger'}`}>
                           {formatAmount(pnl)}
                         </p>
                       </div>
@@ -1462,7 +1480,7 @@ export default function TradeAnalytics() {
                       </div>
                       <div className="bg-krblack/40 rounded-lg p-3 text-center border border-krborder/30">
                         <p className="text-xs text-krmuted mb-1">Win Rate</p>
-                        <p className={`text-xl font-bold ${dayWins / trades >= 0.5 ? 'text-green-400' : 'text-red-400'}`}>
+                        <p className={`text-xl font-bold ${dayWins / trades >= 0.5 ? 'text-krsuccess' : 'text-krdanger'}`}>
                           {((dayWins / trades) * 100).toFixed(0)}%
                         </p>
                       </div>
@@ -1481,9 +1499,9 @@ export default function TradeAnalytics() {
                                 <div className="flex items-center gap-2">
                                   <h4 className="text-base font-semibold text-krtext">{trade.ticker}</h4>
                                   {netPnl >= 0 ? (
-                                    <TrendingUp className="text-green-400" size={18} />
+                                    <TrendingUp className="text-krsuccess" size={18} />
                                   ) : (
-                                    <TrendingDown className="text-red-500" size={20} />
+                                    <TrendingDown className="text-krdanger" size={20} />
                                   )}
                                 </div>
                                 <div className="text-sm text-gray-400 mt-1">
@@ -1491,7 +1509,7 @@ export default function TradeAnalytics() {
                                 </div>
                               </div>
                               <div className="text-right">
-                                <div className={`text-xl font-bold ${netPnl >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                                <div className={`text-xl font-bold ${netPnl >= 0 ? 'text-krsuccess' : 'text-krdanger'}`}>
                                   {netPnl >= 0 ? '+' : ''}{formatAmount(netPnl)}
                                 </div>
                                 <div className="text-xs text-gray-400 mt-1">
@@ -1615,7 +1633,7 @@ export default function TradeAnalytics() {
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
                       <div className="bg-krblack/40 rounded-lg p-3 text-center border border-krborder/30">
                         <p className="text-xs text-krmuted mb-1">Total PnL</p>
-                        <p className={`text-xl font-bold ${tickerStats.pnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                        <p className={`text-xl font-bold ${tickerStats.pnl >= 0 ? 'text-krsuccess' : 'text-krdanger'}`}>
                           {formatAmount(tickerStats.pnl)}
                         </p>
                       </div>
@@ -1625,13 +1643,13 @@ export default function TradeAnalytics() {
                       </div>
                       <div className="bg-krblack/40 rounded-lg p-3 text-center border border-krborder/30">
                         <p className="text-xs text-krmuted mb-1">Win Rate</p>
-                        <p className={`text-xl font-bold ${tickerWins / tickerStats.trades >= 0.5 ? 'text-green-400' : 'text-red-400'}`}>
+                        <p className={`text-xl font-bold ${tickerWins / tickerStats.trades >= 0.5 ? 'text-krsuccess' : 'text-krdanger'}`}>
                           {((tickerWins / tickerStats.trades) * 100).toFixed(0)}%
                         </p>
                       </div>
                       <div className="bg-krblack/40 rounded-lg p-3 text-center border border-krborder/30">
                         <p className="text-xs text-krmuted mb-1">Avg PnL</p>
-                        <p className={`text-xl font-bold ${tickerStats.pnl / tickerStats.trades >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                        <p className={`text-xl font-bold ${tickerStats.pnl / tickerStats.trades >= 0 ? 'text-krsuccess' : 'text-krdanger'}`}>
                           {formatAmount(tickerStats.pnl / tickerStats.trades)}
                         </p>
                       </div>
@@ -1649,9 +1667,9 @@ export default function TradeAnalytics() {
                                 <div className="flex items-center gap-2">
                                   <h4 className="text-lg font-semibold text-krtext">{trade.ticker}</h4>
                                   {netPnl >= 0 ? (
-                                    <TrendingUp className="text-green-500" size={20} />
+                                    <TrendingUp className="text-krsuccess" size={20} />
                                   ) : (
-                                    <TrendingDown className="text-red-500" size={20} />
+                                    <TrendingDown className="text-krdanger" size={20} />
                                   )}
                                   <span className="text-sm text-gray-400">
                                     {trade.type} {trade.position}
@@ -1666,7 +1684,7 @@ export default function TradeAnalytics() {
                                 </div>
                               </div>
                               <div className="text-right">
-                                <div className={`text-xl font-bold ${netPnl >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                                <div className={`text-xl font-bold ${netPnl >= 0 ? 'text-krsuccess' : 'text-krdanger'}`}>
                                   {netPnl >= 0 ? '+' : ''}{formatAmount(netPnl)}
                                 </div>
                                 <div className="text-xs text-gray-400 mt-1">

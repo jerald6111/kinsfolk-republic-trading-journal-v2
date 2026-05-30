@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { TrendingUp, TrendingDown, Flame } from 'lucide-react'
+import { TrendingUp, TrendingDown, Flame, BarChart3, CalendarDays } from 'lucide-react'
 
 // Mini Sparkline Component
 const MiniSparkline: React.FC<{ data: number[]; isPositive: boolean }> = ({ data, isPositive }) => {
@@ -261,9 +261,9 @@ export default function MarketData() {
           {/* Header */}
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-2">
-              <span className="text-4xl">📊</span>
-              <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-krgold to-kryellow bg-clip-text text-transparent">
-                Market Data Center
+              <span className="flex h-11 w-11 items-center justify-center rounded-lg border border-krborder bg-krpanel text-krgold"><BarChart3 size={22} /></span>
+              <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-krwhite">
+                Market <span className="text-krgold">Data</span> Center
               </h1>
             </div>
             <p className="text-krmuted text-sm md:text-base ml-14">
@@ -280,17 +280,17 @@ export default function MarketData() {
               {/* Trending Coins */}
               <div>
                 <div className="flex items-center gap-3 mb-6">
-                  <Flame className="w-6 h-6 text-orange-500" />
-                  <h2 className="text-xl font-semibold text-krtext">🔥 Trending</h2>
+                  <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-krborder bg-krpanel text-krgold"><Flame size={18} /></span>
+                  <h2 className="text-xl font-semibold text-krtext">Trending</h2>
                 </div>
-                <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[600px] overflow-y-auto scrollbar-custom">
+                <div className="bg-krcard shadow-soft rounded-xl border border-krborder transition-all duration-200 hover:border-krgold/40 p-6 h-[600px] overflow-y-auto scrollbar-custom">
                   {loading ? (
                     <div className="flex items-center justify-center h-full">
                       <div className="text-krmuted">Loading trending coins...</div>
                     </div>
                   ) : error ? (
                     <div className="flex flex-col items-center justify-center h-full gap-3">
-                      <div className="text-red-400 text-center">{error}</div>
+                      <div className="text-krdanger text-center">{error}</div>
                       <button 
                         onClick={() => window.location.reload()} 
                         className="px-4 py-2 bg-krgold/20 hover:bg-krgold/30 text-krgold rounded-lg transition-colors"
@@ -313,7 +313,7 @@ export default function MarketData() {
                             <div className="text-right">
                               {priceChange24h !== undefined && priceChange24h !== null ? (
                                 <>
-                                  <div className={`text-sm font-bold ${priceChange24h >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                                  <div className={`text-sm font-bold tnum ${priceChange24h >= 0 ? 'text-krsuccess' : 'text-krdanger'}`}>
                                     {priceChange24h >= 0 ? '+' : ''}{priceChange24h.toFixed(2)}%
                                   </div>
                                   <div className="text-xs text-krmuted">24h</div>
@@ -336,17 +336,17 @@ export default function MarketData() {
               {/* Top Crypto Gainers */}
               <div>
                 <div className="flex items-center gap-3 mb-6">
-                  <TrendingUp className="w-6 h-6 text-green-500" />
-                  <h2 className="text-xl font-semibold text-krtext">🚀 Top Gainers</h2>
+                  <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-krborder bg-krpanel text-krgold"><TrendingUp size={18} /></span>
+                  <h2 className="text-xl font-semibold text-krtext">Top Gainers</h2>
                 </div>
-                <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[600px] overflow-y-auto scrollbar-custom">
+                <div className="bg-krcard shadow-soft rounded-xl border border-krborder transition-all duration-200 hover:border-krgold/40 p-6 h-[600px] overflow-y-auto scrollbar-custom">
                   {loading ? (
                     <div className="flex items-center justify-center h-full">
                       <div className="text-krmuted">Loading top gainers...</div>
                     </div>
                   ) : error ? (
                     <div className="flex flex-col items-center justify-center h-full gap-3">
-                      <div className="text-red-400 text-center">{error}</div>
+                      <div className="text-krdanger text-center">{error}</div>
                       <button 
                         onClick={() => window.location.reload()} 
                         className="px-4 py-2 bg-krgold/20 hover:bg-krgold/30 text-krgold rounded-lg transition-colors"
@@ -357,7 +357,7 @@ export default function MarketData() {
                   ) : (
                     <div className="space-y-3">
                       {topGainers.map((coin, index) => (
-                        <div key={coin.id} className="flex items-center gap-4 p-3 bg-krblack/40 rounded-lg border border-krborder/50 hover:border-green-500/30 transition-colors">
+                        <div key={coin.id} className="flex items-center gap-4 p-3 bg-krblack/40 rounded-lg border border-krborder/50 hover:border-krsuccess/30 transition-colors">
                           <span className="text-krmuted font-semibold text-sm min-w-[24px]">#{index + 1}</span>
                           <img src={coin.image} alt={coin.name} className="w-8 h-8 rounded-full" />
                           <div className="flex-1">
@@ -365,14 +365,14 @@ export default function MarketData() {
                             <div className="text-xs text-krmuted">{coin.symbol.toUpperCase()}</div>
                           </div>
                           <div className="text-right">
-                            <div className="text-sm font-semibold text-krtext">${coin.current_price?.toLocaleString() || 'N/A'}</div>
+                            <div className="text-sm font-semibold text-krtext tnum">${coin.current_price?.toLocaleString() || 'N/A'}</div>
                             <div className="flex flex-col gap-0.5">
-                              <div className={`text-xs font-bold ${(coin.price_change_percentage_1h_in_currency || 0) >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                                1h: {coin.price_change_percentage_1h_in_currency != null ? 
-                                  `${coin.price_change_percentage_1h_in_currency >= 0 ? '+' : ''}${coin.price_change_percentage_1h_in_currency.toFixed(2)}%` 
+                              <div className={`text-xs font-bold tnum ${(coin.price_change_percentage_1h_in_currency || 0) >= 0 ? 'text-krsuccess' : 'text-krdanger'}`}>
+                                1h: {coin.price_change_percentage_1h_in_currency != null ?
+                                  `${coin.price_change_percentage_1h_in_currency >= 0 ? '+' : ''}${coin.price_change_percentage_1h_in_currency.toFixed(2)}%`
                                   : 'N/A'}
                               </div>
-                              <div className="text-xs font-bold text-green-500">
+                              <div className="text-xs font-bold text-krsuccess tnum">
                                 24h: {coin.price_change_percentage_24h != null ? `+${coin.price_change_percentage_24h.toFixed(2)}%` : 'N/A'}
                               </div>
                             </div>
@@ -387,17 +387,17 @@ export default function MarketData() {
               {/* Top Crypto Losers */}
               <div>
                 <div className="flex items-center gap-3 mb-6">
-                  <TrendingDown className="w-6 h-6 text-red-500" />
-                  <h2 className="text-xl font-semibold text-krtext">🚨 Top Losers</h2>
+                  <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-krborder bg-krpanel text-krgold"><TrendingDown size={18} /></span>
+                  <h2 className="text-xl font-semibold text-krtext">Top Losers</h2>
                 </div>
-                <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[600px] overflow-y-auto scrollbar-custom">
+                <div className="bg-krcard shadow-soft rounded-xl border border-krborder transition-all duration-200 hover:border-krgold/40 p-6 h-[600px] overflow-y-auto scrollbar-custom">
                   {loading ? (
                     <div className="flex items-center justify-center h-full">
                       <div className="text-krmuted">Loading top losers...</div>
                     </div>
                   ) : error ? (
                     <div className="flex flex-col items-center justify-center h-full gap-3">
-                      <div className="text-red-400 text-center">{error}</div>
+                      <div className="text-krdanger text-center">{error}</div>
                       <button 
                         onClick={() => window.location.reload()} 
                         className="px-4 py-2 bg-krgold/20 hover:bg-krgold/30 text-krgold rounded-lg transition-colors"
@@ -408,7 +408,7 @@ export default function MarketData() {
                   ) : (
                     <div className="space-y-3">
                       {topLosers.map((coin, index) => (
-                        <div key={coin.id} className="flex items-center gap-4 p-3 bg-krblack/40 rounded-lg border border-krborder/50 hover:border-red-500/30 transition-colors">
+                        <div key={coin.id} className="flex items-center gap-4 p-3 bg-krblack/40 rounded-lg border border-krborder/50 hover:border-krdanger/30 transition-colors">
                           <span className="text-krmuted font-semibold text-sm min-w-[24px]">#{index + 1}</span>
                           <img src={coin.image} alt={coin.name} className="w-8 h-8 rounded-full" />
                           <div className="flex-1">
@@ -416,14 +416,14 @@ export default function MarketData() {
                             <div className="text-xs text-krmuted">{coin.symbol.toUpperCase()}</div>
                           </div>
                           <div className="text-right">
-                            <div className="text-sm font-semibold text-krtext">${coin.current_price?.toLocaleString() || 'N/A'}</div>
+                            <div className="text-sm font-semibold text-krtext tnum">${coin.current_price?.toLocaleString() || 'N/A'}</div>
                             <div className="flex flex-col gap-0.5">
-                              <div className={`text-xs font-bold ${(coin.price_change_percentage_1h_in_currency || 0) >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                                1h: {coin.price_change_percentage_1h_in_currency != null ? 
-                                  `${coin.price_change_percentage_1h_in_currency >= 0 ? '+' : ''}${coin.price_change_percentage_1h_in_currency.toFixed(2)}%` 
+                              <div className={`text-xs font-bold tnum ${(coin.price_change_percentage_1h_in_currency || 0) >= 0 ? 'text-krsuccess' : 'text-krdanger'}`}>
+                                1h: {coin.price_change_percentage_1h_in_currency != null ?
+                                  `${coin.price_change_percentage_1h_in_currency >= 0 ? '+' : ''}${coin.price_change_percentage_1h_in_currency.toFixed(2)}%`
                                   : 'N/A'}
                               </div>
-                              <div className="text-xs font-bold text-red-500">
+                              <div className="text-xs font-bold text-krdanger tnum">
                                 24h: {coin.price_change_percentage_24h != null ? `${coin.price_change_percentage_24h.toFixed(2)}%` : 'N/A'}
                               </div>
                             </div>
@@ -440,7 +440,7 @@ export default function MarketData() {
             <div>
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
-                  <span className="text-2xl">📈</span>
+                  <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-krborder bg-krpanel text-krgold"><TrendingUp size={18} /></span>
                   <h2 className="text-xl font-semibold text-krtext">Cryptocurrency by Ranking</h2>
                 </div>
                 <select
@@ -453,14 +453,14 @@ export default function MarketData() {
                   <option value={300} className="bg-krblack text-krtext">Top 300 by Market Cap</option>
                 </select>
               </div>
-              <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[700px] overflow-y-auto scrollbar-custom">
+              <div className="bg-krcard shadow-soft rounded-xl border border-krborder transition-all duration-200 hover:border-krgold/40 p-6 h-[700px] overflow-y-auto scrollbar-custom">
                 {rankingLoading ? (
                   <div className="flex items-center justify-center h-full">
                     <div className="text-krmuted">Loading cryptocurrency rankings...</div>
                   </div>
                 ) : rankingError ? (
                   <div className="flex flex-col items-center justify-center h-full gap-3">
-                    <div className="text-red-400 text-center">{rankingError}</div>
+                    <div className="text-krdanger text-center">{rankingError}</div>
                     <button 
                       onClick={() => window.location.reload()} 
                       className="px-4 py-2 bg-krgold/20 hover:bg-krgold/30 text-krgold rounded-lg transition-colors"
@@ -496,23 +496,23 @@ export default function MarketData() {
                                 </div>
                               </div>
                             </td>
-                            <td className="py-3 px-4 text-right font-semibold text-krtext">
+                            <td className="py-3 px-4 text-right font-semibold text-krtext tnum">
                               ${coin.current_price?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 }) || 'N/A'}
                             </td>
-                            <td className={`py-3 px-4 text-right font-bold ${(coin.price_change_percentage_1h_in_currency || 0) >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                              {coin.price_change_percentage_1h_in_currency != null ? 
-                                `${coin.price_change_percentage_1h_in_currency >= 0 ? '+' : ''}${coin.price_change_percentage_1h_in_currency.toFixed(2)}%` 
+                            <td className={`py-3 px-4 text-right font-bold tnum ${(coin.price_change_percentage_1h_in_currency || 0) >= 0 ? 'text-krsuccess' : 'text-krdanger'}`}>
+                              {coin.price_change_percentage_1h_in_currency != null ?
+                                `${coin.price_change_percentage_1h_in_currency >= 0 ? '+' : ''}${coin.price_change_percentage_1h_in_currency.toFixed(2)}%`
                                 : 'N/A'}
                             </td>
-                            <td className={`py-3 px-4 text-right font-bold ${(coin.price_change_percentage_24h || 0) >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                              {coin.price_change_percentage_24h != null ? 
-                                `${coin.price_change_percentage_24h >= 0 ? '+' : ''}${coin.price_change_percentage_24h.toFixed(2)}%` 
+                            <td className={`py-3 px-4 text-right font-bold tnum ${(coin.price_change_percentage_24h || 0) >= 0 ? 'text-krsuccess' : 'text-krdanger'}`}>
+                              {coin.price_change_percentage_24h != null ?
+                                `${coin.price_change_percentage_24h >= 0 ? '+' : ''}${coin.price_change_percentage_24h.toFixed(2)}%`
                                 : 'N/A'}
                             </td>
-                            <td className="py-3 px-4 text-right text-krtext">
+                            <td className="py-3 px-4 text-right text-krtext tnum">
                               ${coin.total_volume ? (coin.total_volume / 1e9).toFixed(2) : '0.00'}B
                             </td>
-                            <td className="py-3 px-4 text-right text-krtext">
+                            <td className="py-3 px-4 text-right text-krtext tnum">
                               ${coin.market_cap ? (coin.market_cap / 1e9).toFixed(2) : '0.00'}B
                             </td>
                             <td className="py-3 px-4 text-center">
@@ -537,10 +537,10 @@ export default function MarketData() {
             {/* Full Width: Economic Calendar */}
             <div>
               <div className="flex items-center gap-3 mb-6">
-                <span className="text-2xl">📅</span>
+                <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-krborder bg-krpanel text-krgold"><CalendarDays size={18} /></span>
                 <h2 className="text-xl font-semibold text-krtext">Economic Calendar</h2>
               </div>
-              <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[700px]">
+              <div className="bg-krcard shadow-soft rounded-xl border border-krborder transition-all duration-200 hover:border-krgold/40 p-6 h-[700px]">
                 <div ref={calendarRef} className="h-full w-full"></div>
               </div>
             </div>
@@ -549,7 +549,7 @@ export default function MarketData() {
             <div>
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
-                  <span className="text-2xl">🔥</span>
+                  <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-krborder bg-krpanel text-krgold"><Flame size={18} /></span>
                   <h2 className="text-xl font-semibold text-krtext">Market Heatmap</h2>
                 </div>
                 <select
@@ -562,7 +562,7 @@ export default function MarketData() {
                   <option value="open_interest" className="bg-krblack text-krtext">Open Interest</option>
                 </select>
               </div>
-              <div className="bg-krcard/80 backdrop-blur-sm rounded-xl border border-krborder hover:border-krgold/70 hover:shadow-lg hover:shadow-krgold/10 transition-all duration-200 p-6 h-[700px]">
+              <div className="bg-krcard shadow-soft rounded-xl border border-krborder transition-all duration-200 hover:border-krgold/40 p-6 h-[700px]">
                 <div ref={heatmapRef} className="h-full w-full"></div>
               </div>
             </div>
