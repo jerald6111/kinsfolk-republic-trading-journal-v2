@@ -15,6 +15,8 @@ import {
 } from 'lucide-react'
 import { Reveal, TiltCard, CountUp } from '../components/Motion'
 import Footer from '../components/Footer'
+import FloatingSupportButton from '../components/FloatingSupportButton'
+import AIChatbot from '../components/AIChatbot'
 import { usePwaInstall } from '../hooks/usePwaInstall'
 
 export default function Home() {
@@ -366,6 +368,10 @@ export default function Home() {
       </section>
 
       <Footer />
+
+      {/* Support + AI assistant available on the public homepage too */}
+      <FloatingSupportButton />
+      <AIChatbot />
     </div>
   )
 }
