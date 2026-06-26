@@ -62,22 +62,22 @@ export default function Home() {
 
   const news = [
     {
-      title: 'Windows Desktop App Now Available!',
+      title: 'Optional Cloud Sync Is Here',
+      date: 'June 27, 2026',
+      description:
+        'Sign in to securely back up and sync your journal across devices — private to your account with row-level security. Still 100% optional: the app stays local-first by default.',
+    },
+    {
+      title: 'Windows Desktop App Available',
       date: 'October 14, 2025',
       description:
         'Our professional Windows desktop application is ready for production: enhanced security, offline functionality, auto-updates and native performance.',
     },
     {
-      title: 'New Analytics Features Released',
+      title: 'Advanced Analytics Released',
       date: 'October 10, 2025',
       description:
         'Advanced analytics including risk metrics, exposure analysis and drawdown tracking to better understand your performance.',
-    },
-    {
-      title: 'Enhanced Trade Entry System',
-      date: 'October 5, 2025',
-      description:
-        'The journal entry system now supports both Spot and Futures trading with automatic P&L calculations and leverage tracking.',
     },
   ]
 
@@ -285,7 +285,7 @@ export default function Home() {
       </section>
 
       {/* Features */}
-      <section className="py-20">
+      <section id="features" className="py-20 scroll-mt-20">
         <div className="container mx-auto px-6">
           <Reveal className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-krwhite">

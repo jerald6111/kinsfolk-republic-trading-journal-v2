@@ -296,6 +296,8 @@ export function saveData(data: Partial<AppData>){
     // No vault (legacy/unauthenticated) — keep plaintext behaviour.
     localStorage.setItem(KEY, JSON.stringify(merged))
   }
+  // Notify optional listeners (e.g. cloud auto-sync). Harmless if nothing listens.
+  try { window.dispatchEvent(new Event('kr:data-change')) } catch { /* SSR/no-window */ }
 }
 
 /** Load a small, realistic sample dataset so users can preview the app. */

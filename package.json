@@ -1,6 +1,6 @@
 {
   "name": "kinsfolk-republic-trading-journal-v2",
-    "version": "1.5.0",
+  "version": "1.5.0",
   "private": true,
   "scripts": {
     "dev": "vite",
@@ -8,6 +8,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.108.2",
     "framer-motion": "^10.12.16",
     "lucide-react": "^0.268.0",
     "marked": "^5.1.1",

@@ -21,6 +21,14 @@ const DataSettings = lazy(() => import('./pages/DataSettings'))
 const Download = lazy(() => import('./pages/Download'))
 const RiskCalculator = lazy(() => import('./pages/RiskCalculator'))
 
+// Public info pages (no passcode required)
+const Documentation = lazy(() => import('./pages/Documentation'))
+const Changelog = lazy(() => import('./pages/Changelog'))
+const FAQ = lazy(() => import('./pages/FAQ'))
+const Privacy = lazy(() => import('./pages/Privacy'))
+const Terms = lazy(() => import('./pages/Terms'))
+const CookiePolicy = lazy(() => import('./pages/CookiePolicy'))
+
 function PageFallback() {
   return (
     <div className="flex items-center justify-center py-32 text-krmuted">
@@ -45,6 +53,14 @@ export default function App() {
         <Routes>
           {/* Public marketing homepage */}
           <Route path="/" element={<Home />} />
+
+          {/* Public info pages */}
+          <Route path="/docs" element={<Documentation />} />
+          <Route path="/changelog" element={<Changelog />} />
+          <Route path="/faq" element={<FAQ />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/cookies" element={<CookiePolicy />} />
 
           {/* Everything below is gated behind the passcode + rendered in the app shell */}
           <Route element={<Protected />}>

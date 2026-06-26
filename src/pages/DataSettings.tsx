@@ -15,6 +15,7 @@ import {
 import { useCurrency } from '../context/CurrencyContext'
 import Modal from '../components/Modal'
 import SecuritySettings from '../components/SecuritySettings'
+import CloudSync from '../components/CloudSync'
 import { AlertTriangle, Save, Link2, Trash2, Mail, Shield, Download, Send, CheckCircle2, Info, Eye, EyeOff, Settings, Bell, DollarSign, Lock, Database, Plug } from 'lucide-react'
 
 type EmailFrequency = 'disabled' | 'on-add' | 'on-delete' | 'on-change' | 'daily' | 'weekly'
@@ -371,6 +372,9 @@ export default function DataSettings(){
         {/* Backup & Data tab */}
         {tab === 'data' && (
         <>
+        {/* Cloud Sync (optional) */}
+        <CloudSync />
+
         {/* Email Backup Settings */}
         <div className="bg-krcard shadow-soft rounded-xl border border-krborder transition-all duration-200 hover:border-krgold/40 p-5 mb-6">
         <div className="flex items-center justify-between mb-4">
