@@ -114,7 +114,7 @@ export default function CloudSync() {
       if (mode === 'signup') {
         const { needsConfirmation } = await signUp(email.trim(), password, name.trim())
         if (needsConfirmation) {
-          setAuthMsg({ type: 'info', text: `Account created. Check ${email.trim()} to confirm your email, then sign in.` })
+          setAuthMsg({ type: 'info', text: `Please check your email (${email.trim()}) to activate your account, then come back and sign in.` })
           setMode('signin'); setPassword('')
           return
         }
