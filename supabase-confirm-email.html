@@ -1,0 +1,65 @@
+<!--
+  Kinsfolk Republic — "Confirm signup" email template.
+  Paste this into: Supabase → Authentication → Emails → Templates → "Confirm signup" (Message body).
+  Uses the Supabase variable {{ .ConfirmationURL }} for the activation link.
+-->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#0A0B0D; margin:0; padding:0;">
+  <tr>
+    <td align="center" style="padding:32px 16px; font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px; background-color:#111317; border:1px solid #23262D; border-radius:16px;">
+        <!-- Brand -->
+        <tr>
+          <td style="padding:34px 36px 6px 36px;">
+            <table role="presentation" cellpadding="0" cellspacing="0">
+              <tr>
+                <td width="44" height="44" align="center" valign="middle" bgcolor="#E8B341" style="background-color:#E8B341; border-radius:12px; color:#0A0B0D; font-size:17px; font-weight:bold; font-family:Georgia,'Times New Roman',serif;">KR</td>
+                <td style="padding-left:12px; color:#F2F1EC; font-size:18px; font-weight:bold; letter-spacing:-0.3px;">Kinsfolk Republic</td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <!-- Heading + copy -->
+        <tr>
+          <td style="padding:22px 36px 4px 36px;">
+            <h1 style="margin:0 0 12px 0; color:#F2F1EC; font-size:24px; font-weight:800; letter-spacing:-0.5px;">Confirm your email</h1>
+            <p style="margin:0; color:#9097A1; font-size:15px; line-height:1.6;">
+              Welcome to <strong style="color:#F2F1EC;">Kinsfolk Republic Trading Journal</strong>. Confirm your email to activate your account and start syncing your journal securely across devices.
+            </p>
+          </td>
+        </tr>
+        <!-- Button -->
+        <tr>
+          <td align="left" style="padding:24px 36px 6px 36px;">
+            <table role="presentation" cellpadding="0" cellspacing="0">
+              <tr>
+                <td align="center" bgcolor="#E8B341" style="background-color:#E8B341; border-radius:10px;">
+                  <a href="{{ .ConfirmationURL }}" target="_blank" style="display:inline-block; padding:14px 34px; color:#0A0B0D; font-size:15px; font-weight:700; text-decoration:none;">Confirm your email</a>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <!-- Fallback link -->
+        <tr>
+          <td style="padding:14px 36px 0 36px;">
+            <p style="margin:0; color:#6b7280; font-size:12px; line-height:1.6;">
+              Or paste this link into your browser:<br>
+              <a href="{{ .ConfirmationURL }}" target="_blank" style="color:#E8B341; word-break:break-all;">{{ .ConfirmationURL }}</a>
+            </p>
+          </td>
+        </tr>
+        <!-- Footer -->
+        <tr>
+          <td style="padding:26px 36px 32px 36px;">
+            <div style="border-top:1px solid #23262D; padding-top:18px;">
+              <p style="margin:0; color:#6b7280; font-size:12px; line-height:1.6;">
+                If you didn't create a Kinsfolk Republic account, you can safely ignore this email — no account will be created.
+              </p>
+            </div>
+          </td>
+        </tr>
+      </table>
+      <p style="margin:18px 0 0 0; color:#4b5563; font-size:11px;">© 2026 Kinsfolk Republic Trading Journal · Private, on-device trading journal</p>
+    </td>
+  </tr>
+</table>

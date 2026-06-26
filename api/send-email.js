@@ -1,4 +1,4 @@
-const { Resend } = require('resend');
+const nodemailer = require('nodemailer');
 
 module.exports = async (req, res) => {
   // Set CORS headers
@@ -33,12 +33,18 @@ module.exports = async (req, res) => {
     console.log('Email send request - Data length:', dataStr.length);
     console.log('First 200 chars:', dataStr.substring(0, 200));
 
-    // Initialize Resend from the host environment (set RESEND_API_KEY in Vercel).
-    const apiKey = process.env.RESEND_API_KEY;
-    if (!apiKey) {
-      return res.status(500).json({ error: 'Email service is not configured. Set RESEND_API_KEY in your host environment variables.' });
+    // Send via Gmail SMTP (set GMAIL_USER + GMAIL_APP_PASSWORD in your host env vars).
+    const gmailUser = process.env.GMAIL_USER;
+    const gmailPass = process.env.GMAIL_APP_PASSWORD;
+    if (!gmailUser || !gmailPass) {
+      return res.status(500).json({ error: 'Email service is not configured. Set GMAIL_USER and GMAIL_APP_PASSWORD in your host environment variables.' });
     }
-    const resend = new Resend(apiKey);
+    const transporter = nodemailer.createTransport({
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true,
+      auth: { user: gmailUser, pass: gmailPass },
+    });
 
     // Prepare email HTML
     const emailHTML = `
@@ -117,30 +123,18 @@ module.exports = async (req, res) => {
     // Prepare attachment - Resend requires base64 encoding for attachments
     const filename = `trading-journal-backup-${new Date().toISOString().split('T')[0]}.json`;
     
-    // Convert to base64 for proper attachment handling
-    const base64Content = Buffer.from(dataStr, 'utf-8').toString('base64');
-    
-    // Send email with attachment
-    const { data, error } = await resend.emails.send({
-      from: process.env.RESEND_FROM || 'Kinsfolk Republic <onboarding@resend.dev>',
+    // Send email with the JSON backup attached (nodemailer encodes it).
+    const info = await transporter.sendMail({
+      from: `Kinsfolk Republic <${gmailUser}>`,
       to: email,
-      subject: `🔒 Trading Journal Backup - ${new Date().toLocaleDateString()} - Code: ${antiPhishingCode}`,
+      subject: `Trading Journal Backup - ${new Date().toLocaleDateString()} - Code: ${antiPhishingCode}`,
       html: emailHTML,
       attachments: [
-        {
-          filename: filename,
-          content: base64Content,
-          encoding: 'base64'
-        }
+        { filename: filename, content: dataStr, contentType: 'application/json' }
       ]
     });
 
-    if (error) {
-      console.error('Resend API Error:', error);
-      return res.status(400).json({ error: error.message });
-    }
-
-    return res.status(200).json({ success: true, id: data.id });
+    return res.status(200).json({ success: true, id: info.messageId });
 
   } catch (error) {
     console.error('Error sending email:', error);

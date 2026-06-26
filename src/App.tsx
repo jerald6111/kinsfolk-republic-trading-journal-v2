@@ -6,6 +6,7 @@ import LockScreen from './components/LockScreen'
 import { CurrencyProvider } from './context/CurrencyContext'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { ToastProvider } from './components/Toast'
+import AuthNotice from './components/AuthNotice'
 
 // Lazy-load the gated app pages so the public homepage loads fast.
 const VisionBoard = lazy(() => import('./pages/VisionBoard'))
@@ -49,6 +50,7 @@ export default function App() {
     <AuthProvider>
       <ToastProvider>
       <CurrencyProvider>
+        <AuthNotice />
         <Suspense fallback={<PageFallback />}>
         <Routes>
           {/* Public marketing homepage */}
