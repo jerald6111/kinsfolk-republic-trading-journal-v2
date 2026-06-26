@@ -33,8 +33,12 @@ module.exports = async (req, res) => {
     console.log('Email send request - Data length:', dataStr.length);
     console.log('First 200 chars:', dataStr.substring(0, 200));
 
-    // Initialize Resend
-    const resend = new Resend('re_D145aHmt_8nxXgKGfrUwfUeyP34SrujjN');
+    // Initialize Resend from the host environment (set RESEND_API_KEY in Vercel).
+    const apiKey = process.env.RESEND_API_KEY;
+    if (!apiKey) {
+      return res.status(500).json({ error: 'Email service is not configured. Set RESEND_API_KEY in your host environment variables.' });
+    }
+    const resend = new Resend(apiKey);
 
     // Prepare email HTML
     const emailHTML = `
@@ -118,7 +122,7 @@ module.exports = async (req, res) => {
     
     // Send email with attachment
     const { data, error } = await resend.emails.send({
-      from: 'Kinsfolk Republic <kinsfolk.republic@resend.dev>',
+      from: process.env.RESEND_FROM || 'Kinsfolk Republic <onboarding@resend.dev>',
       to: email,
       subject: `🔒 Trading Journal Backup - ${new Date().toLocaleDateString()} - Code: ${antiPhishingCode}`,
       html: emailHTML,
