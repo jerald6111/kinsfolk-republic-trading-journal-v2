@@ -50,6 +50,7 @@ export default function CloudSync() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [showPw, setShowPw] = useState(false)
   const [authBusy, setAuthBusy] = useState(false)
   const [authMsg, setAuthMsg] = useState<Flash | null>(null)
@@ -65,7 +66,11 @@ export default function CloudSync() {
     let t: ReturnType<typeof setTimeout> | null = null
     const onChange = () => {
       if (t) clearTimeout(t)
-      t = setTimeout(() => { pushToCloud().then(() => setLastSync(getLastSync())).catch(() => {}) }, 1500)
+      t = setTimeout(() => {
+        // Never auto-push an empty journal — that could wipe your cloud backup.
+        if (!hasData(loadData())) return
+        pushToCloud().then(() => setLastSync(getLastSync())).catch(() => {})
+      }, 1500)
     }
     window.addEventListener('kr:data-change', onChange)
     return () => { if (t) clearTimeout(t); window.removeEventListener('kr:data-change', onChange) }
@@ -77,7 +82,7 @@ export default function CloudSync() {
   }
 
   const openAuth = (m: 'signin' | 'signup') => {
-    setMode(m); setAuthMsg(null); setPassword(''); setAuthOpen(true)
+    setMode(m); setAuthMsg(null); setPassword(''); setConfirmPassword(''); setAuthOpen(true)
   }
 
   // After a successful signup-with-session or sign-in: turn on auto-sync, then
@@ -87,28 +92,57 @@ export default function CloudSync() {
     setAutoSync(true); setAuto(true)
     try {
       const cloud = await fetchCloudJournal()
-      if (hasData(cloud)) {
-        const localHasData = hasData(loadData())
-        if (!localHasData || window.confirm('Bring your account’s cloud journal to this device? This replaces the journal currently on this device.')) {
+      const cloudHas = hasData(cloud)
+      const localHas = hasData(loadData())
+
+      // Fresh device, account has a cloud journal → restore it automatically.
+      if (cloudHas && !localHas) {
+        saveData(cloud as AppData)
+        flash('ok', greeting + ' Restored your cloud journal — reloading…')
+        setTimeout(() => window.location.reload(), 900)
+        return
+      }
+
+      // Both this device and the cloud have data → let the user choose; never clobber silently.
+      if (cloudHas && localHas) {
+        if (window.confirm(
+          'This account has a cloud journal saved.\n\n' +
+          "OK = load your cloud journal onto this device (replaces what's here).\n" +
+          "Cancel = keep this device's journal and back it up to the cloud."
+        )) {
           saveData(cloud as AppData)
           flash('ok', greeting + ' Restored your cloud journal — reloading…')
           setTimeout(() => window.location.reload(), 900)
           return
         }
-        flash('ok', greeting)
-      } else {
+        await pushToCloud(); setLastSync(getLastSync())
+        flash('ok', greeting + " This device's journal is backed up.")
+        return
+      }
+
+      // Cloud empty but this device has data → first backup.
+      if (!cloudHas && localHas) {
         await pushToCloud(); setLastSync(getLastSync())
         flash('ok', greeting + ' Backed up — your journal will auto-sync.')
+        return
       }
-    } catch {
+
+      // Both empty → nothing to sync. Importantly, never push empty over a cloud backup.
       flash('ok', greeting)
+    } catch {
+      // On any error, do NOT push (it could overwrite your cloud backup with empty).
+      flash('err', 'Signed in, but couldn’t sync just now — use "Restore from cloud" to pull your data.')
     }
   }
 
   const submitAuth = async () => {
     setAuthMsg(null)
-    if (mode === 'signup' && !name.trim()) { setAuthMsg({ type: 'err', text: 'Please enter your name.' }); return }
     if (!email.trim() || !password) { setAuthMsg({ type: 'err', text: 'Enter your email and password.' }); return }
+    if (mode === 'signup') {
+      if (!name.trim()) { setAuthMsg({ type: 'err', text: 'Please enter your name.' }); return }
+      if (password.length < 6) { setAuthMsg({ type: 'err', text: 'Password must be at least 6 characters.' }); return }
+      if (password !== confirmPassword) { setAuthMsg({ type: 'err', text: 'Passwords do not match.' }); return }
+    }
     setAuthBusy(true)
     try {
       if (mode === 'signup') {
@@ -275,6 +309,21 @@ export default function CloudSync() {
               </button>
             </div>
           </div>
+
+          {mode === 'signup' && (
+            <div>
+              <label className="block text-sm font-medium text-krtext mb-1.5">Confirm password</label>
+              <input
+                type={showPw ? 'text' : 'password'} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Re-enter your password" autoComplete="new-password"
+                onKeyDown={(e) => e.key === 'Enter' && submitAuth()}
+                className={`${inputCls} ${confirmPassword && confirmPassword !== password ? 'border-krdanger/60' : ''}`}
+              />
+              {confirmPassword && confirmPassword !== password && (
+                <p className="mt-1.5 text-xs text-krdanger">Passwords don't match.</p>
+              )}
+            </div>
+          )}
 
           {authMsg && <Note msg={authMsg} />}
 

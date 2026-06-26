@@ -31,8 +31,10 @@ export function setAutoSync(on: boolean) {
 }
 
 export async function getCurrentUser(): Promise<SyncUser | null> {
-  const { data } = await supabase.auth.getUser()
-  return toSyncUser(data.user)
+  // Use the local session (reliable immediately after sign-in) rather than a
+  // network getUser() call which can briefly lag behind signInWithPassword.
+  const { data } = await supabase.auth.getSession()
+  return toSyncUser(data.session?.user)
 }
 
 /** Sign up with a display name. If email confirmation is required, no session is returned yet. */
