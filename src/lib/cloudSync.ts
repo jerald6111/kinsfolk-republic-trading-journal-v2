@@ -3,7 +3,13 @@ import { loadData, saveData, type AppData } from '../utils/storage'
 
 export { isSupabaseConfigured }
 
-export type SyncUser = { id: string; email: string }
+export type SyncUser = { id: string; email: string; name?: string }
+
+function toSyncUser(u: { id: string; email?: string | null; user_metadata?: Record<string, any> } | null | undefined): SyncUser | null {
+  if (!u) return null
+  const meta = u.user_metadata || {}
+  return { id: u.id, email: u.email || '', name: meta.full_name || meta.name || '' }
+}
 
 const LAST_SYNC_KEY = 'kr_cloud_last_sync'
 const AUTOSYNC_KEY = 'kr_cloud_autosync'
@@ -26,13 +32,16 @@ export function setAutoSync(on: boolean) {
 
 export async function getCurrentUser(): Promise<SyncUser | null> {
   const { data } = await supabase.auth.getUser()
-  const u = data.user
-  return u ? { id: u.id, email: u.email || '' } : null
+  return toSyncUser(data.user)
 }
 
-/** Sign up. If the project requires email confirmation, no session is returned yet. */
-export async function signUp(email: string, password: string): Promise<{ needsConfirmation: boolean }> {
-  const { data, error } = await supabase.auth.signUp({ email, password })
+/** Sign up with a display name. If email confirmation is required, no session is returned yet. */
+export async function signUp(email: string, password: string, name: string): Promise<{ needsConfirmation: boolean }> {
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: { data: { full_name: name } },
+  })
   if (error) throw error
   return { needsConfirmation: !data.session }
 }
@@ -78,7 +87,7 @@ export async function pullFromCloud(): Promise<AppData | null> {
 /** Subscribe to Supabase auth changes. Returns an unsubscribe function. */
 export function onAuthChange(cb: (user: SyncUser | null) => void): () => void {
   const { data } = supabase.auth.onAuthStateChange((_event, session) => {
-    cb(session?.user ? { id: session.user.id, email: session.user.email || '' } : null)
+    cb(toSyncUser(session?.user))
   })
   return () => data.subscription.unsubscribe()
 }
