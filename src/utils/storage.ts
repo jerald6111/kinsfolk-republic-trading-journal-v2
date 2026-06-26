@@ -40,9 +40,15 @@ function readLegacyPlaintext(): AppData {
   try { return { ...EMPTY, ...JSON.parse(raw) } } catch { return { ...EMPTY } }
 }
 
-/** Create a new encrypted vault from a passcode, migrating any legacy plaintext data. */
-export async function createVault(passcode: string): Promise<void> {
-  const seed = hasLegacyData() ? readLegacyPlaintext() : { ...EMPTY }
+/**
+ * Create a new encrypted vault from a passcode.
+ * If `seedData` is given (e.g. a journal pulled from the cloud on a new device),
+ * the vault is seeded with it; otherwise it migrates any legacy plaintext data.
+ */
+export async function createVault(passcode: string, seedData?: AppData): Promise<void> {
+  const seed: AppData = seedData
+    ? { ...EMPTY, ...seedData }
+    : (hasLegacyData() ? readLegacyPlaintext() : { ...EMPTY })
   const { key, salt } = await deriveNewKey(passcode)
   const payload = await encryptJSON(key, salt, seed)
   localStorage.setItem(SECURE_KEY, JSON.stringify(payload))

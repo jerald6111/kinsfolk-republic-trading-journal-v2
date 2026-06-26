@@ -3,11 +3,18 @@ import { Cloud, UploadCloud, DownloadCloud, LogOut, CheckCircle2, RefreshCw, Eye
 import Modal from './Modal'
 import {
   isSupabaseConfigured, getCurrentUser, onAuthChange,
-  signIn, signUp, signOut, pushToCloud, pullFromCloud,
+  signIn, signUp, signOut, pushToCloud, pullFromCloud, fetchCloudJournal,
   getLastSync, isAutoSyncOn, setAutoSync, type SyncUser,
 } from '../lib/cloudSync'
+import { loadData, saveData, type AppData } from '../utils/storage'
 
 type Flash = { type: 'ok' | 'err' | 'info'; text: string }
+
+/** True if a journal has any actual content. */
+function hasData(d: AppData | null | undefined): boolean {
+  if (!d) return false
+  return Boolean((d.journal?.length || d.vision?.length || d.playbook?.length || d.wallet?.length))
+}
 
 function timeAgo(ts: number | null): string {
   if (!ts) return 'never'
@@ -73,6 +80,31 @@ export default function CloudSync() {
     setMode(m); setAuthMsg(null); setPassword(''); setAuthOpen(true)
   }
 
+  // After a successful signup-with-session or sign-in: turn on auto-sync, then
+  // either pull the account's cloud journal onto this device, or (if the account
+  // has no backup yet) back this device up.
+  const finishAuthSync = async (greeting: string) => {
+    setAutoSync(true); setAuto(true)
+    try {
+      const cloud = await fetchCloudJournal()
+      if (hasData(cloud)) {
+        const localHasData = hasData(loadData())
+        if (!localHasData || window.confirm('Bring your account’s cloud journal to this device? This replaces the journal currently on this device.')) {
+          saveData(cloud as AppData)
+          flash('ok', greeting + ' Restored your cloud journal — reloading…')
+          setTimeout(() => window.location.reload(), 900)
+          return
+        }
+        flash('ok', greeting)
+      } else {
+        await pushToCloud(); setLastSync(getLastSync())
+        flash('ok', greeting + ' Backed up — your journal will auto-sync.')
+      }
+    } catch {
+      flash('ok', greeting)
+    }
+  }
+
   const submitAuth = async () => {
     setAuthMsg(null)
     if (mode === 'signup' && !name.trim()) { setAuthMsg({ type: 'err', text: 'Please enter your name.' }); return }
@@ -82,18 +114,17 @@ export default function CloudSync() {
       if (mode === 'signup') {
         const { needsConfirmation } = await signUp(email.trim(), password, name.trim())
         if (needsConfirmation) {
-          setAuthMsg({ type: 'info', text: `Account created. Check ${email.trim()} to confirm, then sign in.` })
+          setAuthMsg({ type: 'info', text: `Account created. Check ${email.trim()} to confirm your email, then sign in.` })
           setMode('signin'); setPassword('')
           return
         }
-        setAuthOpen(false)
-        flash('ok', `Welcome, ${name.trim()}! Your journal can now sync to the cloud.`)
+        setAuthOpen(false); setPassword('')
+        await finishAuthSync(`Welcome, ${name.trim()}!`)
       } else {
         await signIn(email.trim(), password)
-        setAuthOpen(false)
-        flash('ok', 'Signed in.')
+        setAuthOpen(false); setPassword('')
+        await finishAuthSync('Signed in.')
       }
-      setPassword('')
     } catch (e: any) {
       setAuthMsg({ type: 'err', text: e?.message || 'Something went wrong.' })
     } finally {

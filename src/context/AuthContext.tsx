@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useCallback, useEffect, use
 import {
   hasVault, createVault, unlockVault, lockVault,
   verifyPasscode, changePasscode as changeVaultPasscode,
+  type AppData,
 } from '../utils/storage'
 
 type AuthStatus = 'setup' | 'locked' | 'unlocked'
@@ -23,7 +24,7 @@ export function setAutoLockMinutes(min: number): void {
 
 type AuthContextType = {
   status: AuthStatus
-  createPasscode: (passcode: string) => Promise<void>
+  createPasscode: (passcode: string, seedData?: AppData) => Promise<void>
   unlock: (passcode: string) => Promise<void>
   lock: () => void
   /** Verify the current passcode then re-encrypt under a new one. Throws if old is wrong. */
@@ -35,8 +36,8 @@ const AuthContext = createContext<AuthContextType | null>(null)
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [status, setStatus] = useState<AuthStatus>(() => (hasVault() ? 'locked' : 'setup'))
 
-  const createPasscode = useCallback(async (passcode: string) => {
-    await createVault(passcode)
+  const createPasscode = useCallback(async (passcode: string, seedData?: AppData) => {
+    await createVault(passcode, seedData)
     setStatus('unlocked')
   }, [])
 

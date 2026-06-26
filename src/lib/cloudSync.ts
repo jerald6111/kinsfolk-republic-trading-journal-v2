@@ -67,6 +67,21 @@ export async function pushToCloud(): Promise<void> {
   markSynced()
 }
 
+/** Fetch the cloud journal WITHOUT writing it locally (used on a new device before a vault exists). */
+export async function fetchCloudJournal(): Promise<AppData | null> {
+  const user = await getCurrentUser()
+  if (!user) throw new Error('Please sign in first.')
+  const { data, error } = await supabase
+    .from('journals')
+    .select('data')
+    .eq('user_id', user.id)
+    .maybeSingle()
+  if (error) throw error
+  if (!data) return null
+  markSynced()
+  return (data.data || {}) as AppData
+}
+
 /** Pull the cloud journal and write it into the local (encrypted) store. */
 export async function pullFromCloud(): Promise<AppData | null> {
   const user = await getCurrentUser()
